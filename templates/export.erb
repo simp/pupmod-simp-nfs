@@ -1,0 +1,94 @@
+<% if !@comment.empty? then -%>
+# <%= @comment %>
+<% end -%>
+<%
+# Here's where we build the options string.
+
+t_options = Array.new
+
+if !@custom.empty? then
+  # delete parentheses and spaces
+  t_options = @custom.delete('( )')
+  t_options = "(#{t_options})"
+else
+  if @insecure then
+    t_options.push('insecure')
+  end
+
+  if @rw then
+    t_options.push('rw')
+  end
+
+  if @async then
+    t_options.push('async')
+  else
+    t_options.push('sync')
+  end
+
+  if @no_wdelay then
+    t_options.push('no_wdelay')
+  end
+
+  if @nohide then
+    t_options.push('nohide')
+  end
+
+  if @crossmnt then
+    t_options.push('crossmnt')
+  end
+
+  if @subtree_check then
+    t_options.push('subtree_check')
+  end
+
+  if @insecure_locks then
+    t_options.push('insecure_locks')
+  end
+
+  if @no_acl then
+    t_options.push('no_acl')
+  end
+
+  if !@mountpoint.empty? then
+    t_options.push("mp=#{@mountpoint}")
+  end
+
+  if !@fsid.empty? then
+    t_options.push("fsid=#{@fsid}")
+  end
+  
+  if !@refer.empty? then
+    t_options.push("refer=#{@refer}")
+  end
+
+  t_options.push("sec=#{@sec}")
+
+  if @no_root_squash then
+    t_options.push('no_root_squash')
+  end
+
+  if @all_squash then
+    t_options.push('all_squash')
+  end
+
+  t_options.push("anonuid=#{@anonuid}")
+  t_options.push("anongid=#{@anongid}")
+
+  t_options = "(#{t_options.join(',')})"
+end
+
+t_output = Array.new
+# Put it all together
+t_client = Array(@client.dup).flatten
+t_client.push("127.0.0.1")
+t_client.uniq.sort.each do |cl|
+  if cl == '127.0.0.1' then
+    # Sometimes stunnel will bind on a high port, so we need to account for
+    # that.
+    t_output.push("#{@export_path} #{cl}#{t_options.split(')').first + ',insecure)'}")
+  else
+    t_output.push("#{@export_path} #{cl}#{t_options}")
+  end
+end
+-%>
+<%= t_output.join("\n") %>

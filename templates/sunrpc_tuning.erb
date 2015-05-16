@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+# This file managed by Puppet. Modifications will be overwritten.
+#
+# sunrpc_tuning       Tunes /proc/sys/sunrpc (launched after lockd)
+#
+# chkconfig: 345 15 85
+# description: set values to sunrpc after module is loaded
+# probe: true
+
+case "$1" in
+   start)
+      echo "Setting sunrpc.tcp_slot_table_entries ..."
+      /sbin/sysctl -w sunrpc.tcp_slot_table_entries=<%= @sunrpc_tcp_slot_table_entries %>
+      /sbin/sysctl -w sunrpc.udp_slot_table_entries=<%= @sunrpc_udp_slot_table_entries %>
+      ;;
+   *) ;;
+esac
+

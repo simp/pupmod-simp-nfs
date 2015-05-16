@@ -1,0 +1,92 @@
+<%
+# Variable Validation
+
+if not @verbosity.empty? then
+  if @verbosity !~ /^\d+$/ then
+    raise Puppet::ParseError.new("'$verbosity' must be a digit, got #{@verbosity}")
+  end
+end
+
+['trans_method','gss_methods'].each do |t_to_check|
+  t_eval_check = eval(t_to_check)
+  if not t_eval_check.empty? then
+    t_allowed_methods = [
+      'nsswitch',
+      'static'
+    ]
+
+    if t_eval_check == 'umich_ldap' then
+      raise Puppet::ParseError.new(
+        "Error: '#{t_to_check}' cannot be 'umich_ldap' as it is not yet supported."
+      )
+    end
+    if not t_allowed_methods.include?(t_eval_check) then
+      raise Puppet::ParseError.new(
+        "Error: '#{t_to_check}' must be one of '#{t_allowed_methods.join("','")}'. Got: #{t_eval_check}"
+      )
+    end
+  end
+end
+
+if not (@static_translation.empty? or @static_translation.class.eql?(Hash)) then
+  raise Puppet::ParseError.new(
+    "Error: 'static_translation' must be a Hash."
+  )
+end
+
+# Variable Munging
+
+t_local_realms = @local_realms.dup
+if t_local_realms.is_a?(Array) then
+  t_local_realms = t_local_realms.join(',')
+end
+
+t_method = @trans_method.dup
+if t_method.is_a?(Array) then
+  t_method= t_method.join(',')
+end
+
+t_gss_methods = @gss_methods.dup
+if t_gss_methods.is_a?(Array) then
+  t_gss_methods= t_gss_methods.join(',')
+end
+
+-%>
+# This file is managed by Puppet. Any changes made to the file will be
+# overwritten at the next Puppet run.
+[General]
+
+<% if not @verbosity.empty? then -%>
+Verbosity = <%= @verbosity %>
+<% end -%>
+Domain = <%= @domain %>
+<% if not @local_realms.empty? then -%>
+Local-Realms = <%= @local_realms %>
+<% end -%>
+
+[Mapping]
+
+Nobody-User = <%= @nobody_user %>
+Nobody-Group = <%= @nobody_group %>
+
+[Translation]
+
+Method = <%= t_method %>
+<% if not @gss_methods.empty? then -%>
+GSS-Methods = <%= t_gss_methods %>
+<% end -%>
+
+[Static]
+<% 
+if not @static_translation.empty? then
+  @static_translation.each_pair do |k,v|
+-%>
+<%= k %> = <%= v %>
+<% 
+  end
+end
+-%>
+
+[UMICH_SCHEMA]
+
+# This is not yet supported by the SIMP configuration.

@@ -1,0 +1,18 @@
+---
+fixtures:
+  symlinks:
+    nfs: "#{source_dir}"
+    auditd: "#{source_dir}/../auditd"
+    augeasproviders_core: "#{source_dir}/../augeasproviders_core"
+    augeasproviders_grub: "#{source_dir}/../augeasproviders_grub"
+    augeasproviders_sysctl: "#{source_dir}/../augeasproviders_sysctl"
+    common: "#{source_dir}/../common"
+    concat: "#{source_dir}/../concat"
+    functions: "#{source_dir}/../functions"
+    iptables: "#{source_dir}/../iptables"
+    pki: "#{source_dir}/../pki"
+    stdlib: "#{source_dir}/../stdlib"
+    stunnel: "#{source_dir}/../stunnel"
+    svckill: "#{source_dir}/../svckill"
+    sysctl: "#{source_dir}/../sysctl"
+    tcpwrappers: "#{source_dir}/../tcpwrappers"
