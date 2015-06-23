@@ -179,11 +179,11 @@ class nfs (
   svckill::ignore { 'nfs-rquotad': }
 
   service { $::nfs::service_names::rpcidmapd :
-    ensure      => 'running',
-    enable      => true,
-    hasrestart  => false,
-    hasstatus   => true,
-    start       => "/sbin/service ${::nfs::service_names::rpcidmapd} start;
+    ensure     => 'running',
+    enable     => true,
+    hasrestart => false,
+    hasstatus  => true,
+    start      => "/sbin/service ${::nfs::service_names::rpcidmapd} start;
       if [ \$? -ne 0 ]; then
         /bin/mount | /bin/grep -q 'sunrpc';
         if [ \$? -ne 0 ]; then
@@ -191,7 +191,7 @@ class nfs (
         fi
       fi
       /sbin/service ${::nfs::service_names::rpcidmapd} start;",
-    require     => Package['nfs-utils']
+    require    => Package['nfs-utils']
   }
 
   $nfs_notifies = $is_server ? {
@@ -203,12 +203,12 @@ class nfs (
   }
 
   file { '/etc/sysconfig/nfs':
-    ensure   => 'file',
-    owner    => 'root',
-    group    => 'root',
-    mode     => '0644',
-    content  => template('nfs/nfs_sysconfig.erb'),
-    notify   => $nfs_notifies
+    ensure  => 'file',
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
+    content => template('nfs/nfs_sysconfig.erb'),
+    notify  => $nfs_notifies
   }
 
   if $secure_nfs {

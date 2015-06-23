@@ -69,12 +69,12 @@ class nfs::server::create_home_dirs (
   $syslog_priority = 'LOG_NOTICE',
 ) {
   file { '/etc/cron.hourly/create_home_directories.rb':
-    owner    => 'root',
-    group    => 'root',
-    mode     => '0500',
-    content  => template('nfs/create_home_directories.rb.erb'),
-    notify   => [ Exec['/etc/cron.hourly/create_home_directories.rb'] ],
-    require  => [ Package['ruby-ldap'], File[$export_dir] ],
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0500',
+    content => template('nfs/create_home_directories.rb.erb'),
+    notify  => [ Exec['/etc/cron.hourly/create_home_directories.rb'] ],
+    require => [ Package['ruby-ldap'], File[$export_dir] ],
   }
 
   exec { '/etc/cron.hourly/create_home_directories.rb':
