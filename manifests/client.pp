@@ -41,24 +41,25 @@ class nfs::client (
     dports      => $callback_port
   }
 
-  if ! defined(Sysctl::Value['fs.nfs.nfs_callback_tcpport']) {
-    exec { 'modprobe_nfs':
-      command => '/sbin/modprobe nfs',
-      onlyif  => '/sbin/lsmod | /bin/grep -w nfs; /usr/bin/test $? -ne 0',
-      require => Package['nfs-utils'],
-      notify  => Sysctl::Value['fs.nfs.nfs_callback_tcpport']
-    }
+  exec { 'modprobe_nfs':
+    command => '/sbin/modprobe nfs',
+    unless  => '/sbin/lsmod | /bin/grep -qw nfs',
+    require => [
+      Package['nfs-utils'],
+      File['/etc/modprobe.d/nfs.conf']
+    ],
+    notify  => Sysctl::Value['fs.nfs.nfs_callback_tcpport']
+  }
 
-    sysctl::value { 'fs.nfs.nfs_callback_tcpport':
-      value   => $callback_port
-    }
+  sysctl::value { 'fs.nfs.nfs_callback_tcpport':
+    value   => $callback_port
   }
 
   file { '/etc/modprobe.d/nfs.conf':
     owner   => 'root',
     group   => 'root',
     mode    => '0640',
-    content => "options nfs callback_tcpport=${callback_port}"
+    content => "options nfs callback_tcpport=${callback_port}\n"
   }
 
   if (!empty($use_stunnel) and $use_stunnel) or (!host_is_me($nfs_server) and $nfs::use_stunnel) {

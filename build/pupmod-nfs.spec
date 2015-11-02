@@ -1,7 +1,7 @@
 Summary: NFS Puppet Module
 Name: pupmod-nfs
 Version: 4.1.0
-Release: 12
+Release: 13
 License: Apache License, Version 2.0
 Group: Applications/System
 Source: %{name}-%{version}-%{release}.tar.gz
@@ -62,6 +62,9 @@ fi
 # Post uninstall stuff
 
 %changelog
+* Mon Nov 02 2015 Trevor Vaughan <tvaughan@onyxpoint.com> - 4.1.0-13
+- Updated the dependency chain for the NFS client kernel module load ordering.
+
 * Thu Feb 19 2015 Trevor Vaughan <tvaughan@onyxpoint.com> - 4.1.0-12
 - Migrated to the new 'simp' environment.
 
