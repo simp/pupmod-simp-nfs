@@ -7,7 +7,8 @@ fixtures:
     augeasproviders_grub: "#{source_dir}/../augeasproviders_grub"
     augeasproviders_sysctl: "#{source_dir}/../augeasproviders_sysctl"
     common: "#{source_dir}/../common"
-    concat: "#{source_dir}/../concat"
+    simplib: "#{source_dir}/../simplib"
+    simpcat: "#{source_dir}/../simpcat
     functions: "#{source_dir}/../functions"
     iptables: "#{source_dir}/../iptables"
     pki: "#{source_dir}/../pki"

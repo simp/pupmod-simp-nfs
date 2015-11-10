@@ -1,7 +1,7 @@
 Summary: NFS Puppet Module
 Name: pupmod-nfs
 Version: 4.1.0
-Release: 13
+Release: 14
 License: Apache License, Version 2.0
 Group: Applications/System
 Source: %{name}-%{version}-%{release}.tar.gz
@@ -9,7 +9,8 @@ Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Requires: pupmod-augeasproviders_sysctl
 Requires: pupmod-autofs >= 4.1.0
 Requires: pupmod-common >= 4.1.0-6
-Requires: pupmod-concat >= 4.0.0-0
+Requires: pupmod-simplib >= 1.0.0-0
+Requires: pupmod-simpcat >= 4.0.0-0
 Requires: pupmod-stunnel >= 4.2.0-0
 Requires: pupmod-sysctl >= 4.1.0-2
 Requires: puppet >= 3.3.0
@@ -62,6 +63,9 @@ fi
 # Post uninstall stuff
 
 %changelog
+* Mon Nov 09 2015 Chris Tessmer <chris.tessmer@onypoint.com> - 4.1.0-14
+- migration to simplib and simpcat (lib/ only)
+
 * Mon Nov 02 2015 Trevor Vaughan <tvaughan@onyxpoint.com> - 4.1.0-13
 - Updated the dependency chain for the NFS client kernel module load ordering.
 
@@ -98,7 +102,7 @@ fi
 - Set sysctl sunrpc table entries only if secure_nfs is enabled.  Both
   values depend on the rpcgssd service.
 
-* Sun May 05 2014 Kendall Moore <kmoore@keywcorp.com> - 4.1.0-3
+* Mon May 05 2014 Kendall Moore <kmoore@keywcorp.com> - 4.1.0-3
 - Updated referecnes to newly named global LDAP variables.
 - Refactored /etc/sysconfig/nfs to be managed only once instead of by both server and client.
 
