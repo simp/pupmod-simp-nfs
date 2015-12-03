@@ -34,7 +34,14 @@ class nfs::client (
   $callback_port = '876',
   $use_stunnel = ''
 ) {
+
+  validate_port($callback_port)
+  if !empty($use_stunnel) { validate_bool($use_stunnel) }
+
   include 'nfs'
+  if (!empty($use_stunnel) and $use_stunnel) or (!host_is_me($nfs_server) and $nfs::use_stunnel) {
+    include 'nfs::client::stunnel'
+  }
 
   iptables::add_tcp_stateful_listen { "nfs4_callback_port_${nfs_server}":
     client_nets => $nfs_server,
@@ -61,11 +68,4 @@ class nfs::client (
     mode    => '0640',
     content => "options nfs callback_tcpport=${callback_port}\n"
   }
-
-  if (!empty($use_stunnel) and $use_stunnel) or (!host_is_me($nfs_server) and $nfs::use_stunnel) {
-    include 'nfs::client::stunnel'
-  }
-
-  validate_port($callback_port)
-  if !empty($use_stunnel) { validate_bool($use_stunnel) }
 }

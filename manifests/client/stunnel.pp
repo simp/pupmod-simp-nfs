@@ -39,6 +39,16 @@ class nfs::client::stunnel(
 ) {
   include 'nfs::client'
 
+  validate_integer($version)
+  validate_port($nfs_accept_port)
+  validate_port($nfs_connect_port)
+  validate_port($portmapper_accept_port)
+  validate_port($portmapper_connect_port)
+  validate_port($rquotad_connect_port)
+  validate_port($lockd_connect_port)
+  validate_port($mountd_connect_port)
+  validate_port($statd_connect_port)
+
   # Don't do this if you're running on yourself because, well, it's bad!
   if ! (host_is_me($nfs::nfs_server) or $nfs::is_server){
     include 'stunnel'
@@ -77,14 +87,4 @@ class nfs::client::stunnel(
       }
     }
   }
-
-  validate_integer($version)
-  validate_port($nfs_accept_port)
-  validate_port($nfs_connect_port)
-  validate_port($portmapper_accept_port)
-  validate_port($portmapper_connect_port)
-  validate_port($rquotad_connect_port)
-  validate_port($lockd_connect_port)
-  validate_port($mountd_connect_port)
-  validate_port($statd_connect_port)
 }

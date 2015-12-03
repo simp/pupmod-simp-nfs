@@ -72,12 +72,6 @@ define nfs::server::export (
 ) {
   include 'nfs::server'
 
-  $lname = inline_template('<%= @name.gsub("/","|") -%>')
-
-  concat_fragment { "nfs+$lname.export":
-    content => template('nfs/export.erb')
-  }
-
   validate_bool($insecure)
   validate_bool($rw)
   validate_bool($async)
@@ -89,4 +83,10 @@ define nfs::server::export (
   validate_bool($no_acl)
   validate_bool($no_root_squash)
   validate_bool($all_squash)
+
+  $lname = inline_template('<%= @name.gsub("/","|") -%>')
+
+  concat_fragment { "nfs+${lname}.export":
+    content => template('nfs/export.erb')
+  }
 }

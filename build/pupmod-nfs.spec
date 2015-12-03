@@ -1,14 +1,13 @@
 Summary: NFS Puppet Module
 Name: pupmod-nfs
 Version: 4.1.0
-Release: 14
+Release: 15
 License: Apache License, Version 2.0
 Group: Applications/System
 Source: %{name}-%{version}-%{release}.tar.gz
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Requires: pupmod-augeasproviders_sysctl
 Requires: pupmod-autofs >= 4.1.0
-Requires: pupmod-common >= 4.1.0-6
 Requires: pupmod-simplib >= 1.0.0-0
 Requires: pupmod-simpcat >= 4.0.0-0
 Requires: pupmod-stunnel >= 4.2.0-0
@@ -63,6 +62,12 @@ fi
 # Post uninstall stuff
 
 %changelog
+* Fri Dec 04 2015 Chris Tessmer <chris.tessmer@onyxpoint.com> - 4.1.0-15
+- Replaced all 'lsb*' facts with their (package-independent)
+  'operatingsystem*' counterparts.
+- Normalized common static module assets.
+- Moved parameter validations to the top of each class.
+
 * Mon Nov 09 2015 Chris Tessmer <chris.tessmer@onypoint.com> - 4.1.0-14
 - migration to simplib and simpcat (lib/ only)
 

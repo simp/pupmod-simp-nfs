@@ -49,6 +49,13 @@ class nfs::server::stunnel (
 ) {
   include '::nfs::server'
 
+  validate_port($nfs_accept_port)
+  validate_port($portmapper_accept_port)
+  validate_port($rquotad_accept_port)
+  validate_port($nlockmgr_accept_port)
+  validate_port($mountd_accept_port)
+  validate_port($status_accept_port)
+
   Service['nfs'] -> Service['stunnel']
 
   if $version == '4' {
@@ -108,11 +115,4 @@ class nfs::server::stunnel (
       $status_accept_port
     ]
   }
-
-  validate_port($nfs_accept_port)
-  validate_port($portmapper_accept_port)
-  validate_port($rquotad_accept_port)
-  validate_port($nlockmgr_accept_port)
-  validate_port($mountd_accept_port)
-  validate_port($status_accept_port)
 }

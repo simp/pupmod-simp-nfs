@@ -105,6 +105,10 @@ class nfs::server (
   include 'nfs'
   include 'tcpwrappers'
 
+  validate_net_list($client_ips)
+  validate_integer($sunrpc_udp_slot_table_entries)
+  validate_integer($sunrpc_tcp_slot_table_entries)
+
   concat_build { 'nfs':
     order => '*.export'
   }
@@ -226,8 +230,4 @@ class nfs::server (
     # isn't working correctly.
     tcpwrappers::allow { 'nfs': pattern => 'ALL' }
   }
-
-  validate_net_list($client_ips)
-  validate_integer($sunrpc_udp_slot_table_entries)
-  validate_integer($sunrpc_tcp_slot_table_entries)
 }

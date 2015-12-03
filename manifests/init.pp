@@ -105,6 +105,24 @@ class nfs (
 
   include 'nfs::service_names'
 
+  validate_absolute_path($rquotad)
+  validate_bool($use_stunnel)
+  validate_bool($is_server)
+  validate_bool($is_client)
+  validate_bool($nfsv3)
+  validate_bool($mountd_nfs_v1)
+  validate_bool($mountd_nfs_v2)
+  validate_bool($mountd_nfs_v3)
+  validate_bool($secure_nfs)
+  validate_integer($rpcnfsdcount)
+  validate_integer($nfsd_v4_grace)
+  validate_port($rquotad_port)
+  validate_port($lockd_tcpport)
+  validate_port($lockd_udpport)
+  validate_port($mountd_port)
+  validate_port($statd_port)
+  validate_port($statd_outgoing_port)
+
   if $use_stunnel {
     include 'stunnel'
   }
@@ -224,22 +242,4 @@ class nfs (
   if $is_client {
     include 'nfs::client'
   }
-
-  validate_absolute_path($rquotad)
-  validate_bool($use_stunnel)
-  validate_bool($is_server)
-  validate_bool($is_client)
-  validate_bool($nfsv3)
-  validate_bool($mountd_nfs_v1)
-  validate_bool($mountd_nfs_v2)
-  validate_bool($mountd_nfs_v3)
-  validate_bool($secure_nfs)
-  validate_integer($rpcnfsdcount)
-  validate_integer($nfsd_v4_grace)
-  validate_port($rquotad_port)
-  validate_port($lockd_tcpport)
-  validate_port($lockd_udpport)
-  validate_port($mountd_port)
-  validate_port($statd_port)
-  validate_port($statd_outgoing_port)
 }
