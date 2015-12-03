@@ -68,6 +68,14 @@ class nfs::server::create_home_dirs (
   $syslog_facility = 'LOG_LOCAL6',
   $syslog_priority = 'LOG_NOTICE',
 ) {
+
+  validate_absolute_path($export_dir)
+  validate_absolute_path($skel_dir)
+  validate_array_member($ldap_scope, ['one','sub','base'])
+  validate_port($port)
+  validate_bool($tls)
+  validate_bool($quiet)
+
   file { '/etc/cron.hourly/create_home_directories.rb':
     owner   => 'root',
     group   => 'root',
@@ -80,11 +88,4 @@ class nfs::server::create_home_dirs (
   exec { '/etc/cron.hourly/create_home_directories.rb':
     refreshonly => true,
   }
-
-  validate_absolute_path($export_dir)
-  validate_absolute_path($skel_dir)
-  validate_array_member($ldap_scope, ['one','sub','base'])
-  validate_port($port)
-  validate_bool($tls)
-  validate_bool($quiet)
 }

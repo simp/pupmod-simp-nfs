@@ -12,13 +12,13 @@ describe 'nfs::server::create_home_dirs' do
     :hardwaremodel => 'x86_64',
     :interfaces => 'lo',
     :ipaddress_lo => '127.0.0.1',
-    :lsbmajdistrelease => '6',
+    :operatingsystemmajrelease => '6',
     :operatingsystem => 'RedHat',
     :operatingsystemmajrelease => '6',
     :processorcount => 4,
     :uid_min => '500'
   }}
 
-  it { should create_class('nfs::server::create_home_dirs') }
-  it { should create_file('/etc/cron.hourly/create_home_directories.rb') }
+  it { is_expected.to create_class('nfs::server::create_home_dirs') }
+  it { is_expected.to create_file('/etc/cron.hourly/create_home_directories.rb') }
 end

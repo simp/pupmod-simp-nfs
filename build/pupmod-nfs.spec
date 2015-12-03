@@ -8,7 +8,6 @@ Source: %{name}-%{version}-%{release}.tar.gz
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Requires: pupmod-augeasproviders_sysctl
 Requires: pupmod-autofs >= 4.1.0
-Requires: pupmod-common >= 4.1.0-6
 Requires: pupmod-simplib >= 1.0.0-0
 Requires: pupmod-simpcat >= 4.0.0-0
 Requires: pupmod-stunnel >= 4.2.0-0

@@ -1,0 +1,53 @@
+{
+  "name":    "simp-nfs",
+  "version": "4.1.0",
+  "author":  "simp",
+  "summary": "manages NFS server and client, also PKI and stunnelling",
+  "license": "Apache-2.0",
+  "source":  "https://github.com/simp/pupmod-simp-nfs",
+  "project_page": "https://github.com/simp/pupmod-simp-nfs",
+  "issues_url":   "https://simp-project.atlassian.net",
+  "tags": [ "simp", "nfs", "nfs4", "pki" ],
+  "dependencies": [
+    {
+      "name": "simp-autofs",
+      "version_requirement": ">= 4.1.0"
+    },
+    {
+      "name": "herculesteam/augeasproviders_sysctl",
+      "version_requirement": ">= 2.0.2"
+    },
+    {
+      "name": "simp-simpcat",
+      "version_requirement": ">= 3.4.0"
+    },
+    {
+      "name": "simp-simplib",
+      "version_requirement": ">= 1.0.0"
+    },
+    {
+      "name": "simp-stunnel",
+      "version_requirement": ">= 4.2.0"
+    },
+    {
+      "name": "simp-sysctl",
+      "version_requirement": ">= 4.1.0"
+    }
+  ],
+  "operatingsystem_support": [
+    {
+      "operatingsystem": "CentOS",
+      "operatingsystemrelease": [
+        "6",
+        "7"
+      ]
+    },
+    {
+      "operatingsystem": "RedHat",
+      "operatingsystemrelease": [
+        "6",
+        "7"
+      ]
+    }
+  ]
+}

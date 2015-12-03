@@ -1,3 +1,7 @@
+# == Class: nfs::service_names
+#
+# This class provides appropriate service names based on the operating system.
+#
 class nfs::service_names {
   if $::operatingsystem in ['RedHat', 'CentOS'] {
     $rpcbind   = 'rpcbind'
