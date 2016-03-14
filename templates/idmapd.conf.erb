@@ -8,7 +8,7 @@ if not @verbosity.empty? then
 end
 
 ['trans_method','gss_methods'].each do |t_to_check|
-  t_eval_check = eval(t_to_check)
+  t_eval_check = eval("@#{t_to_check}")
   if not t_eval_check.empty? then
     t_allowed_methods = [
       'nsswitch',

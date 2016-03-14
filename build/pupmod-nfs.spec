@@ -1,7 +1,7 @@
 Summary: NFS Puppet Module
 Name: pupmod-nfs
-Version: 4.1.0
-Release: 15
+Version: 4.2.0
+Release: 0
 License: Apache License, Version 2.0
 Group: Applications/System
 Source: %{name}-%{version}-%{release}.tar.gz
@@ -17,7 +17,7 @@ Buildarch: noarch
 Requires: simp-bootstrap >= 4.2.0
 Obsoletes: pupmod-nfs-test
 
-Prefix: /etc/puppet/environments/simp/modules
+Prefix: %{_sysconfdir}/puppet/environments/simp/modules
 
 %description
 This puppet module supports the configuration of NFS.
@@ -62,6 +62,10 @@ fi
 # Post uninstall stuff
 
 %changelog
+* Mon Mar 14 2016 Trevor Vaughan <tvaughan@onyxpoint.com> - 4.2.0-0
+- Updated to Semantic Versioning
+- Fixed the 'eval' variables in the templates
+
 * Fri Dec 04 2015 Chris Tessmer <chris.tessmer@onyxpoint.com> - 4.1.0-15
 - Replaced all 'lsb*' facts with their (package-independent)
   'operatingsystem*' counterparts.

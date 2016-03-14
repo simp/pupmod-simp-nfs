@@ -16,5 +16,6 @@ fixtures:
     svckill: "git://github.com/simp/pupmod-simp-svckill"
     sysctl: "git://github.com/simp/pupmod-simp-sysctl"
     tcpwrappers: "git://github.com/simp/pupmod-simp-tcpwrappers"
+    compliance_markup: "https://github.com/trevor-vaughan/pupmod-compliance"
   symlinks:
     nfs: "#{source_dir}"

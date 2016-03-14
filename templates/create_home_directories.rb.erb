@@ -6,7 +6,7 @@
     'default' => 'LDAP::LDAP_SCOPE_BASE'
   }
 
-  SCOPE_MAPPING[ldap_scope] ? t_scope = SCOPE_MAPPING[ldap_scope] : t_scope = SCOPE_MAPPING
+  SCOPE_MAPPING[@ldap_scope] ? t_scope = SCOPE_MAPPING[@ldap_scope] : t_scope = SCOPE_MAPPING
 -%>
 require 'fileutils'
 require 'ldap'
@@ -66,7 +66,7 @@ servers.each do |svr|
   begin
     Timeout::timeout(tmout) do
       begin
-        s = TCPSocket.new(svr,<%= port %>)
+        s = TCPSocket.new(svr,<%= @port %>)
         s.close
       rescue Errno::ECONNREFUSED, Effno::EHOSTUNREACH
         raise Exception

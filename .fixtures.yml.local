@@ -17,3 +17,4 @@ fixtures:
     svckill: "#{source_dir}/../svckill"
     sysctl: "#{source_dir}/../sysctl"
     tcpwrappers: "#{source_dir}/../tcpwrappers"
+    compliance_markup: "#{source_dir}/../compliance_markup"
