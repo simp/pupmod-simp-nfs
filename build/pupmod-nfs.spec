@@ -62,6 +62,10 @@ fi
 # Post uninstall stuff
 
 %changelog
+* Wed Mar 16 2016 Nick Markowski <nmarkowski@keywcorp.com> - 4.2.0-0
+- Added an lvm2 class to ensure nfs-utils can upgrade.  This class
+  should be removed once the bug is fixed upstream.
+
 * Mon Mar 14 2016 Trevor Vaughan <tvaughan@onyxpoint.com> - 4.2.0-0
 - Updated to Semantic Versioning
 - Fixed the 'eval' variables in the templates
