@@ -80,6 +80,7 @@ end
 t_output = Array.new
 # Put it all together
 t_client = Array(@client.dup).flatten
+t_client.map! { |cl| (['ALL','all','ANY','any'].include? cl) ? '*' : cl }.flatten!
 t_client.push("127.0.0.1")
 t_client.uniq.sort.each do |cl|
   if cl == '127.0.0.1' then

@@ -1,6 +1,6 @@
 Summary: NFS Puppet Module
 Name: pupmod-nfs
-Version: 4.2.0
+Version: 4.2.1
 Release: 0
 License: Apache License, Version 2.0
 Group: Applications/System
@@ -62,6 +62,9 @@ fi
 # Post uninstall stuff
 
 %changelog
+* Thu Mar 17 2016 Nick Markowski <nmarkowski@keywcorp.com> - 4.2.1-0
+- Updated the exports template to convert clients 'all' or 'any' to '*'
+
 * Mon Mar 14 2016 Trevor Vaughan <tvaughan@onyxpoint.com> - 4.2.0-0
 - Updated to Semantic Versioning
 - Fixed the 'eval' variables in the templates
