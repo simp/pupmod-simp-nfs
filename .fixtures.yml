@@ -2,9 +2,15 @@
 fixtures:
   repositories:
     auditd: "git://github.com/simp/pupmod-simp-auditd"
-    augeasproviders_core: "git://github.com/simp/augeasproviders_core"
-    augeasproviders_grub: "git://github.com/simp/augeasproviders_grub"
-    augeasproviders_sysctl: "git://github.com/simp/augeasproviders_sysctl"
+    augeasproviders_core:
+      repo: "git://github.com/simp/augeasproviders_core"
+      branch: "simp-master"
+    augeasproviders_grub:
+      repo: "git://github.com/simp/augeasproviders_grub"
+      branch: "simp-master"
+    augeasproviders_sysctl:
+      repo: "git://github.com/simp/augeasproviders_sysctl"
+      branch: "simp-master"
     common: "git://github.com/simp/pupmod-simp-common"
     simplib: "git://github.com/simp/pupmod-simp-simplib"
     simpcat: "git://github.com/simp/pupmod-simp-concat"
