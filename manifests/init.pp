@@ -76,6 +76,11 @@
 #   Default: true
 #   Enable secure NFS mounts.
 #
+# [*ensure_lvm2_latest*]
+#   Accepts: Boolean
+#   Default: true
+#   See nfs::lvm2 for further description.
+#
 # == Authors
 #
 # * Trevor Vaughan <mailto:tvaughan@onyxpoint.com>
@@ -100,7 +105,8 @@ class nfs (
   $mountd_port = '20048',
   $statd_port = '662',
   $statd_outgoing_port = '2020',
-  $secure_nfs = true
+  $secure_nfs = true,
+  $ensure_lvm2_latest = true
 ){
 
   include 'nfs::service_names'
@@ -122,9 +128,14 @@ class nfs (
   validate_port($mountd_port)
   validate_port($statd_port)
   validate_port($statd_outgoing_port)
+  validate_bool($ensure_lvm2_latest)
 
   if $use_stunnel {
     include 'stunnel'
+  }
+
+  if $ensure_lvm2_latest {
+    include 'nfs::lvm2'
   }
 
   if host_is_me($server) or $is_server {
@@ -152,8 +163,10 @@ class nfs (
     }
   }
 
+  $nfs_utils_require =  $ensure_lvm2_latest ? {true => Class['nfs::lvm2'], default => 'nil'}
   package { 'nfs-utils':
-    ensure => 'latest'
+    ensure  => 'latest',
+    require => $nfs_utils_require
   }
 
   package { 'nfs4-acl-tools':
