@@ -6,7 +6,7 @@ class nfs::service_names {
   if $::operatingsystem in ['RedHat', 'CentOS'] {
     $rpcbind   = 'rpcbind'
 
-    if versioncmp($::operatingsystemmajrelease,'7') < 0 {
+    if (versioncmp($::operatingsystemrelease,'6.7') < 0) {
       $nfs_lock    = 'nfslock'
       $nfs_server  = 'nfs'
       $rpcgssd     = 'rpcgssd'

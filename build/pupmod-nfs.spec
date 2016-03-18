@@ -1,7 +1,7 @@
 Summary: NFS Puppet Module
 Name: pupmod-nfs
-Version: 4.3.0
-Release: 1
+Version: 4.4.0
+Release: 0
 License: Apache License, Version 2.0
 Group: Applications/System
 Source: %{name}-%{version}-%{release}.tar.gz
@@ -62,7 +62,10 @@ fi
 # Post uninstall stuff
 
 %changelog
-* Thu Mar 18 2016 Nick Markowski <nmarkowski@keywcorp.com> - 4.3.0-1
+* Fri Mar 18 2016 Nick Markowski <nmarkowski@keywcorp.com> - 4.4.0-0
+- Ensure that EL6.7+ uses SSSD over NSCD.
+
+* Fri Mar 18 2016 Nick Markowski <nmarkowski@keywcorp.com> - 4.3.0-1
 - Updated the augeas fixtures to reference the simp-master branch.
 
 * Thu Mar 17 2016 Nick Markowski <nmarkowski@keywcorp.com> - 4.3.0-0
