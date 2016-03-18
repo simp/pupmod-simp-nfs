@@ -32,7 +32,11 @@ describe 'nfs' do
     it { is_expected.to create_class('nfs') }
     it { is_expected.to compile.with_all_deps }
     it { is_expected.to create_file('/etc/exports') }
-    it { is_expected.to contain_package('nfs-utils').with_ensure('latest') }
+    it { is_expected.to contain_package('nfs-utils').with({
+        :ensure  => 'latest',
+        :require => 'Class[Nfs::Lvm2]'
+      })
+    }
     it { is_expected.to contain_package('nfs4-acl-tools').with_ensure('latest') }
     it { is_expected.to contain_service('nfslock').with({
         :ensure  => 'running',
