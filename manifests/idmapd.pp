@@ -47,7 +47,7 @@ class nfs::idmapd (
   $gss_methods = '',
   $static_translation = ''
 ) {
-  include 'nfs'
+  include '::nfs'
 
   file { '/etc/idmapd.conf':
     owner   => 'root',

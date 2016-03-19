@@ -109,7 +109,7 @@ class nfs (
   $ensure_lvm2_latest = true
 ){
 
-  include 'nfs::service_names'
+  include '::nfs::service_names'
 
   validate_absolute_path($rquotad)
   validate_bool($use_stunnel)
@@ -131,15 +131,15 @@ class nfs (
   validate_bool($ensure_lvm2_latest)
 
   if $use_stunnel {
-    include 'stunnel'
+    include '::stunnel'
   }
 
   if $ensure_lvm2_latest {
-    include 'nfs::lvm2'
+    include '::nfs::lvm2'
   }
 
   if host_is_me($server) or $is_server {
-    include 'nfs::server'
+    include '::nfs::server'
 
     file { '/etc/exports':
       ensure    => 'file',
@@ -149,7 +149,7 @@ class nfs (
       content   => undef,
       source    => concat_output('nfs'),
       subscribe => Concat_build['nfs'],
-      audit     => content,
+      audit     => 'content',
       notify    => Exec['nfs_re-export']
     }
   }
@@ -253,6 +253,6 @@ class nfs (
   }
 
   if $is_client {
-    include 'nfs::client'
+    include '::nfs::client'
   }
 }

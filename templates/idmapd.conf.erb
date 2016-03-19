@@ -77,12 +77,12 @@ GSS-Methods = <%= t_gss_methods %>
 <% end -%>
 
 [Static]
-<% 
+<%
 if not @static_translation.empty? then
   @static_translation.each_pair do |k,v|
 -%>
 <%= k %> = <%= v %>
-<% 
+<%
   end
 end
 -%>

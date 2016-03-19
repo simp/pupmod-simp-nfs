@@ -48,6 +48,7 @@ class nfs::server::stunnel (
   $status_accept_port = '6620'
 ) {
   include '::nfs::server'
+  include '::stunnel'
 
   validate_port($nfs_accept_port)
   validate_port($portmapper_accept_port)
@@ -56,7 +57,7 @@ class nfs::server::stunnel (
   validate_port($mountd_accept_port)
   validate_port($status_accept_port)
 
-  Service['nfs'] -> Service['stunnel']
+  Service[$::nfs::service_names::nfs_server] -> Service['stunnel']
 
   if $version == '4' {
     stunnel::add { 'nfs':
