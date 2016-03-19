@@ -38,9 +38,9 @@ class nfs::client (
   validate_port($callback_port)
   if !empty($use_stunnel) { validate_bool($use_stunnel) }
 
-  include 'nfs'
-  if (!empty($use_stunnel) and $use_stunnel) or (!host_is_me($nfs_server) and $nfs::use_stunnel) {
-    include 'nfs::client::stunnel'
+  include '::nfs'
+  if (!empty($use_stunnel) and $use_stunnel) or (!host_is_me($nfs_server) and $::nfs::use_stunnel) {
+    include '::nfs::client::stunnel'
   }
 
   iptables::add_tcp_stateful_listen { "nfs4_callback_port_${nfs_server}":
@@ -59,7 +59,8 @@ class nfs::client (
   }
 
   sysctl::value { 'fs.nfs.nfs_callback_tcpport':
-    value   => $callback_port
+    value  => $callback_port,
+    silent => true,
   }
 
   file { '/etc/modprobe.d/nfs.conf':

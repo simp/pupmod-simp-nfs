@@ -1,6 +1,6 @@
 Summary: NFS Puppet Module
 Name: pupmod-nfs
-Version: 4.4.0
+Version: 4.4.1
 Release: 0
 License: Apache License, Version 2.0
 Group: Applications/System
@@ -62,6 +62,10 @@ fi
 # Post uninstall stuff
 
 %changelog
+* Sat Mar 19 2016 Trevor Vaughan <tvaughan@onyxpoint.com> - 4.4.1-0
+- Several bug fixes that ensure that the module will work without being bound
+  to a Puppet master.
+
 * Fri Mar 18 2016 Nick Markowski <nmarkowski@keywcorp.com> - 4.4.0-0
 - Ensure that EL6.7+ uses SSSD over NSCD.
 

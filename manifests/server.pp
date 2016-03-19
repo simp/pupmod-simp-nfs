@@ -102,8 +102,8 @@ class nfs::server (
   $sunrpc_udp_slot_table_entries = '128',
   $sunrpc_tcp_slot_table_entries = '128'
 ){
-  include 'nfs'
-  include 'tcpwrappers'
+  include '::nfs'
+  include '::tcpwrappers'
 
   validate_net_list($client_ips)
   validate_integer($sunrpc_udp_slot_table_entries)
@@ -138,32 +138,32 @@ class nfs::server (
   }
 
   # $stunnel_port_override is a value that is set by the stunnel overlay.
-  if $nfs::server::stunnel::stunnel_port_override {
+  if $::nfs::server::stunnel::stunnel_port_override {
     iptables::add_tcp_stateful_listen { 'nfs_client_tcp_ports':
       client_nets => $client_ips,
-      dports      => $nfs::server::stunnel::stunnel_port_override
+      dports      => $::nfs::server::stunnel::stunnel_port_override
     }
     iptables::add_udp_listen { 'nfs_client_udp_ports':
       client_nets => $client_ips,
-      dports      => $nfs::server::stunnel::stunnel_port_override
+      dports      => $::nfs::server::stunnel::stunnel_port_override
     }
   }
   else {
-    if ( $nfs::mountd_nfs_v2 ) or ( $nfs::mountd_nfs_v3 ) {
+    if ( $::nfs::mountd_nfs_v2 ) or ( $::nfs::mountd_nfs_v3 ) {
       $lports = [
         '111',
         '2049',
-        $nfs::rquotad_port,
-        $nfs::lockd_tcpport,
-        $nfs::mountd_port,
-        $nfs::statd_port
+        $::nfs::rquotad_port,
+        $::nfs::lockd_tcpport,
+        $::nfs::mountd_port,
+        $::nfs::statd_port
       ] # <-- End ports
     }
     else {
       $lports = [
         '111',
         '2049',
-        $nfs::rquotad_port
+        $::nfs::rquotad_port
       ]
     }
 
@@ -193,9 +193,10 @@ class nfs::server (
     require => File['/etc/init.d/sunrpc_tuning']
   }
 
-  if $nfs::secure_nfs {
+  if $::nfs::secure_nfs {
     sysctl::value { 'sunrpc.tcp_slot_table_entries':
       value   => $sunrpc_tcp_slot_table_entries,
+      silent  => true,
       notify  => [
         Service[$::nfs::service_names::nfs_server],
         Service[$::nfs::service_names::nfs_lock],
@@ -205,6 +206,7 @@ class nfs::server (
 
     sysctl::value { 'sunrpc.udp_slot_table_entries':
       value   => $sunrpc_udp_slot_table_entries,
+      silent  => true,
       notify  => [
         Service[$::nfs::service_names::nfs_server],
         Service[$::nfs::service_names::nfs_lock],
@@ -223,8 +225,8 @@ class nfs::server (
     pattern => $client_ips
   }
 
-  if $nfs::use_stunnel {
-    include 'nfs::server::stunnel'
+  if $::nfs::use_stunnel {
+    include '::nfs::server::stunnel'
 
     # This is here due to some bug where allowing things through regularly
     # isn't working correctly.
