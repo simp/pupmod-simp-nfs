@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a6ced46_725ca626",
+        "filename": "manifests/server.pp",
+        "patchSetId": 1
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1005194
+      },
+      "writtenOn": "2016-03-22T14:27:18Z",
+      "side": 1,
+      "message": "This will always equate to true and is included properly at the end of the manifest",
+      "range": {
+        "startLine": 108,
+        "startChar": 0,
+        "endLine": 110,
+        "endChar": 3
+      },
+      "revId": "170059a19658c505ca3dffeeb6eda072e9000273",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a6ced46_b23d3ebe",
+        "filename": "spec/classes/init_spec.rb",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1005194
+      },
+      "writtenOn": "2016-03-22T14:27:18Z",
+      "side": 1,
+      "message": "These have el7 equivalents which need to be accounted for",
+      "range": {
+        "startLine": 19,
+        "startChar": 10,
+        "endLine": 37,
+        "endChar": 14
+      },
+      "revId": "170059a19658c505ca3dffeeb6eda072e9000273",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
