@@ -1,6 +1,6 @@
 {
   "name":    "simp-nfs",
-  "version": "4.4.1",
+  "version": "4.4.2",
   "author":  "simp",
   "summary": "manages NFS server and client, also PKI and stunnelling",
   "license": "Apache-2.0",
@@ -10,7 +10,7 @@
   "tags": [ "simp", "nfs", "nfs4", "pki" ],
   "dependencies": [
     {
-      "name": "simp-autofs",
+      "name": "simp/autofs",
       "version_requirement": ">= 4.1.0"
     },
     {
@@ -18,19 +18,19 @@
       "version_requirement": ">= 2.0.2"
     },
     {
-      "name": "simp-simpcat",
+      "name": "simp/simpcat",
       "version_requirement": ">= 3.4.0"
     },
     {
-      "name": "simp-simplib",
+      "name": "simp/simplib",
       "version_requirement": ">= 1.0.0"
     },
     {
-      "name": "simp-stunnel",
+      "name": "simp/stunnel",
       "version_requirement": ">= 4.2.0"
     },
     {
-      "name": "simp-sysctl",
+      "name": "simp/sysctl",
       "version_requirement": ">= 4.1.0"
     }
   ],

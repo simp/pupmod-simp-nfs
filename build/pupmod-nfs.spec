@@ -1,6 +1,6 @@
 Summary: NFS Puppet Module
 Name: pupmod-nfs
-Version: 4.4.1
+Version: 4.4.2
 Release: 0
 License: Apache License, Version 2.0
 Group: Applications/System
@@ -62,6 +62,10 @@ fi
 # Post uninstall stuff
 
 %changelog
+* Wed Mar 23 2016 Trevor Vaughan <tvaughan@onyxpoint.com> - 4.4.2-0
+- Minor bug fix to ensure that $::nfs::stunnel variables are not called if the
+  module is not using stunnel.
+
 * Sat Mar 19 2016 Trevor Vaughan <tvaughan@onyxpoint.com> - 4.4.1-0
 - Several bug fixes that ensure that the module will work without being bound
   to a Puppet master.

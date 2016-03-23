@@ -138,7 +138,7 @@ class nfs::server (
   }
 
   # $stunnel_port_override is a value that is set by the stunnel overlay.
-  if $::nfs::server::stunnel::stunnel_port_override {
+  if $::nfs::use_stunnel and $::nfs::server::stunnel::stunnel_port_override {
     iptables::add_tcp_stateful_listen { 'nfs_client_tcp_ports':
       client_nets => $client_ips,
       dports      => $::nfs::server::stunnel::stunnel_port_override
