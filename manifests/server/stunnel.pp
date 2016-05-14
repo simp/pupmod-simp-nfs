@@ -38,6 +38,7 @@
 #
 class nfs::server::stunnel (
   $version = '4',
+  # FIXME: this shou;ld probably be a private class
   $client_ips = $::nfs::server::client_ips,
   $nfs_accept_address = '0.0.0.0',
   $nfs_accept_port = '20490',
