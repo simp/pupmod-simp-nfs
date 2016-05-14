@@ -1,13 +1,18 @@
 {
-  "name":    "simp-nfs",
-  "version": "4.4.2",
-  "author":  "simp",
+  "name": "simp-nfs",
+  "version": "4.4.3",
+  "author": "simp",
   "summary": "manages NFS server and client, also PKI and stunnelling",
   "license": "Apache-2.0",
-  "source":  "https://github.com/simp/pupmod-simp-nfs",
+  "source": "https://github.com/simp/pupmod-simp-nfs",
   "project_page": "https://github.com/simp/pupmod-simp-nfs",
-  "issues_url":   "https://simp-project.atlassian.net",
-  "tags": [ "simp", "nfs", "nfs4", "pki" ],
+  "issues_url": "https://simp-project.atlassian.net",
+  "tags": [
+    "simp",
+    "nfs",
+    "nfs4",
+    "pki"
+  ],
   "dependencies": [
     {
       "name": "simp/autofs",
