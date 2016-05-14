@@ -1,6 +1,6 @@
 Summary: NFS Puppet Module
 Name: pupmod-nfs
-Version: 4.4.2
+Version: 4.4.3
 Release: 0
 License: Apache License, Version 2.0
 Group: Applications/System
@@ -62,6 +62,9 @@ fi
 # Post uninstall stuff
 
 %changelog
+* Mon May 16 2016 Chris Tessmer <chris.tessmer@onyxpoint.com> - 4.4.3
+- Sanitized cross-class variables for 'STRICT_VARIABLES=yes'
+
 * Wed Mar 23 2016 Trevor Vaughan <tvaughan@onyxpoint.com> - 4.4.2-0
 - Minor bug fix to ensure that $::nfs::stunnel variables are not called if the
   module is not using stunnel.

@@ -50,7 +50,8 @@ class nfs::client::stunnel(
   validate_port($statd_connect_port)
 
   # Don't do this if you're running on yourself because, well, it's bad!
-  if ! (host_is_me($::nfs::nfs_server) or $::nfs::is_server){
+  if ! ((defined('$::nfs::nfs_server') and host_is_me(getvar('::nfs::nfs_server'))) or
+        (defined('$::nfs::is_server') and getvar('::nfs::is_server'))) {
     include '::stunnel'
 
     if $version == '4' {
