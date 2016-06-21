@@ -11,14 +11,19 @@ class nfs::service_names {
       $nfs_server  = 'nfs'
       $rpcgssd     = 'rpcgssd'
       $rpcidmapd   = 'rpcidmapd'
+      $rpcsvcgssd  = 'rpcsvcgssd'
     }
     else {
-      $nfs_lock    = 'nfs-lock'
+      $nfs_lock    = 'rpc-statd'
       $nfs_mountd  = 'nfs-mountd'
       $nfs_rquotad = 'nfs-rquotad'
       $nfs_server  = 'nfs-server'
-      $rpcgssd     = 'nfs-secure'
-      $rpcidmapd   = 'nfs-idmap'
+      $rpcidmapd   = 'nfs-idmapd'
+      $rpcsvcgssd  = 'rpc-svcgssd'
+      $rpcgssd     = 'rpc-gssd'
     }
+  }
+  else {
+    fail("Operating System '${::operatingsystem}' is not supported by ${module_name}")
   }
 }
