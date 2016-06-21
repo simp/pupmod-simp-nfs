@@ -47,7 +47,6 @@ class nfs::idmapd (
   $gss_methods = '',
   $static_translation = ''
 ) {
-  include '::nfs'
 
   file { '/etc/idmapd.conf':
     owner   => 'root',
@@ -55,5 +54,22 @@ class nfs::idmapd (
     mode    => '0644',
     content => template('nfs/idmapd.conf.erb'),
     notify  => Service[$::nfs::service_names::rpcidmapd]
+  }
+
+  service { $::nfs::service_names::rpcidmapd :
+    ensure     => 'running',
+    enable     => true,
+    hasrestart => false,
+    hasstatus  => true,
+    start      => "/sbin/service ${::nfs::service_names::rpcidmapd} start;
+      if [ \$? -ne 0 ]; then
+        /bin/mount | /bin/grep -q 'sunrpc';
+        if [ \$? -ne 0 ]; then
+          /bin/mount -t rpc_pipefs sunrpc /var/lib/nfs/rpc_pipefs;
+        fi
+      fi
+      /sbin/service ${::nfs::service_names::rpcidmapd} start;",
+    require    => Package['nfs-utils'],
+    subscribe  => File['/etc/sysconfig/nfs']
   }
 }

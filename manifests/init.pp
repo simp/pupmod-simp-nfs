@@ -1,93 +1,66 @@
-# == Class: nfs
-#
 # Provides the base segments for NFS server *and* client services.
 #
-# == Parameters
+# @param use_stunnel [Boolean] If set, wrap stunnel around the NFS server
+#   connections. This is ideally suited for environments without a working
+#   Kerberos setup. However, they can be used synchronously.
 #
-# [*mountd_nfs_v1*]
-#   Accepts: true|false
-#   Default: true
-#   Whether or not to act as an NFSv1 server. Due to current issues in
-#   RHEL/CentOS this must be set to 'yes' to properly unmount.
+# @param is_server [Boolean] Explicitly state that this system should be an NFS
+#   server. Further configuration will need to be made via the `nfs::server`
+#   classes.
 #
-# [*mountd_nfs_v2*]
-#   Accepts: true|false
-#   Default: false
-#   Whether or not to act as an NFSv2 server.
+# @param is_client [Boolean] Explicitly stat that this system should be an NFS
+#   client. Further configuration will need to be made via the `nfs::client`
+#   classes.
 #
-# [*mountd_nfs_v3*]
-#   Accepts: true|false
-#   Default: false
-#   Whether or not to act as an NFSv3 server.
+# @param mountd_nfs_v1 [Boolean] Whether or not to act as an NFSv1 server. Due
+#   to current issues in RHEL/CentOS this must be set to 'yes' to properly
+#   unmount.
 #
-# [*rquotad*]
-#   Accepts: Fully Qualified Path
-#   Default: '/usr/sbin/rpc/rquotad'
-#   The path to the rquotad executable.
+# @param mountd_nfs_v2 [Boolean] Whether or not to act as an NFSv2 server.
 #
-# [*rquotad_port*]
-#   Accepts: Integer
-#   Default: '875'
-#   The port upon which rquotad should listen.
+# @param mountd_nfs_v3 [Boolean] Whether or not to act as an NFSv3 server.
 #
-# [*lockd_tcpport*]
-#   Accepts: Integer
-#   Default: 32803
-#   The TCP port upon which lockd should listen.
+# @param rquotad [Absolute Path] The path to the rquotad executable.
 #
-# [*lockd_udpport*]
-#   Accepts: Integer
-#   Default: 32803
-#   The UDP port upon which lockd should listen.
+# @param rquotad_port [Integer] The port upon which rquotad should listen.
 #
-# [*rpcnfsdargs*]
-#   Accepts: String
-#   Default: '-N 2'
-#   Arbitrary arguments to pass to nfsd. The defaults disable NFSv2
-#   from being served to clients.
+# @param lockd_tcpport [Integer] The TCP port upon which lockd should listen.
 #
-# [*rpcnfsdcount*]
-#   Accepts: Integer
-#   Default: '8'
-#   The number of NFS server threads to start by default.
+# @param lockd_udpport [Integer] The UDP port upon which lockd should listen.
 #
-# [*nfsd_v4_grace*]
-#   Accepts: Integer
-#   Default: 90
-#   The V4 grace period in seconds.
+# @param rpcnfsdargs [String] Arbitrary arguments to pass to nfsd. The defaults
+#   disable NFSv2 from being served to clients.
 #
-# [*mountd_port*]
-#   Accepts: Integer
-#   Default: '892'
-#   The port upon which mountd should listen.
+# @param rpcnfsdcount [Integer] The number of NFS server threads to start by
+#   default.
 #
-# [*statd_port*]
-#   Accepts: Integer
-#   Default: '662'
-#   The port upon which statd should listen.
+# @param nfsd_v4_grace [Integer] The V4 grace period in seconds.
 #
-# [*statd_outgoing_port*]
-#   Accepts: Integer
-#   Default: '2020'
-#   The port that statd will use when connecting to client systems.
+# @param mountd_port [Port] The port upon which mountd should listen.
 #
-# [*secure_nfs*]
-#   Accepts: true|false
-#   Default: true
-#   Enable secure NFS mounts.
+# @param statd_port [Port] The port upon which statd should listen.
 #
-# [*ensure_lvm2_latest*]
-#   Accepts: Boolean
-#   Default: true
-#   See nfs::lvm2 for further description.
+# @param statd_outgoing_port [Port] The port that statd will use when
+#   connecting to client systems.
 #
-# == Authors
+# @param secure_nfs [Boolean] Enable secure NFS mounts.
 #
-# * Trevor Vaughan <mailto:tvaughan@onyxpoint.com>
-# * Kendall Moore <mailto:kmoore@keywcorp.com>
+# @param ensure_lvm2_latest [Boolean] See nfs::lvm2 for further description.
+#
+# @param simp_krb5 [Boolean] Use the SIMP `krb5` module for Kerberos support.
+#   @note You may need to set variables in `::krb5::config` via Hiera or your
+#     ENC if you do not like the defaults.
+#
+# @param simp_keytab_on_puppet [Boolean] If set, and $simp_krb5 is true, then
+#   set the NFS server to pull its keytab directly from the Puppet server.
+#
+# @param simp_iptables [Boolean] If set, use the SIMP iptables module to manage
+#   firewall connections.
+#
+# @author Trevor Vaughan <tvaughan@onyxpoint.com>
+# @author Kendall Moore <kendall.moore@onyxpoint.com>
 #
 class nfs (
-  $server,
   $use_stunnel = false,
   $is_server = false,
   $is_client = true,
@@ -106,7 +79,10 @@ class nfs (
   $statd_port = '662',
   $statd_outgoing_port = '2020',
   $secure_nfs = true,
-  $ensure_lvm2_latest = true
+  $ensure_lvm2_latest = true,
+  $simp_krb5 = defined('$::simp_krb5') ? { true => getvar($::simp_krb5), default => hiera('simp_krb5', true) },
+  $simp_keytab_on_puppet = true,
+  $simp_iptables = defined('$::use_iptables') ? { true => getvar('::use_iptables'), default => hiera('use_iptables',true) }
 ){
 
   include '::nfs::service_names'
@@ -129,78 +105,105 @@ class nfs (
   validate_port($statd_port)
   validate_port($statd_outgoing_port)
   validate_bool($ensure_lvm2_latest)
+  validate_bool($simp_keytab_on_puppet)
+  validate_bool($simp_krb5)
 
-  if $use_stunnel {
-    include '::stunnel'
+  $_is_server = ($is_server or (host_is_me($server) and $use_stunnel))
+
+  include '::nfs::install'
+
+  if $simp_krb5 {
+    include '::krb5'
+
+    if $simp_keytab_on_puppet {
+      include '::krb5::keytab'
+    }
   }
 
   if $ensure_lvm2_latest {
     include '::nfs::lvm2'
+
+    Class['nfs::lvm2'] -> Class['nfs::install']
   }
 
-  if host_is_me($server) or $is_server {
+  if $is_client {
+    include '::nfs::client'
+
+    Class['nfs::install'] -> Class['nfs::client']
+  }
+
+  if $_is_server {
+
     include '::nfs::server'
 
-    file { '/etc/exports':
-      ensure    => 'file',
-      mode      => '0640',
-      owner     => 'root',
-      group     => 'root',
-      content   => undef,
-      source    => concat_output('nfs'),
-      subscribe => Concat_build['nfs'],
-      audit     => 'content',
-      notify    => Exec['nfs_re-export']
-    }
-  }
-  else {
-    file { '/etc/exports':
-      ensure  => 'file',
-      mode    => '0640',
-      owner   => 'root',
-      group   => 'root',
-      content => "\n"
+    Class['nfs::install'] -> Class['nfs::server']
+
+    if $simp_krb5 {
+      Class['krb5'] ~> Class['nfs::server']
+
+      if $simp_keytab_on_puppet {
+        Class['krb5::keytab'] ~> Class['nfs::server']
+      }
     }
   }
 
-  $nfs_utils_require =  $ensure_lvm2_latest ? {true => Class['nfs::lvm2'], default => 'nil'}
-  package { 'nfs-utils':
-    ensure  => 'latest',
-    require => $nfs_utils_require
-  }
+  if $secure_nfs {
+    if !empty($::nfs::service_names::rpcgssd) {
+      service { $::nfs::service_names::rpcgssd :
+        ensure     => 'running',
+        enable     => true,
+        hasrestart => true,
+        hasstatus  => true
+      }
 
-  package { 'nfs4-acl-tools':
-    ensure => 'latest'
-  }
+      # If you don't put your keytabs on the Puppet server, you'll need to add
+      # code to trigger this yourself!
+      if $simp_keytab_on_puppet {
+        Class['krb5::keytab'] ~> Service[$::nfs::service_names::rpcgssd]
+      }
 
-  service { $::nfs::service_names::nfs_lock :
-    ensure     => 'running',
-    enable     => true,
-    hasrestart => true,
-    hasstatus  => false,
-    status     =>
-      '/bin/true; source /etc/rc.d/init.d/functions; status rpc.statd',
-    require    => [
-      Service[$::nfs::service_names::rpcbind],
-      Package['nfs-utils']
-    ]
-  }
-
-  if ($is_client) and ($nfsv3) and ($use_stunnel) {
-    service { $::nfs::service_names::rpcbind :
-      ensure     => 'stopped',
-      enable     => false,
-      hasrestart => true,
-      hasstatus  => true
+      Class['nfs::install'] -> Service[$::nfs::service_names::rpcgssd]
+      Service[$::nfs::service_names::rpcbind] -> Service[$::nfs::service_names::rpcgssd]
     }
   }
-  else {
-    service { $::nfs::service_names::rpcbind :
+
+  if $_is_server or $nfsv3 {
+
+    service { $::nfs::service_names::nfs_lock :
       ensure     => 'running',
       enable     => true,
       hasrestart => true,
       hasstatus  => true,
-      require    => Service[$::nfs::service_names::rpcidmapd]
+      require    => [
+        Class['nfs::install'],
+        Package['nfs-utils']
+      ]
+    }
+
+    if (!$_is_server and $is_client and $use_stunnel) {
+      service { $::nfs::service_names::rpcbind :
+        ensure  => 'stopped',
+        enable  => false,
+        require => Class['nfs::install']
+      }
+    }
+    else {
+      service { $::nfs::service_names::rpcbind :
+        ensure     => 'running',
+        enable     => true,
+        hasrestart => true,
+        hasstatus  => true
+      }
+
+      Class['nfs::install'] -> Service[$::nfs::service_names::rpcbind]
+      Service[$::nfs::service_names::rpcbind] -> Service[$::nfs::service_names::nfs_lock]
+    }
+  }
+  else {
+    service { $::nfs::service_names::rpcbind :
+      ensure => 'stopped',
+      enable => false,
+      require => Class['nfs::install']
     }
   }
 
@@ -209,50 +212,17 @@ class nfs (
   svckill::ignore { 'nfs-mountd': }
   svckill::ignore { 'nfs-rquotad': }
 
-  service { $::nfs::service_names::rpcidmapd :
-    ensure     => 'running',
-    enable     => true,
-    hasrestart => false,
-    hasstatus  => true,
-    start      => "/sbin/service ${::nfs::service_names::rpcidmapd} start;
-      if [ \$? -ne 0 ]; then
-        /bin/mount | /bin/grep -q 'sunrpc';
-        if [ \$? -ne 0 ]; then
-          /bin/mount -t rpc_pipefs sunrpc /var/lib/nfs/rpc_pipefs;
-        fi
-      fi
-      /sbin/service ${::nfs::service_names::rpcidmapd} start;",
-    require    => Package['nfs-utils']
-  }
-
-  $nfs_notifies = $is_server ? {
-    true    => [
-      Service[$::nfs::service_names::rpcidmapd],
-      Service[$::nfs::service_names::nfs_server]
-    ],
-    default => Service[$::nfs::service_names::rpcgssd]
-  }
-
   file { '/etc/sysconfig/nfs':
     ensure  => 'file',
     owner   => 'root',
     group   => 'root',
     mode    => '0644',
-    content => template('nfs/nfs_sysconfig.erb'),
-    notify  => $nfs_notifies
+    content => template('nfs/nfs_sysconfig.erb')
   }
 
-  if $secure_nfs {
-    service { $::nfs::service_names::rpcgssd :
-      ensure     => 'running',
-      enable     => true,
-      hasrestart => true,
-      hasstatus  => true,
-      require    => Service[$::nfs::service_names::rpcbind]
-    }
-  }
+  Class['nfs::install'] -> File['/etc/sysconfig/nfs']
 
-  if $is_client {
-    include '::nfs::client'
+  if $_is_server {
+    File['/etc/sysconfig/nfs'] ~> Service[$::nfs::service_names::nfs_server]
   }
 }
