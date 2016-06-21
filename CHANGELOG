@@ -1,3 +1,6 @@
+* Mon Aug 01 2016 Trevor Vaughan <tvaughan@onyxpoint.com> - 4.5.0-0
+- Added Kerberos Support
+
 * Wed Jul 20 2016 Nick Markowski <nmarkowski@keywcorp.com> - 4.4.4-0
 - Removed create_home_dirs functionality (and added it to the simp module).
 

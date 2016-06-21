@@ -1,5 +1,3 @@
-# == Class: nfs::client::stunnel
-#
 # Connect to an NFS server over stunnel
 #
 # You may need to change 'nfs_accept_port' to something different if you're
@@ -9,24 +7,33 @@
 # the callback port is not exposed via a reverse tunnel. This will be rectified
 # when Kerberos is added to the systems.
 #
-# [*version*]
-#   The version of NFS to use.  This has been tested for NFS versions 3 and 4
+# Due to the nature of Stunnel, you can only have *one* of these in your
+# environment. If you need encrypted connections to multiple systems, you can
+# either inheirit and enhance this class or you can use Kerberos (preferred).
 #
-# [*nfs_accept_port*]
-# [*nfs_connect_port*]
-# [*portmapper_accept_port*]
-# [*portmapper_connect_port*]
-# [*rquotad_connect_port*]
-# [*lockd_connect_port*]
-# [*mountd_connect_port*]
-# [*statd_connect_port*]
+# @param version [Integer] The version of NFS to use.  This has been tested for
+#   NFS versions 3 and 4
+# @param nfs_accept_port [Port] The stunnel local accept port.
 #
-# == Authors
+# @param nfs_connect_port [Port] The stunnel remote connection port.
 #
-# * Trevor Vaughan <mailto:tvaughan@onyxpoint.com>
-# * Kendall Moore <mailto:kmoore@keywcorp.com>
+# @param portmapper_accept_port [Port] The portmapper local accept port.
+#
+# @param portmapper_connect_port [Port] The portmapper remote connection port.
+#
+# @param rquotad_connect_port [Port] The rquotad remote connection port.
+#
+# @param lockd_connect_port [Port] The lockd remote connection port.
+#
+# @param mountd_connect_port [Port] The mountd remote connection port.
+#
+# @param statd_connect_port [Port] The statd remote connection port.
+#
+# @author Trevor Vaughan <tvaughan@onyxpoint.com>
+# @author Kendall Moore <kendall.moore@onyxpoint.com>
 #
 class nfs::client::stunnel(
+  $nfs_server = $::nfs::client::nfs_server,
   $version = '4',
   $nfs_accept_port = '2049',
   $nfs_connect_port = '20490',
@@ -36,9 +43,9 @@ class nfs::client::stunnel(
   $lockd_connect_port = '32804',
   $mountd_connect_port = '8920',
   $statd_connect_port = '6620',
-) {
-  include '::nfs::client'
+) inherits ::nfs::client {
 
+  validate_net_list($nfs_server)
   validate_integer($version)
   validate_port($nfs_accept_port)
   validate_port($nfs_connect_port)
@@ -50,40 +57,39 @@ class nfs::client::stunnel(
   validate_port($statd_connect_port)
 
   # Don't do this if you're running on yourself because, well, it's bad!
-  if ! ((defined('$::nfs::nfs_server') and host_is_me(getvar('::nfs::nfs_server'))) or
-        (defined('$::nfs::is_server') and getvar('::nfs::is_server'))) {
+  if !host_is_me($nfs_server) {
     include '::stunnel'
 
     if $version == '4' {
       stunnel::add { 'nfs_client':
-        connect => ["${::nfs::client::nfs_server}:${nfs_connect_port}"],
+        connect => ["${nfs_server}:${nfs_connect_port}"],
         accept  => "127.0.0.1:${nfs_accept_port}"
       }
     }
     else {
       stunnel::add { 'nfs_client':
-        connect => ["${::nfs::client::nfs_server}:${nfs_connect_port}"],
+        connect => ["${nfs_server}:${nfs_connect_port}"],
         accept  => "127.0.0.1:${nfs_accept_port}"
       }
       stunnel::add { 'portmapper':
-        connect => ["${::nfs::client::nfs_server}:${portmapper_connect_port}"],
+        connect => ["${nfs_server}:${portmapper_connect_port}"],
         accept  => "127.0.0.1:${portmapper_accept_port}",
         require => Service[$::nfs::service_names::rpcbind]
       }
       stunnel::add { 'rquotad':
-        connect => ["${::nfs::client::nfs_server}:${rquotad_connect_port}"],
+        connect => ["${nfs_server}:${rquotad_connect_port}"],
         accept  => "127.0.0.1:${::nfs::rquotad_port}"
       }
       stunnel::add { 'lockd':
-        connect => ["${::nfs::client::nfs_server}:${lockd_connect_port}"],
+        connect => ["${nfs_server}:${lockd_connect_port}"],
         accept  => "127.0.0.1:${::nfs::lockd_tcpport}"
       }
       stunnel::add { 'mountd':
-        connect => ["${::nfs::client::nfs_server}:${mountd_connect_port}"],
+        connect => ["${nfs_server}:${mountd_connect_port}"],
         accept  => "127.0.0.1:${::nfs::mountd_port}"
       }
       stunnel::add { 'status':
-        connect => ["${::nfs::client::nfs_server}:${statd_connect_port}"],
+        connect => ["${nfs_server}:${statd_connect_port}"],
         accept  => "127.0.0.1:${::nfs::statd_port}"
       }
     }
