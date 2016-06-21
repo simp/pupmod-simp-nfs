@@ -85,25 +85,25 @@ class nfs::server::stunnel (
     stunnel::add { 'rquotad':
       client      => false,
       client_nets => $client_ips,
-      connect     => [$nfs::rquotad_port],
+      connect     => [$::nfs::rquotad_port],
       accept      => "${nfs_accept_address}:${rquotad_accept_port}"
     }
     stunnel::add { 'nlockmgr':
       client      => false,
       client_nets => $client_ips,
-      connect     => [$nfs::lockd_tcpport],
+      connect     => [$::nfs::lockd_tcpport],
       accept      => "${nfs_accept_address}:${nlockmgr_accept_port}"
     }
     stunnel::add { 'mountd':
       client      => false,
       client_nets => $client_ips,
-      connect     => [$nfs::mountd_port],
+      connect     => [$::nfs::mountd_port],
       accept      => "${nfs_accept_address}:${mountd_accept_port}"
     }
     stunnel::add { 'status':
       client      => false,
       client_nets => $client_ips,
-      connect     => [$nfs::statd_port],
+      connect     => [$::nfs::statd_port],
       accept      => "${nfs_accept_address}:${status_accept_port}"
     }
 

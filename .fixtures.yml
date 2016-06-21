@@ -1,7 +1,9 @@
 ---
 fixtures:
   repositories:
-    auditd: "git://github.com/simp/pupmod-simp-auditd"
+    auditd:
+      repo: "git://github.com/simp/pupmod-simp-auditd"
+      branch: "master"
     augeasproviders_core:
       repo: "git://github.com/simp/augeasproviders_core"
       branch: "simp-master"
@@ -11,18 +13,44 @@ fixtures:
     augeasproviders_sysctl:
       repo: "git://github.com/simp/augeasproviders_sysctl"
       branch: "simp-master"
-    common: "git://github.com/simp/pupmod-simp-common"
-    simp: "git://github.com/simp/pupmod-simp-simp"
-    simplib: "git://github.com/simp/pupmod-simp-simplib"
-    simpcat: "git://github.com/simp/pupmod-simp-concat"
-    functions: "git://github.com/simp/pupmod-simp-functions"
-    iptables: "git://github.com/simp/pupmod-simp-iptables"
-    pki: "git://github.com/simp/pupmod-simp-pki"
-    stdlib: "git://github.com/simp/puppetlabs-stdlib"
-    stunnel: "git://github.com/simp/pupmod-simp-stunnel"
-    svckill: "git://github.com/simp/pupmod-simp-svckill"
-    sysctl: "git://github.com/simp/pupmod-simp-sysctl"
-    tcpwrappers: "git://github.com/simp/pupmod-simp-tcpwrappers"
-    compliance_markup: "https://github.com/trevor-vaughan/pupmod-compliance"
+    compliance_markup:
+      repo: "https://github.com/simp/pupmod-simp-compliance_markup"
+      branch: "master"
+    haveged:
+      repo: "https://github.com/simp/puppet-haveged"
+      branch: "simp-master"
+    iptables:
+      repo: "git://github.com/simp/pupmod-simp-iptables"
+      branch: "master"
+    krb5:
+      repo: "https://github.com/simp/pupmod-simp-krb5"
+      branch: "master"
+    pki:
+      repo: "git://github.com/simp/pupmod-simp-pki"
+      branch: "master"
+    selinux:
+      repo: "git://github.com/simp/pupmod-simp-selinux"
+      branch: "master"
+    simpcat:
+      repo: "git://github.com/simp/pupmod-simp-concat"
+      branch: "master"
+    simplib:
+      repo: "git://github.com/simp/pupmod-simp-simplib"
+      branch: "master"
+    stdlib:
+      repo: "git://github.com/simp/puppetlabs-stdlib"
+      branch: "simp-master"
+    stunnel:
+      repo: "git://github.com/simp/pupmod-simp-stunnel"
+      branch: "master"
+    svckill:
+      repo: "git://github.com/simp/pupmod-simp-svckill"
+      branch: "master"
+    sysctl:
+      repo: "git://github.com/simp/pupmod-simp-sysctl"
+      branch: "master"
+    tcpwrappers:
+      repo: "git://github.com/simp/pupmod-simp-tcpwrappers"
+      branch: "master"
   symlinks:
     nfs: "#{source_dir}"
