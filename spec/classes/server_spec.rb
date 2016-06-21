@@ -4,7 +4,7 @@ describe 'nfs::server' do
   context 'supported operating systems' do
     on_supported_os.each do |os, facts|
       context "on #{os}" do
-        let(:pre_condition) { 'include "nfs"' }
+        let(:pre_condition) { 'class { "nfs": is_server => true }' }
         let(:facts) { facts }
 
         it { is_expected.to create_class('nfs::server') }
@@ -23,14 +23,12 @@ describe 'nfs::server' do
 
           if ['RedHat','CentOS'].include?(facts[:operatingsystem]) && facts[:operatingsystemmajrelease].to_s < '7'
             it { is_expected.to contain_service('nfs').with({
-                :ensure  => 'running',
-                :require => 'Service[rpcbind]'
+                :ensure  => 'running'
               })
             }
           else
             it { is_expected.to contain_service('nfs-server').with({
-                :ensure  => 'running',
-                :require => 'Service[rpcbind]'
+                :ensure  => 'running'
               })
             }
           end

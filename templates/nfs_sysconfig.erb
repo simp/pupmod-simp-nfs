@@ -13,7 +13,11 @@ MOUNTD_NFS_V3=yes
 <% else -%>
 MOUNTD_NFS_V3=no
 <% end -%>
+<% if @nfsv3 -%>
 RQUOTAD="<%= scope.lookupvar('::nfs::rquotad') %>"
+<% else -%>
+RQUOTAD=no
+<% end -%>
 RQUOTAD_PORT=<%= scope.lookupvar('::nfs::rquotad_port') %>
 <% if scope.function_defined(['$rpcrquotadopts']) && !@rpcrquotadopts.empty? then -%>
 RPCRQUOTADOPTS="<%= @rpcrquotadopts %>"
