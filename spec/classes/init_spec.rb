@@ -7,12 +7,10 @@ describe 'nfs' do
         let(:facts){ facts }
 
         shared_examples_for "a fact set" do
-          it { is_expected.to create_class('nfs') }
           it { is_expected.to compile.with_all_deps }
-          it { is_expected.to create_file('/etc/exports') }
+          it { is_expected.to create_class('nfs') }
           it { is_expected.to contain_package('nfs-utils').with({
-              :ensure  => 'latest',
-              :require => 'Class[Nfs::Lvm2]'
+              :ensure  => 'latest'
             })
           }
           it { is_expected.to contain_package('nfs4-acl-tools').with_ensure('latest') }
@@ -27,48 +25,8 @@ describe 'nfs' do
               :content => /MOUNTD_PORT=20048/,
               })
             }
-            it { is_expected.to contain_service('nfslock').with({
-              :ensure  => 'running',
-              :require => ['Service[rpcbind]', 'Package[nfs-utils]']
-              })
-            }
-            it { is_expected.to contain_service('rpcbind').with({
-              :ensure  => 'running',
-              :require => 'Service[rpcidmapd]'
-              })
-            }
-            it { is_expected.to contain_service('rpcidmapd').with({
-              :ensure  => 'running',
-              :require => 'Package[nfs-utils]'
-              })
-            }
-            it { is_expected.to contain_service('rpcgssd').with({
-              :ensure  => 'running',
-              :require => 'Service[rpcbind]'
-              })
-            }
           else
             it { is_expected.to create_file('/etc/sysconfig/nfs') }
-            it { is_expected.to contain_service('nfs-lock').with({
-              :ensure  => 'running',
-              :require => ['Service[rpcbind]', 'Package[nfs-utils]']
-              })
-            }
-            it { is_expected.to contain_service('rpcbind').with({
-              :ensure  => 'running',
-              :require => 'Service[nfs-idmap]'
-              })
-            }
-            it { is_expected.to contain_service('nfs-idmap').with({
-              :ensure  => 'running',
-              :require => 'Package[nfs-utils]'
-              })
-            }
-            it { is_expected.to contain_service('nfs-secure').with({
-              :ensure  => 'running',
-              :require => 'Service[rpcbind]'
-              })
-            }
           end
         end
       end
