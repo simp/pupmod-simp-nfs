@@ -18,7 +18,7 @@ File.umask(0122)
 
 ldap_params = Hash.new
 
-servers = (["<%= @uri.map { |x| x = x.split("://").last }.join(',') %>"])
+servers = (["<%= Array(@uri).map { |x| x = x.split("://").last }.join(',') %>"])
 server = nil
 userou = 'ou=People,<%= @base_dn %>'
 export_dir = '<%= @export_dir %>'

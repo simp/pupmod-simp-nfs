@@ -1,6 +1,6 @@
 Summary: NFS Puppet Module
 Name: pupmod-nfs
-Version: 4.4.3
+Version: 4.5.0
 Release: 0
 License: Apache License, Version 2.0
 Group: Applications/System
@@ -12,10 +12,11 @@ Requires: pupmod-simplib >= 1.0.0-0
 Requires: pupmod-simpcat >= 4.0.0-0
 Requires: pupmod-stunnel >= 4.2.0-0
 Requires: pupmod-sysctl >= 4.1.0-2
+Requires: pupmod-krb5 >= 5.0.0
 Requires: puppet >= 3.3.0
 Buildarch: noarch
 Requires: simp-bootstrap >= 4.2.0
-Obsoletes: pupmod-nfs-test
+Obsoletes: pupmod-nfs-test >= 0.0.1
 
 Prefix: %{_sysconfdir}/puppet/environments/simp/modules
 
@@ -62,6 +63,9 @@ fi
 # Post uninstall stuff
 
 %changelog
+* Fri Jun 17 2016 Trevor Vaughan <tvaughan@onyxpoint.com> - 4.5.0
+- Added Kerberos Support
+
 * Mon May 16 2016 Chris Tessmer <chris.tessmer@onyxpoint.com> - 4.4.3
 - Sanitized cross-class variables for 'STRICT_VARIABLES=yes'
 

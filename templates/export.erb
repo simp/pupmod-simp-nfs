@@ -1,95 +1,95 @@
-<% if !@comment.empty? then -%>
+<% unless @comment.empty? -%>
 # <%= @comment %>
 <% end -%>
 <%
 # Here's where we build the options string.
 
-t_options = Array.new
+_options = Array.new
 
-if !@custom.empty? then
+unless @custom.empty?
   # delete parentheses and spaces
-  t_options = @custom.delete('( )')
-  t_options = "(#{t_options})"
+  _options = @custom.delete('( )')
+  _options = "(#{_options})"
 else
-  if @insecure then
-    t_options.push('insecure')
+  if @insecure
+    _options.push('insecure')
   end
 
-  if @rw then
-    t_options.push('rw')
+  if @rw
+    _options.push('rw')
   end
 
-  if @async then
-    t_options.push('async')
+  if @async
+    _options.push('async')
   else
-    t_options.push('sync')
+    _options.push('sync')
   end
 
-  if @no_wdelay then
-    t_options.push('no_wdelay')
+  if @no_wdelay
+    _options.push('no_wdelay')
   end
 
-  if @nohide then
-    t_options.push('nohide')
+  if @nohide
+    _options.push('nohide')
   end
 
-  if @crossmnt then
-    t_options.push('crossmnt')
+  if @crossmnt
+    _options.push('crossmnt')
   end
 
-  if @subtree_check then
-    t_options.push('subtree_check')
+  if @subtree_check
+    _options.push('subtree_check')
   end
 
-  if @insecure_locks then
-    t_options.push('insecure_locks')
+  if @insecure_locks
+    _options.push('insecure_locks')
   end
 
-  if @no_acl then
-    t_options.push('no_acl')
+  unless @mountpoint.to_s.empty?
+    if @mountpoint.to_s =~ %r(^/)
+      _options.push("mp=#{@mountpoint}")
+    else
+      _options.push('mp')
+    end
   end
 
-  if !@mountpoint.empty? then
-    t_options.push("mp=#{@mountpoint}")
+  unless @fsid.empty?
+    _options.push("fsid=#{@fsid}")
   end
 
-  if !@fsid.empty? then
-    t_options.push("fsid=#{@fsid}")
+  unless @refer.empty?
+    _options.push("refer=#{@refer}")
   end
 
-  if !@refer.empty? then
-    t_options.push("refer=#{@refer}")
+  _options.push("sec=#{@sec}")
+
+  if @no_roo_squash
+    _options.push('no_roo_squash')
   end
 
-  t_options.push("sec=#{@sec}")
-
-  if @no_root_squash then
-    t_options.push('no_root_squash')
+  if @all_squash
+    _options.push('all_squash')
   end
 
-  if @all_squash then
-    t_options.push('all_squash')
-  end
+  _options.push("anonuid=#{@anonuid}")
+  _options.push("anongid=#{@anongid}")
 
-  t_options.push("anonuid=#{@anonuid}")
-  t_options.push("anongid=#{@anongid}")
-
-  t_options = "(#{t_options.join(',')})"
+  _options = "(#{_options.join(',')})"
 end
 
-t_output = Array.new
+_output = Array.new
 # Put it all together
-t_client = Array(@client.dup).flatten
-t_client.map! { |cl| (['ALL','all','ANY','any'].include? cl) ? '*' : cl }.flatten!
-t_client.push("127.0.0.1")
-t_client.uniq.sort.each do |cl|
-  if cl == '127.0.0.1' then
+_client = Array(@client.dup).flatten
+_client.map! { |cl| (['ALL','all','ANY','any'].include? cl) ? '*' : cl }.flatten!
+_client.push("127.0.0.1")
+_client.uniq.sort.each do |cl|
+  if cl == '127.0.0.1'
     # Sometimes stunnel will bind on a high port, so we need to account for
     # that.
-    t_output.push("#{@export_path} #{cl}#{t_options.split(')').first + ',insecure)'}")
+    _output.push("#{@export_path} #{cl}#{_options.split(')').first + ',insecure)'}")
   else
-    t_output.push("#{@export_path} #{cl}#{t_options}")
+    _output.push("#{@export_path} #{cl}#{_options}")
   end
 end
 -%>
-<%= t_output.join("\n") %>
+<%= _output.join("\n") %>
