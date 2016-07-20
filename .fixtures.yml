@@ -12,6 +12,7 @@ fixtures:
       repo: "git://github.com/simp/augeasproviders_sysctl"
       branch: "simp-master"
     common: "git://github.com/simp/pupmod-simp-common"
+    simp: "git://github.com/simp/pupmod-simp-simp"
     simplib: "git://github.com/simp/pupmod-simp-simplib"
     simpcat: "git://github.com/simp/pupmod-simp-concat"
     functions: "git://github.com/simp/pupmod-simp-functions"

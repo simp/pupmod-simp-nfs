@@ -1,0 +1,9 @@
+Requires: pupmod-augeasproviders_sysctl
+Requires: pupmod-autofs >= 4.1.0
+Requires: pupmod-simplib >= 1.0.0-0
+Requires: pupmod-simpcat >= 4.0.0-0
+Requires: pupmod-stunnel >= 4.2.0-0
+Requires: pupmod-sysctl >= 4.1.0-2
+Requires: puppet >= 3.3.0
+Requires: simp-bootstrap >= 4.2.0
+Obsoletes: pupmod-nfs-test
