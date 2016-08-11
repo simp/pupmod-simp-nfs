@@ -22,7 +22,7 @@
 #
 # @param statdarg [String] An arbitrary string of options to pass to statd.
 #
-# @param statd_ha_callout [Absolute Path] The fully path of an application that
+# @param statd_ha_callout [AbsolutePath] The fully path of an application that
 #   should be used for statd HA.
 #
 # @param rpcidmapdargs [String] Artibrary arguments to pass to idmapd.
