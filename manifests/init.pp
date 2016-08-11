@@ -20,7 +20,7 @@
 #
 # @param mountd_nfs_v3 [Boolean] Whether or not to act as an NFSv3 server.
 #
-# @param rquotad [Absolute Path] The path to the rquotad executable.
+# @param rquotad [AbsolutePath] The path to the rquotad executable.
 #
 # @param rquotad_port [Integer] The port upon which rquotad should listen.
 #
