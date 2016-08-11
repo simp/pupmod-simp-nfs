@@ -12,7 +12,7 @@
 # Note: If `$client` is an array, then multiple identical entries will be created
 # for each entry in the array.
 #
-# @param export_path [Absolute Path] The path on the filesystem to export.
+# @param export_path [AbsolutePath] The path on the filesystem to export.
 #
 # @param client [Array] An array of NFS exports-compatible clients to which
 #   the export should be served. The entry will be repeated for each client.
@@ -40,7 +40,7 @@
 # @param insecure_locks [Boolean] If set, do not require authentication of
 #   locking requests.
 #
-# @param mountpoint [Absolute Path or Boolean] Require the passed path to be
+# @param mountpoint [AbsolutePath or Boolean] Require the passed path to be
 #   successfully mounted. If a boolean, then require the export path to be
 #   successfully mounted.
 #
