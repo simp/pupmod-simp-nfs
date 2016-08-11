@@ -22,6 +22,184 @@
       "revId": "91abec5f80425c29648b2074adfecde5899fccc7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baa041b7_057662a3",
+        "filename": "README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1005194
+      },
+      "writtenOn": "2016-08-11T21:07:57Z",
+      "side": 1,
+      "message": "install pupmod-simp-nfs, pupmod-simp-autofs",
+      "range": {
+        "startLine": 43,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 82
+      },
+      "revId": "91abec5f80425c29648b2074adfecde5899fccc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baa041b7_255ba623",
+        "filename": "README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1005194
+      },
+      "writtenOn": "2016-08-11T21:07:57Z",
+      "side": 1,
+      "message": "Export ``/srv/nfs_share`` on the server, mount as ``/mnt/nfs`` on the\nclient.",
+      "revId": "91abec5f80425c29648b2074adfecde5899fccc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baa041b7_c56bdab7",
+        "filename": "README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1005194
+      },
+      "writtenOn": "2016-08-11T21:07:57Z",
+      "side": 1,
+      "message": "On the node intended to be the server",
+      "range": {
+        "startLine": 79,
+        "startChar": 0,
+        "endLine": 79,
+        "endChar": 47
+      },
+      "revId": "91abec5f80425c29648b2074adfecde5899fccc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baa041b7_85b15249",
+        "filename": "README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1005194
+      },
+      "writtenOn": "2016-08-11T21:07:57Z",
+      "side": 1,
+      "message": "On a node intended to be a client, you need to create a profile  class:",
+      "range": {
+        "startLine": 101,
+        "startChar": 1,
+        "endLine": 101,
+        "endChar": 127
+      },
+      "revId": "91abec5f80425c29648b2074adfecde5899fccc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baa041b7_059d42bb",
+        "filename": "README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1005194
+      },
+      "writtenOn": "2016-08-11T21:07:57Z",
+      "side": 1,
+      "message": "This is repeated, don\u0027t need to re-include it.",
+      "range": {
+        "startLine": 136,
+        "startChar": 0,
+        "endLine": 138,
+        "endChar": 24
+      },
+      "revId": "91abec5f80425c29648b2074adfecde5899fccc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baa041b7_c5a2bafb",
+        "filename": "README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 1005194
+      },
+      "writtenOn": "2016-08-11T21:07:57Z",
+      "side": 1,
+      "message": "This is repeated.",
+      "range": {
+        "startLine": 148,
+        "startChar": 0,
+        "endLine": 148,
+        "endChar": 20
+      },
+      "revId": "91abec5f80425c29648b2074adfecde5899fccc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baa041b7_e59ffeb1",
+        "filename": "README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 1005194
+      },
+      "writtenOn": "2016-08-11T21:07:57Z",
+      "side": 1,
+      "message": "This is repeated.",
+      "range": {
+        "startLine": 151,
+        "startChar": 2,
+        "endLine": 151,
+        "endChar": 22
+      },
+      "revId": "91abec5f80425c29648b2074adfecde5899fccc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baa041b7_a5a57603",
+        "filename": "README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 1005194
+      },
+      "writtenOn": "2016-08-11T21:07:57Z",
+      "side": 1,
+      "message": "This is repeated.",
+      "range": {
+        "startLine": 155,
+        "startChar": 0,
+        "endLine": 159,
+        "endChar": 22
+      },
+      "revId": "91abec5f80425c29648b2074adfecde5899fccc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
     }
   ]
 }
