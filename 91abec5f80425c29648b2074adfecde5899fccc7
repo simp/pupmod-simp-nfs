@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa041b7_054f826b",
+        "filename": "README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1005194
+      },
+      "writtenOn": "2016-08-11T20:53:56Z",
+      "side": 1,
+      "message": "afaik our module supports this, but the underlying services can\u0027t co-exist. I\u0027d make it clear that no one should attempt to enable both at the same time.",
+      "range": {
+        "startLine": 23,
+        "startChar": 64,
+        "endLine": 23,
+        "endChar": 127
+      },
+      "revId": "91abec5f80425c29648b2074adfecde5899fccc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
