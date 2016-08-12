@@ -46,6 +46,30 @@
       "revId": "08bbee20434359a74810a607e488c5d8930392d9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baa041b7_bd546afd",
+        "filename": "README.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 1005194
+      },
+      "writtenOn": "2016-08-12T15:03:04Z",
+      "side": 1,
+      "message": "This is just to show users what to add. You could modify the statement above to \u0027On the node intended to be the server, add the following kerberos kdc class:\u0027 or something of the sort",
+      "parentUuid": "baa041b7_0b2d53fd",
+      "range": {
+        "startLine": 149,
+        "startChar": 4,
+        "endLine": 149,
+        "endChar": 22
+      },
+      "revId": "08bbee20434359a74810a607e488c5d8930392d9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
     }
   ]
 }
