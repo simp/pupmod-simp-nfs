@@ -22,6 +22,30 @@
       "revId": "08bbee20434359a74810a607e488c5d8930392d9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baa041b7_0b2d53fd",
+        "filename": "README.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 1005361
+      },
+      "writtenOn": "2016-08-12T13:40:34Z",
+      "side": 1,
+      "message": "I wasn\u0027t sure about this one. It is repeated, but having it look like the classes array only has one class in it for this example would be confusing. This only needs to represent adding a class",
+      "parentUuid": "baa041b7_6bf61fd8",
+      "range": {
+        "startLine": 149,
+        "startChar": 4,
+        "endLine": 149,
+        "endChar": 22
+      },
+      "revId": "08bbee20434359a74810a607e488c5d8930392d9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
     }
   ]
 }
