@@ -95,7 +95,6 @@ class site::nfs_server {
   nfs::server::export { 'nfs4_root':
     client      => ['*'],
     export_path => '/srv/nfs_share',
-    sec         => ['sys'],
     require     => File['/srv/nfs_share']
   }
 }
@@ -127,6 +126,8 @@ class site::nfs_client {
 
 ### Usage with krb5
 
+WARNING! This functionality requires some manual configuration and is largely untested.
+
 This module, used with the [SIMP krb5 module](https://github.com/simp/pupmod-simp-krb5), can automatically use kerberos to secure the exported filesystem. The module can create and manage the entire kerberos configuration automatically, but check the krb5 module itself if you want more control.
 
 Modify the examples provided above to include the following hieradata:
@@ -138,8 +139,14 @@ simp_krb5: true
 
 nfs::secure_nfs: true
 
+nfs::server::export::sec:
+  - 'krb5p'
+
 krb5::kdc::auto_keytabs::global_services:
   - 'nfs'
+
+classes:
+  - 'krb5::keytab'
 ```
 
 On the node intended to be the server, add `krb5::kdc` to the class list:
@@ -147,6 +154,19 @@ On the node intended to be the server, add `krb5::kdc` to the class list:
 ``` yaml
 classes:
   - 'krb5::kdc'
+```
+
+In the profile class to be added to a node intended to be a client, modify mount to read:
+
+``` puppet
+  mount { "/mnt/nfs":
+    ensure  => 'mounted',
+    fstype  => 'nfs4',
+    device  => '<your_server_fqdn>:/srv/nfs_share',
+    options => 'sec=krb5p'
+    require => File['/mnt/nfs']
+  }
+
 ```
 
 There are no changes required for any client-specific hieradata.

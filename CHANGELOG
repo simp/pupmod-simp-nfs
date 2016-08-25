@@ -1,3 +1,6 @@
+* Thu Aug 25 2016 Nick Markowski <nmarkowski@keywcorp.com> 4.5.2-0
+- Defaulted export sec to sys.
+
 * Fri Aug 12 2016 Nick Miller <nick.miller@onyxpoint.com> - 4.5.1-0
 - Added a new README
 
