@@ -18,8 +18,6 @@ describe 'nfs::server::export' do
         it { is_expected.to compile.with_all_deps }
         it { is_expected.to contain_class('nfs::server') }
         it { is_expected.to create_concat_fragment("nfs+#{title}.export") }
-        it { is_expected.to_not contain_selboolean('nfs_anon_write') }
-
 
         context 'when sec includes "sys"' do
           let(:params) {
@@ -32,9 +30,9 @@ describe 'nfs::server::export' do
           it { is_expected.to compile.with_all_deps }
 
           if ['RedHat','CentOS'].include?(facts[:operatingsystem]) && facts[:operatingsystemmajrelease].to_s > '6'
-            it { is_expected.to contain_selboolean('nfs_anon_write') }
+            it { is_expected.to contain_selboolean('nfsd_anon_write') }
           else
-            it { is_expected.to_not contain_selboolean('nfs_anon_write') }
+            it { is_expected.to_not contain_selboolean('nfsd_anon_write') }
           end
         end
       end
