@@ -87,6 +87,8 @@ nfs::server : '#NFS_SERVERS#'
 # infrastructure for our tests.
 nfs::secure_nfs : true
 nfs::simp_krb5 : true
+nfs::server::export::sec:
+  - 'krb5p'
 nfs::is_server : #IS_SERVER#
 nfs::server::client_ips : 'ALL'
     EOM
