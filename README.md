@@ -95,7 +95,6 @@ class site::nfs_server {
   nfs::server::export { 'nfs4_root':
     client      => ['*'],
     export_path => '/srv/nfs_share',
-    sec         => ['sys'],
     require     => File['/srv/nfs_share']
   }
 }
@@ -138,8 +137,14 @@ simp_krb5: true
 
 nfs::secure_nfs: true
 
+nfs::server::export::sec:
+  - 'krb5p'
+
 krb5::kdc::auto_keytabs::global_services:
   - 'nfs'
+
+classes:
+  - 'krb5::keytab'
 ```
 
 On the node intended to be the server, add `krb5::kdc` to the class list:
@@ -147,6 +152,19 @@ On the node intended to be the server, add `krb5::kdc` to the class list:
 ``` yaml
 classes:
   - 'krb5::kdc'
+```
+
+In the profile class to be added to a node intended to be a client, modify mount to read:
+
+``` puppet
+  mount { "/mnt/nfs":
+    ensure  => 'mounted',
+    fstype  => 'nfs4',
+    device  => '<your_server_fqdn>:/srv/nfs_share',
+    options => 'sec=krb5p'
+    require => File['/mnt/nfs']
+  }
+
 ```
 
 There are no changes required for any client-specific hieradata.
