@@ -87,6 +87,8 @@ nfs::server : '#NFS_SERVERS#'
 # infrastructure for our tests.
 nfs::secure_nfs : true
 nfs::simp_krb5 : true
+nfs::server::export::sec:
+  - 'krb5p'
 nfs::is_server : #IS_SERVER#
 nfs::server::client_ips : 'ALL'
     EOM
@@ -114,7 +116,8 @@ nfs::server::client_ips : 'ALL'
         keytab_src = %(/var/kerberos/krb5kdc/generated_keytabs/#{fact_on(host,'fqdn')}/krb5.keytab)
 
         host.mkdir_p('/tmp/keytabs')
-        on(host, "cp #{keytab_src} /tmp/keytabs/#{fact_on(host, 'fqdn')}.keytab")
+        on(host, "cp #{keytab_src} /tmp/keytabs/")
+        #on(host, "cp #{keytab_src} /tmp/keytabs/#{fact_on(host, 'fqdn')}.keytab")
       end
 
       it 'should work with no errors' do
@@ -200,7 +203,8 @@ nfs::server::client_ips : 'ALL'
             # doing.
             server.do_scp_from(keytab_src, tmpdir, {})
             host.mkdir_p('/tmp/keytabs')
-            host.do_scp_to(File.join(tmpdir, File.basename(keytab_src)), "/tmp/keytabs/#{client_fqdn}.keytab", {})
+            #host.do_scp_to(File.join(tmpdir, File.basename(keytab_src)), "/tmp/keytabs/#{client_fqdn}.keytab", {})
+            host.do_scp_to(File.join(tmpdir, File.basename(keytab_src)), "/tmp/keytabs/", {})
           ensure
             FileUtils.remove_entry_secure(tmpdir)
           end
