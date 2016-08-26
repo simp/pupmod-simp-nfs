@@ -105,10 +105,10 @@ class nfs::server (
   }
 
   file { '/etc/exports':
-    ensure    => 'file',
-    mode      => '0640',
-    owner     => 'root',
-    group     => 'root'
+    ensure => 'file',
+    mode   => '0640',
+    owner  => 'root',
+    group  => 'root'
   }
 
   exec { 'nfs_re-export':
@@ -202,26 +202,29 @@ class nfs::server (
   }
 
   sysctl::value { 'sunrpc.tcp_slot_table_entries':
-    value   => $sunrpc_tcp_slot_table_entries,
-    silent  => true,
-    notify  => Service[$::nfs::service_names::nfs_server]
+    value  => $sunrpc_tcp_slot_table_entries,
+    silent => true,
+    notify => Service[$::nfs::service_names::nfs_server]
   }
 
   sysctl::value { 'sunrpc.udp_slot_table_entries':
-    value   => $sunrpc_udp_slot_table_entries,
-    silent  => true,
-    notify  => Service[$::nfs::service_names::nfs_server]
+    value  => $sunrpc_udp_slot_table_entries,
+    silent => true,
+    notify => Service[$::nfs::service_names::nfs_server]
   }
 
   if $::nfs::secure_nfs {
-    service { $::nfs::service_names::rpcsvcgssd :
-      enable     => 'true',
-      ensure     => 'running',
-      hasrestart => 'true',
-      hasstatus  => 'true'
+    if !empty($::nfs::service_names::rpcsvcgssd) {
+      service { $::nfs::service_names::rpcsvcgssd :
+        ensure     => 'running',
+        enable     => true,
+        hasrestart => true,
+        hasstatus  => true
+      }
+
+      Service[$::nfs::service_names::rpcbind] -> Service[$::nfs::service_names::rpcsvcgssd]
     }
 
-    Service[$::nfs::service_names::rpcbind] -> Service[$::nfs::service_names::rpcsvcgssd]
     Service[$::nfs::service_names::rpcbind] -> Sysctl::Value['sunrpc.tcp_slot_table_entries']
     Service[$::nfs::service_names::rpcbind] -> Sysctl::Value['sunrpc.udp_slot_table_entries']
     Sysctl::Value['sunrpc.tcp_slot_table_entries'] ~> Service[$::nfs::service_names::nfs_lock]
