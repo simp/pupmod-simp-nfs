@@ -171,7 +171,7 @@ class nfs (
         Class['krb5::keytab'] ~> Service[$::nfs::service_names::rpcgssd]
       }
 
-      Class['nfs::install'] -> Service[$::nfs::service_names::rpcgssd]
+      File['/etc/sysconfig/nfs'] -> Service[$::nfs::service_names::rpcgssd]
       Service[$::nfs::service_names::rpcbind] -> Service[$::nfs::service_names::rpcgssd]
     }
   }
@@ -183,13 +183,13 @@ class nfs (
       enable     => true,
       hasrestart => true,
       hasstatus  => true,
-      require    => Class['nfs::install']
+      require => File['/etc/sysconfig/nfs']
     }
 
     if (!$is_server and $is_client and $use_stunnel) {
       service { $::nfs::service_names::rpcbind :
         ensure  => 'stopped',
-        require => Class['nfs::install']
+        require => File['/etc/sysconfig/nfs']
       }
     }
     else {
@@ -200,7 +200,7 @@ class nfs (
         hasstatus  => true
       }
 
-      Class['nfs::install'] -> Service[$::nfs::service_names::rpcbind]
+      File['/etc/sysconfig/nfs'] -> Service[$::nfs::service_names::rpcbind]
       Service[$::nfs::service_names::rpcbind] -> Service[$::nfs::service_names::nfs_lock]
     }
   }
@@ -216,12 +216,21 @@ class nfs (
   svckill::ignore { 'nfs-mountd': }
   svckill::ignore { 'nfs-rquotad': }
 
+  concat_build { 'sysconfig_nfs':
+    quiet  => true,
+    target => '/etc/sysconfig/nfs'
+  }
+
+  concat_fragment { 'sysconfig_nfs+init':
+    content => template('nfs/nfs_sysconfig.erb')
+  }
+
   file { '/etc/sysconfig/nfs':
     ensure  => 'file',
     owner   => 'root',
     group   => 'root',
     mode    => '0644',
-    content => template('nfs/nfs_sysconfig.erb')
+    require => Concat_build['sysconfig_nfs']
   }
 
   Class['nfs::install'] -> File['/etc/sysconfig/nfs']

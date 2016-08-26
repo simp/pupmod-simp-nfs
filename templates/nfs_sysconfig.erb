@@ -1,63 +1,28 @@
-<% if scope.lookupvar('::nfs::mountd_nfs_v1') then -%>
+<% if scope.lookupvar('::nfs::mountd_nfs_v1') -%>
 MOUNTD_NFS_V1=yes
 <% else -%>
 MOUNTD_NFS_V1=no
 <% end -%>
-<% if scope.lookupvar('::nfs::mountd_nfs_v2') then -%>
+<% if scope.lookupvar('::nfs::mountd_nfs_v2') -%>
 MOUNTD_NFS_V2=yes
 <% else -%>
 MOUNTD_NFS_V2=no
 <% end -%>
-<% if scope.lookupvar('::nfs::mountd_nfs_v3') then -%>
+<% if scope.lookupvar('::nfs::mountd_nfs_v3') -%>
 MOUNTD_NFS_V3=yes
 <% else -%>
 MOUNTD_NFS_V3=no
 <% end -%>
-<% if @nfsv3 -%>
-RQUOTAD="<%= scope.lookupvar('::nfs::rquotad') %>"
-<% else -%>
-RQUOTAD=no
-<% end -%>
-RQUOTAD_PORT=<%= scope.lookupvar('::nfs::rquotad_port') %>
-<% if scope.function_defined(['$rpcrquotadopts']) && !@rpcrquotadopts.empty? then -%>
-RPCRQUOTADOPTS="<%= @rpcrquotadopts %>"
-<% end -%>
-<% if scope.function_defined(['$lockd_arg']) && !@lockd_arg.empty? then -%>
-LOCKD_ARG="<= lockd_arg %>"
-<% end -%>
-LOCKD_TCPPORT=<%= scope.lookupvar('::nfs::lockd_tcpport') %>
-LOCKD_UDPPORT=<%= scope.lookupvar('::nfs::lockd_udpport') %>
-<% if scope.lookupvar('::nfs::rpcnfsdargs') && !scope.lookupvar('::nfs::rpcnfsdargs').empty? then -%>
+<% if scope.lookupvar('::nfs::rpcnfsdargs') && !scope.lookupvar('::nfs::rpcnfsdargs').empty? -%>
 RPCNFSDARGS="<%= scope.lookupvar('::nfs::rpcnfsdargs') %>"
 <% end -%>
 RPCNFSDCOUNT=<%= scope.lookupvar('::nfs::rpcnfsdcount') %>
 NFSD_V4_GRACE=<%= scope.lookupvar('::nfs::nfsd_v4_grace') %>
-<% if scope.function_defined(['$nfsd_module']) && !@nfsd_module.empty? then -%>
-NFSD_MODULE="noload"
-<% end %>
-<% if scope.function_defined(['$rpcmountdopts']) && !@rpcmountdopts.empty? then -%>
-RPCMOUNTDOPTS="<%= @rpcmountdopts %>"
-<% end -%>
 MOUNTD_PORT=<%= scope.lookupvar('::nfs::mountd_port') %>
-<% if scope.function_defined(['$statdarg']) && !@statdarg.empty? then -%>
-STATDARG=""
-<% end -%>
+<% if scope.lookupvar('::nfs::secure_nfs') -%>
 STATD_PORT=<%= scope.lookupvar('::nfs::statd_port') %>
 STATD_OUTGOING_PORT=<%= scope.lookupvar('::nfs::statd_outgoing_port') %>
-<% if scope.function_defined(['$statd_ha_callout']) && !@statd_ha_callout.empty? then -%>
-STATD_HA_CALLOUT="<%= @statd_ha_callout %>"
-<% end -%>
-<% if scope.function_defined(['$rpcidmapdargs']) && !@rpcidmapdargs.empty? then -%>
-RPCIDMAPDARGS="<%= @rpcidmapdargs %>"
-<% end -%>
-<% if scope.lookupvar('::nfs::secure_nfs') then -%>
 SECURE_NFS=yes
 <% else -%>
 SECURE_NFS=no
-<% end -%>
-<% if scope.function_defined(['$rpcgssdargs']) && !@rpcgssdargs.empty? then -%>
-RPCGSSDARGS="<%= @rpcgssdargs %>"
-<% end -%>
-<% if scope.function_defined(['$rpcsvcgssdargs']) && !@rpcsvcgssdargs.empty? then -%>
-RPCSVCGSSDARGS="<%= @rpcsvcgssdargs %>"
 <% end -%>
