@@ -19,9 +19,12 @@
 
 ## Description
 
-The SIMP nfs module can manage the exporting and mounting of nfs devices. It provides all the infrastructure needed to share a folder over the network.
+The SIMP nfs module can manage the exporting and mounting of nfs devices. It
+provides all the infrastructure needed to share a folder over the network.
 
-The module is broken into two parts: the server and the client. It supports security with either krb5 or stunnel, but not both. The services conflict at a system level.
+The module is broken into two parts: the server and the client. It supports
+security with either ``stunnel`` or ``krb5``, but not both. The services
+conflict at a system level.
 
 
 ### This is a SIMP module
@@ -30,25 +33,28 @@ This module is a component of the [System Integrity Management Platform](https:/
 
 If you find any issues, they may be submitted to our [bug tracker](https://simp-project.atlassian.net/).
 
-This module is optimally designed for use within a larger SIMP ecosystem, but it can be used independently:
+This module is optimally designed for use within a larger SIMP ecosystem, but
+it can be used independently:
 
- * When included within the SIMP ecosystem, security compliance settings will be managed from the Puppet server.
- * If used independently, all SIMP-managed security subsystems are disabled by default and must be explicitly opted into by administrators.  Please review the `$client_nets`, `$enable_*` and `$use_*` parameters in `manifests/init.pp` for details.
-
+ * When included within the SIMP ecosystem, security compliance settings will
+ be managed from the Puppet server.
+ * If used independently, all SIMP-managed security subsystems are disabled by
+ default and must be explicitly opted into by administrators.  Please review
+ the ``$client_nets``, ``$enable_*`` and ``$use_*`` parameters in ``manifests/init.pp``
+ for details.
 
 ## Setup
 
-
 ### Setup Requirements
 
-The only thing necessary to begin using nfs is to install pupmod-simp-nfs and pupmod-simp-autofs into your modulepath.
-
+The only thing necessary to begin using nfs is to install pupmod-simp-nfs and
+pupmod-simp-autofs into your modulepath.
 
 ### Beginning with nfs
 
 To get started with this module, a few settings have to be set in hiera.
 
-To be applied to all nodes, in `default.yaml`:
+To be applied to all nodes, in ``default.yaml``:
 
 ``` yaml
 nfs::server: "your.server.fqdn"
@@ -74,12 +80,13 @@ classes:
 
 ## Usage
 
-
 ### Basic Usage
 
-In order to export `/srv/nfs_share` and mount it as `/mnt/nfs` on a client, you need to create a couple of profile classes.
+In order to export ``/srv/nfs_share`` and mount it as ``/mnt/nfs`` on a client, you
+need to create a couple of profile classes.
 
-One to be added to the node intended to be the server, to define the exported path:
+One to be added to the node intended to be the server, to define the exported
+path:
 
 ``` puppet
 class site::nfs_server {
@@ -100,7 +107,9 @@ class site::nfs_server {
 }
 ```
 
-And another profile class to be added to a node intended to be a client, to mount the exported filesystem on a node. Note that all that is needed is the native Puppet `mount` resource:
+And another profile class to be added to a node intended to be a client, to
+mount the exported filesystem on a node. Note that all that is needed is the
+native Puppet ``mount`` resource:
 
 ``` puppet
 class site::nfs_client {
@@ -126,21 +135,25 @@ class site::nfs_client {
 
 ### Usage with krb5
 
-WARNING! This functionality requires some manual configuration and is largely untested.
+-------------------------------------------------------------------------------
+> **WARNING!**
+>
+> This functionality requires some manual configuration and is largely untested.
+-------------------------------------------------------------------------------
 
-This module, used with the [SIMP krb5 module](https://github.com/simp/pupmod-simp-krb5), can automatically use kerberos to secure the exported filesystem. The module can create and manage the entire kerberos configuration automatically, but check the krb5 module itself if you want more control.
+This module, used with the [SIMP krb5 module](https://github.com/simp/pupmod-simp-krb5),
+can automatically use kerberos to secure the exported filesystem. The module
+can create and manage the entire kerberos configuration automatically, but
+check the ``krb5`` module itself if you want more control.
 
 Modify the examples provided above to include the following hieradata:
 
-To be applied on every node in `default.yaml`:
+To be applied on every node via ``default.yaml``:
 
 ``` yaml
 simp_krb5: true
 
 nfs::secure_nfs: true
-
-nfs::server::export::sec:
-  - 'krb5p'
 
 krb5::kdc::auto_keytabs::global_services:
   - 'nfs'
@@ -149,14 +162,15 @@ classes:
   - 'krb5::keytab'
 ```
 
-On the node intended to be the server, add `krb5::kdc` to the class list:
+On the node intended to be the server, add ``krb5::kdc`` to the class list:
 
 ``` yaml
 classes:
   - 'krb5::kdc'
 ```
 
-In the profile class to be added to a node intended to be a client, modify mount to read:
+In the profile class to be added to a node intended to be a client, add a
+``mount`` like the following:
 
 ``` puppet
   mount { "/mnt/nfs":
@@ -178,21 +192,29 @@ Please reference the [SIMP documentation](http://simp.readthedocs.io/en/master/u
 
 ## Limitations
 
-SIMP Puppet modules are generally intended for use on Red Hat Enterprise Linux and compatible distributions, such as CentOS. Please see the [`metadata.json` file](./metadata.json) for the most up-to-date list of supported operating systems, Puppet versions, and module dependencies.
+SIMP Puppet modules are generally intended for use on Red Hat Enterprise Linux
+and compatible distributions, such as CentOS. Please see the [`metadata.json` file](./metadata.json)
+for the most up-to-date list of supported operating systems, Puppet versions,
+and module dependencies.
 
 
 ## Development
 
 Please read our [Contribution Guide](https://simp-project.atlassian.net/wiki/display/SD/Contributing+to+SIMP) and visit our [developer wiki](https://simp-project.atlassian.net/wiki/display/SD/SIMP+Development+Home).
 
-
 ### Acceptance tests
 
-This module includes [Beaker](https://github.com/puppetlabs/beaker) acceptance tests using the SIMP [Beaker Helpers](https://github.com/simp/rubygem-simp-beaker-helpers).  By default the tests use [Vagrant](https://www.vagrantup.com/) with [VirtualBox](https://www.virtualbox.org) as a back-end; Vagrant and VirtualBox must both be installed to run these tests without modification. To execute the tests run the following:
+This module includes [Beaker](https://github.com/puppetlabs/beaker) acceptance
+tests using the SIMP [Beaker Helpers](https://github.com/simp/rubygem-simp-beaker-helpers).
+By default the tests use [Vagrant](https://www.vagrantup.com/) with
+[VirtualBox](https://www.virtualbox.org) as a back-end; Vagrant and VirtualBox
+must both be installed to run these tests without modification. To execute the
+tests run the following:
 
 ```shell
 bundle install
 bundle exec rake beaker:suites
 ```
 
-Please refer to the [SIMP Beaker Helpers documentation](https://github.com/simp/rubygem-simp-beaker-helpers/blob/master/README.md) for more information.
+Please refer to the [SIMP Beaker Helpers documentation](https://github.com/simp/rubygem-simp-beaker-helpers/blob/master/README.md)
+for more information.
