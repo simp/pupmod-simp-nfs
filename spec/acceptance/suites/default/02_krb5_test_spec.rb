@@ -19,7 +19,11 @@ describe 'nfs krb5' do
         end
       end
 
-      host_ipaddresses = host_ipaddresses.flatten.uniq.compact
+      etc_hosts = on(host, 'puppet resource host').stdout.strip
+      etc_hosts = etc_hosts.lines.map!{|x| x.strip =~ /ip\s+=>\s+(?:'|")(.*)(?:'|")/; x = $1}
+      etc_hosts.delete_if{|x| x.nil? || x.empty? || x == '127.0.0.1'}
+
+      host_ipaddresses = (etc_hosts + host_ipaddresses).flatten.uniq.compact
       host_ipaddresses.delete_if{|x| x =~ /^\s*$/}
     end
 
@@ -87,8 +91,6 @@ nfs::server : '#NFS_SERVERS#'
 # infrastructure for our tests.
 nfs::secure_nfs : true
 nfs::simp_krb5 : true
-nfs::server::export::sec:
-  - 'krb5p'
 nfs::is_server : #IS_SERVER#
 nfs::server::client_ips : 'ALL'
     EOM
@@ -158,7 +160,8 @@ nfs::server::client_ips : 'ALL'
 
           nfs::server::export { 'nfs4_root':
             client      => ['*'],
-            export_path => '/srv/nfs_share'
+            export_path => '/srv/nfs_share',
+            sec         => ['krb5p']
           }
 
           File['/srv/nfs_share'] -> Nfs::Server::Export['nfs4_root']
