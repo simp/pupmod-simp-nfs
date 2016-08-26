@@ -66,7 +66,7 @@ class nfs::client (
   if $simp_iptables {
     include '::iptables'
 
-    iptables::add_tcp_stateful_listen { "nfs4_callback_port":
+    iptables::add_tcp_stateful_listen { 'nfs4_callback_port':
       client_nets => $nfs_server,
       dports      => $callback_port
     }

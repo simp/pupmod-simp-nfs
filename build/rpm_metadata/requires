@@ -1,7 +1,8 @@
 Requires: pupmod-herculesteam-augeasproviders_sysctl
 Requires: pupmod-puppetlabs-stdlib
 Requires: pupmod-simp-autofs >= 4.1.0
-Requires: pupmod-simp-krb5 >= 5.0.0
+Requires: pupmod-simp-iptables >= 4.1.4
+Requires: pupmod-simp-krb5 >= 5.0.5
 Requires: pupmod-simp-simpcat >= 4.0.0-0
 Requires: pupmod-simp-simplib >= 1.0.0-0
 Requires: pupmod-simp-stunnel >= 4.2.0-0
