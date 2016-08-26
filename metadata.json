@@ -23,8 +23,12 @@
       "version_requirement": ">= 2.0.2"
     },
     {
+      "name": "simp/iptables",
+      "version_requirement": ">= 4.1.4"
+    },
+    {
       "name": "simp/krb5",
-      "version_requirement": ">= 5.0.0"
+      "version_requirement": ">= 5.0.5"
     },
     {
       "name": "simp/simpcat",

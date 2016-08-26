@@ -214,14 +214,17 @@ class nfs::server (
   }
 
   if $::nfs::secure_nfs {
-    service { $::nfs::service_names::rpcsvcgssd :
-      enable     => 'true',
-      ensure     => 'running',
-      hasrestart => 'true',
-      hasstatus  => 'true'
+    if !empty($::nfs::service_names::rpcsvcgssd) {
+      service { $::nfs::service_names::rpcsvcgssd :
+        enable     => 'true',
+        ensure     => 'running',
+        hasrestart => 'true',
+        hasstatus  => 'true'
+      }
+
+      Service[$::nfs::service_names::rpcbind] -> Service[$::nfs::service_names::rpcsvcgssd]
     }
 
-    Service[$::nfs::service_names::rpcbind] -> Service[$::nfs::service_names::rpcsvcgssd]
     Service[$::nfs::service_names::rpcbind] -> Sysctl::Value['sunrpc.tcp_slot_table_entries']
     Service[$::nfs::service_names::rpcbind] -> Sysctl::Value['sunrpc.udp_slot_table_entries']
     Sysctl::Value['sunrpc.tcp_slot_table_entries'] ~> Service[$::nfs::service_names::nfs_lock]

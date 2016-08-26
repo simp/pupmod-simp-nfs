@@ -126,7 +126,11 @@ class site::nfs_client {
 
 ### Usage with krb5
 
-WARNING! This functionality requires some manual configuration and is largely untested.
+-------------------------------------------------------------------------------
+> **WARNING!**
+>
+> This functionality requires some manual configuration and is largely untested.
+-------------------------------------------------------------------------------
 
 This module, used with the [SIMP krb5 module](https://github.com/simp/pupmod-simp-krb5), can automatically use kerberos to secure the exported filesystem. The module can create and manage the entire kerberos configuration automatically, but check the krb5 module itself if you want more control.
 
