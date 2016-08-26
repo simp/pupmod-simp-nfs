@@ -1,0 +1,16 @@
+module gss_hotfix 1.0;
+
+require {
+	type gssd_t;
+	type gssproxy_t;
+	type krb5_conf_t;
+	class dir { read search open };
+}
+
+#============= gssd_t ==============
+allow gssd_t krb5_conf_t:dir search;
+allow gssd_t krb5_conf_t:dir { read open };
+
+#============= gssproxy_t ==============
+allow gssproxy_t krb5_conf_t:dir search;
+allow gssproxy_t krb5_conf_t:dir { read open };
