@@ -19,15 +19,8 @@ describe 'nfs' do
 
         if os =~ /(?:redhat|centos)-(\d+)/
           it_behaves_like "a fact set"
-
-          if $1.to_i < 7
-            it { is_expected.to create_file('/etc/sysconfig/nfs').with({
-              :content => /MOUNTD_PORT=20048/,
-              })
-            }
-          else
-            it { is_expected.to create_file('/etc/sysconfig/nfs') }
-          end
+          it { is_expected.to contain_concat_fragment('sysconfig_nfs+init').with_content(%r(MOUNTD_PORT=20048)) }
+          it { is_expected.to create_file('/etc/sysconfig/nfs') }
         end
       end
     end

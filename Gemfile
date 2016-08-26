@@ -42,6 +42,7 @@ group :development do
   gem 'pry'
   gem 'pry-doc'
   gem 'puppet-strings'
+  gem 'pry-coolline'
 
   # `listen` is a dependency of `guard`
   # from `listen` 3.1+, `ruby_dep` requires Ruby version >= 2.2.3, ~> 2.2

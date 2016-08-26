@@ -16,6 +16,8 @@
 # @param nfsd_module [String] If set to 'noload' will prevent the nfsd module
 #   from being pre-loaded.
 #   Valid Options: 'noload'
+# NOTE: if this is set to _anything_ other than an empty string, the template
+# will say 'noload'
 #
 # @param rpcmountdopts [String] An arbitrary string of options to pass to
 #   mountd.
@@ -97,6 +99,10 @@ class nfs::server (
   validate_bool($simp_iptables)
 
   if $nfsv3 { include '::nfs::idmapd' }
+
+  concat_fragment { "sysconfig_nfs+server":
+    content => template('nfs/nfs_sysconfig_server.erb')
+  }
 
   concat_build { 'nfs':
     order  => '*.export',

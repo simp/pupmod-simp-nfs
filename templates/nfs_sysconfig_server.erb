@@ -1,0 +1,22 @@
+
+<% if scope.function_defined(['$nfsd_module']) && !@nfsd_module.empty? then -%>
+NFSD_MODULE="noload"
+<% end %>
+<% if scope.function_defined(['$rpcmountdopts']) && !@rpcmountdopts.empty? then -%>
+RPCMOUNTDOPTS="<%= @rpcmountdopts %>"
+<% end -%>
+<% if scope.function_defined(['$statdarg']) && !@statdarg.empty? then -%>
+STATDARG=""
+<% end -%>
+<% if scope.function_defined(['$statd_ha_callout']) && !@statd_ha_callout.empty? then -%>
+STATD_HA_CALLOUT="<%= @statd_ha_callout %>"
+<% end -%>
+<% if scope.function_defined(['$rpcidmapdargs']) && !@rpcidmapdargs.empty? then -%>
+RPCIDMAPDARGS="<%= @rpcidmapdargs %>"
+<% end -%>
+<% if scope.function_defined(['$rpcgssdargs']) && !@rpcgssdargs.empty? then -%>
+RPCGSSDARGS="<%= @rpcgssdargs %>"
+<% end -%>
+<% if scope.function_defined(['$rpcsvcgssdargs']) && !@rpcsvcgssdargs.empty? then -%>
+RPCSVCGSSDARGS="<%= @rpcsvcgssdargs %>"
+<% end -%>
