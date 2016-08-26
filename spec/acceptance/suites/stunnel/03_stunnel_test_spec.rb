@@ -69,11 +69,6 @@ nfs::server::client_ips : 'ALL'
         on(host, 'cd /etc/pki/simp-testing/pki/cacerts; ln cacerts.pem tmpca.pem')
       end
 
-      it 'should enable selinux' do
-        apply_manifest_on(host, 'include "::selinux"')
-        host.reboot
-      end
-
       it 'should work with no errors' do
         hdata = hieradata.dup
         if servers.include?(host)
@@ -88,15 +83,9 @@ nfs::server::client_ips : 'ALL'
         apply_manifest_on(host, manifest, :catch_failures => true)
       end
 
-=begin
-Can't figure out why this is failing! This failure is not reproduceable if I
-pause here and then try it by hand.
-=end
-
       it 'should be idempotent' do
         apply_manifest_on(host, manifest, :catch_changes => true)
       end
-#=end
     end
   end
 
