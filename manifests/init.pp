@@ -113,6 +113,17 @@ class nfs (
   if $simp_krb5 {
     include '::krb5'
 
+    if $::operatingsystem in ['RedHat', 'CentOS'] {
+      if (versioncmp($::operatingsystemmajrelease,'6') > 0) {
+        # This is here because the SELinux rules for directory includes in krb5
+        # are broken.
+
+        include '::nfs::selinux_hotfix'
+
+        Class['::nfs::selinux_hotfix'] -> Class['::nfs::install']
+      }
+    }
+
     if $simp_keytab_on_puppet {
       include '::krb5::keytab'
     }
@@ -183,7 +194,6 @@ class nfs (
     if (!$_is_server and $is_client and $use_stunnel) {
       service { $::nfs::service_names::rpcbind :
         ensure  => 'stopped',
-        enable  => false,
         require => Class['nfs::install']
       }
     }
@@ -201,8 +211,7 @@ class nfs (
   }
   else {
     service { $::nfs::service_names::rpcbind :
-      ensure => 'stopped',
-      enable => false,
+      ensure  => 'stopped',
       require => Class['nfs::install']
     }
   }

@@ -19,8 +19,14 @@ class nfs::service_names {
       $nfs_rquotad = 'nfs-rquotad'
       $nfs_server  = 'nfs-server'
       $rpcidmapd   = 'nfs-idmapd'
-      $rpcsvcgssd  = 'rpc-svcgssd'
       $rpcgssd     = 'rpc-gssd'
+
+      if (versioncmp($::operatingsystemrelease,'7.1') < 0) {
+        $rpcsvcgssd  = 'rpc-svcgssd'
+      }
+      else {
+        $rpcsvcgssd  = ''
+      }
     }
   }
   else {
