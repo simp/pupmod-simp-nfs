@@ -37,6 +37,7 @@ class nfs::client (
   $callback_port = '876',
   $use_stunnel = $::nfs::use_stunnel,
   $simp_iptables = $::nfs::simp_iptables,
+  # FIXME: `$sec` appears to be unused
   $sec = $::nfs::simp_krb5
 ) inherits ::nfs {
 
