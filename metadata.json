@@ -1,6 +1,6 @@
 {
   "name": "simp-nfs",
-  "version": "4.5.1",
+  "version": "4.5.2",
   "author": "simp",
   "summary": "manages NFS server and client, also PKI and stunnelling",
   "license": "Apache-2.0",
@@ -23,8 +23,12 @@
       "version_requirement": ">= 2.0.2"
     },
     {
+      "name": "simp/iptables",
+      "version_requirement": ">= 4.1.4"
+    },
+    {
       "name": "simp/krb5",
-      "version_requirement": ">= 5.0.0"
+      "version_requirement": ">= 5.0.5"
     },
     {
       "name": "simp/simpcat",

@@ -19,7 +19,11 @@ describe 'nfs krb5' do
         end
       end
 
-      host_ipaddresses = host_ipaddresses.flatten.uniq.compact
+      etc_hosts = on(host, 'puppet resource host').stdout.strip
+      etc_hosts = etc_hosts.lines.map!{|x| x.strip =~ /ip\s+=>\s+(?:'|")(.*)(?:'|")/; x = $1}
+      etc_hosts.delete_if{|x| x.nil? || x.empty? || x == '127.0.0.1'}
+
+      host_ipaddresses = (etc_hosts + host_ipaddresses).flatten.uniq.compact
       host_ipaddresses.delete_if{|x| x =~ /^\s*$/}
     end
 
@@ -114,7 +118,7 @@ nfs::server::client_ips : 'ALL'
         keytab_src = %(/var/kerberos/krb5kdc/generated_keytabs/#{fact_on(host,'fqdn')}/krb5.keytab)
 
         host.mkdir_p('/tmp/keytabs')
-        on(host, "cp #{keytab_src} /tmp/keytabs/#{fact_on(host, 'fqdn')}.keytab")
+        on(host, "cp #{keytab_src} /tmp/keytabs/")
       end
 
       it 'should work with no errors' do
@@ -156,7 +160,8 @@ nfs::server::client_ips : 'ALL'
 
           nfs::server::export { 'nfs4_root':
             client      => ['*'],
-            export_path => '/srv/nfs_share'
+            export_path => '/srv/nfs_share',
+            sec         => ['krb5p']
           }
 
           File['/srv/nfs_share'] -> Nfs::Server::Export['nfs4_root']
@@ -200,7 +205,7 @@ nfs::server::client_ips : 'ALL'
             # doing.
             server.do_scp_from(keytab_src, tmpdir, {})
             host.mkdir_p('/tmp/keytabs')
-            host.do_scp_to(File.join(tmpdir, File.basename(keytab_src)), "/tmp/keytabs/#{client_fqdn}.keytab", {})
+            host.do_scp_to(File.join(tmpdir, File.basename(keytab_src)), "/tmp/keytabs/", {})
           ensure
             FileUtils.remove_entry_secure(tmpdir)
           end

@@ -85,7 +85,7 @@ define nfs::server::export (
   $fsid = '',
   $nordirplus = false,
   $refer = '',
-  $sec = ['krb5p'],
+  $sec = ['sys'],
   $no_root_squash = false,
   $all_squash = false,
   $anonuid = '65534',

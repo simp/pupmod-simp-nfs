@@ -64,7 +64,6 @@ nfs::is_server: true
 classes:
   - 'site::nfs_server'
 ```
-
 On a node intended to be a client:
 
 ``` yaml
@@ -74,15 +73,26 @@ classes:
 
 ## Usage
 
-
 ### Basic Usage
 
-In order to export `/srv/nfs_share` and mount it as `/mnt/nfs` on a client, you need to create a couple of profile classes.
+In order to export `/srv/nfs_share` and mount it as `/mnt/nfs` on a client,
+you need to create a couple of profile classes.
 
 One to be added to the node intended to be the server, to define the exported path:
 
 ``` puppet
-class site::nfs_server {
+class site::nfs_server (
+  $usekrb5 = hiera('nfs::simp_krb5',false),
+  $client_nets = defined('$::client_nets') ? { true => $::client_nets,default => hiera('client_nets') },
+  ){
+  include '::nfs'
+
+  if $usekrb5 {
+    $security = 'krb5p'
+  } else {
+    $security = 'sys'
+  }
+
   include '::nfs'
 
   file { '/srv/nfs_share':
@@ -93,9 +103,9 @@ class site::nfs_server {
   }
 
   nfs::server::export { 'nfs4_root':
-    client      => ['*'],
+    client      => $client_nets,
     export_path => '/srv/nfs_share',
-    sec         => ['sys'],
+    sec         => ["${security}"],
     require     => File['/srv/nfs_share']
   }
 }
@@ -104,8 +114,17 @@ class site::nfs_server {
 And another profile class to be added to a node intended to be a client, to mount the exported filesystem on a node. Note that all that is needed is the native Puppet `mount` resource:
 
 ``` puppet
-class site::nfs_client {
+class site::nfs_client (
+    $usekrb5 = hiera('nfs::simp_krb5',false),
+  ){
   include '::nfs'
+
+  if $usekrb5 {
+    $security = 'krb5p'
+  } else {
+    $security = 'sys'
+  }
+
 
   file { '/mnt/nfs':
     ensure => 'directory',
@@ -118,7 +137,7 @@ class site::nfs_client {
     ensure  => 'mounted',
     fstype  => 'nfs4',
     device  => '<your_server_fqdn>:/srv/nfs_share',
-    options => 'sec=sys'
+    options => "sec=${security}",
     require => File['/mnt/nfs']
   }
 }
@@ -127,6 +146,8 @@ class site::nfs_client {
 
 ### Usage with krb5
 
+WARNING! This functionality requires some manual configuration and is largely untested.
+
 This module, used with the [SIMP krb5 module](https://github.com/simp/pupmod-simp-krb5), can automatically use kerberos to secure the exported filesystem. The module can create and manage the entire kerberos configuration automatically, but check the krb5 module itself if you want more control.
 
 Modify the examples provided above to include the following hieradata:
@@ -134,10 +155,11 @@ Modify the examples provided above to include the following hieradata:
 To be applied on every node in `default.yaml`:
 
 ``` yaml
-simp_krb5: true
+simp_krb5 : true
+nfs::simp_krb5 : true
+nfs::secure_nfs : true
 
-nfs::secure_nfs: true
-
+krb5::config::dns_lookup_kdc : false
 krb5::kdc::auto_keytabs::global_services:
   - 'nfs'
 ```
@@ -149,7 +171,49 @@ classes:
   - 'krb5::kdc'
 ```
 
-There are no changes required for any client-specific hieradata.
+Add the following entry to both your site::nfs_server and site::nfs_client
+manifests replacing <class_name> with the correct class name (either nfs_sever
+or nfs_client)
+
+```puppet
+Class['krb5::keytab'] -> Class['site::<class_name>']
+
+# If your realm is not your domain name then change this
+# to the string that is your realm
+# If your kdc server is not the puppet server change admin_server
+# entry to the FQDN of your admin server/kdc.
+
+myrealm = inline_template('<%= @domain.upcase %>')
+
+krb5::setting::realm { ${myrealm}:
+  admin_server => hiera('puppet::server'),
+  default_domain => ${myrealm}
+}
+
+```
+
+SIMP does not have kerberos set up to work automatically with LDAP yet.
+You must add a pricipal for  each user you want to give access to the krb5 protected
+directories.  To do this log onto the KDC and run:
+
+```bash
+kadmin.local
+#note the prompt is now kadmin.local
+kadmin.local:  add_principal -pw <password> <username>
+...
+kadmin.local:  exit
+```
+When the user logs on after kerberos has been configured they must run:
+
+```bash
+kinit
+```
+It will ask them for their password.  Once the have done this they should be
+able to access any shares from that realm.
+
+If you get an error that it can't access the profile, that means that the
+configuration files in /etc/krb5.conf.d and /etc/krb5.conf.simp.d and
+/etc/krb5.conf are not world readable.
 
 ### Automatic mounting of home directories
 

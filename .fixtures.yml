@@ -53,4 +53,4 @@ fixtures:
       repo: "git://github.com/simp/pupmod-simp-tcpwrappers"
       branch: "master"
   symlinks:
-    nfs: "#{source_dir}"
+    iptables: "#{source_dir}/../iptables"
