@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa041b7_31616cd4",
+        "filename": ".fixtures.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1005143
+      },
+      "writtenOn": "2016-09-01T13:09:22Z",
+      "side": 1,
+      "message": "wat",
+      "range": {
+        "startLine": 56,
+        "startChar": 4,
+        "endLine": 56,
+        "endChar": 40
+      },
+      "revId": "06f91ccf6e6d08ebfc2c0e093cad9bfab5b78f35",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baa041b7_b1a33c00",
+        "filename": "README.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1005143
+      },
+      "writtenOn": "2016-09-01T13:09:22Z",
+      "side": 1,
+      "message": "I did not know you could double-backtick in markdown.",
+      "range": {
+        "startLine": 26,
+        "startChar": 21,
+        "endLine": 26,
+        "endChar": 23
+      },
+      "revId": "06f91ccf6e6d08ebfc2c0e093cad9bfab5b78f35",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
