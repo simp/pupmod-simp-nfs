@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa041b7_51cab06f",
+        "filename": "README.md",
+        "patchSetId": 6
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1005143
+      },
+      "writtenOn": "2016-09-01T13:09:22Z",
+      "side": 1,
+      "message": "We should aim to wrap markdown text @ 80 char when feasible.",
+      "range": {
+        "startLine": 22,
+        "startChar": 100,
+        "endLine": 22,
+        "endChar": 151
+      },
+      "revId": "28b1a503919c7d5b97c81dd66f096d922d9aebbc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baa041b7_71cdb485",
+        "filename": "README.md",
+        "patchSetId": 6
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1005143
+      },
+      "writtenOn": "2016-09-01T13:09:22Z",
+      "side": 1,
+      "message": "Is this true?  I don\u0027t see anything in the code to support that.  The header comments in `manifests/init.pp` evensuggest the opposite:\n\n   # @param use_stunnel [Boolean] If set, wrap stunnel around the NFS server\n   #   connections. This is ideally suited for environments without a working\n   #   Kerberos setup. However, they can be used synchronously.",
+      "range": {
+        "startLine": 24,
+        "startChar": 114,
+        "endLine": 24,
+        "endChar": 168
+      },
+      "revId": "28b1a503919c7d5b97c81dd66f096d922d9aebbc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baa041b7_11c4285d",
+        "filename": "README.md",
+        "patchSetId": 6
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 1005143
+      },
+      "writtenOn": "2016-09-01T13:09:22Z",
+      "side": 1,
+      "message": "Added this section since it was in the TOC",
+      "range": {
+        "startLine": 213,
+        "startChar": 0,
+        "endLine": 214,
+        "endChar": 0
+      },
+      "revId": "28b1a503919c7d5b97c81dd66f096d922d9aebbc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
