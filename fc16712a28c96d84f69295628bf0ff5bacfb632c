@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa041b7_6d4dde98",
+        "filename": "README.md",
+        "patchSetId": 8
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1004834
+      },
+      "writtenOn": "2016-09-01T19:39:16Z",
+      "side": 1,
+      "message": "This has a working hotfix",
+      "revId": "fc16712a28c96d84f69295628bf0ff5bacfb632c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
