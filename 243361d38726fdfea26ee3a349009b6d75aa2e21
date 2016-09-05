@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa041b7_984e0dc1",
+        "filename": "manifests/client.pp",
+        "patchSetId": 2
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1005143
+      },
+      "writtenOn": "2016-09-05T20:33:26Z",
+      "side": 1,
+      "message": "This is true.  I vote we remove `$nfs:client::sec`.",
+      "range": {
+        "startLine": 40,
+        "startChar": 0,
+        "endLine": 41,
+        "endChar": 1
+      },
+      "revId": "243361d38726fdfea26ee3a349009b6d75aa2e21",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
