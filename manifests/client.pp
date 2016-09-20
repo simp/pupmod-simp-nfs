@@ -57,7 +57,7 @@ class nfs::client (
 
     file { '/etc/exports':
       ensure  => 'file',
-      mode    => '0640',
+      mode    => '0644',
       owner   => 'root',
       group   => 'root',
       content => "\n"
