@@ -17,7 +17,7 @@ describe 'nfs::server::export' do
 
         it { is_expected.to compile.with_all_deps }
         it { is_expected.to contain_class('nfs::server') }
-        it { is_expected.to create_concat_fragment("nfs+#{title}.export") }
+        it { is_expected.to create_simpcat_fragment("nfs+#{title}.export") }
 
         context 'when sec includes "sys"' do
           let(:params) {

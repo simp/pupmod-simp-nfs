@@ -125,7 +125,7 @@ define nfs::server::export (
 
   $_name = inline_template('<%= @name.gsub("/","|") -%>')
 
-  concat_fragment { "nfs+${_name}.export":
+  simpcat_fragment { "nfs+${_name}.export":
     content => template('nfs/export.erb')
   }
 

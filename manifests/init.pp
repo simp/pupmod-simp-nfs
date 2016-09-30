@@ -216,12 +216,12 @@ class nfs (
   svckill::ignore { 'nfs-mountd': }
   svckill::ignore { 'nfs-rquotad': }
 
-  concat_build { 'sysconfig_nfs':
+  simpcat_build { 'sysconfig_nfs':
     quiet  => true,
     target => '/etc/sysconfig/nfs'
   }
 
-  concat_fragment { 'sysconfig_nfs+init':
+  simpcat_fragment { 'sysconfig_nfs+init':
     content => template('nfs/nfs_sysconfig.erb')
   }
 
@@ -230,7 +230,7 @@ class nfs (
     owner   => 'root',
     group   => 'root',
     mode    => '0644',
-    require => Concat_build['sysconfig_nfs']
+    require => Simpcat_build['sysconfig_nfs']
   }
 
   Class['nfs::install'] -> File['/etc/sysconfig/nfs']
