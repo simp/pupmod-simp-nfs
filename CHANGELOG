@@ -1,4 +1,8 @@
-* Thu Aug 25 2016 Nick Markowski <nmarkowski@keywcorp.com> 4.5.2-0
+* Fri Sep 30 2016 Trevor Vaughan <tvaughan@onyxpoint.com> - 5.0.0-0
+- Updated to use the new 'simpcat' module that deconflicts with
+  'puppetlabs/concat'
+
+* Thu Aug 25 2016 Nick Markowski <nmarkowski@keywcorp.com> - 4.5.2-0
 - Defaulted export sec to sys.
 - Updated documentation to reflect krb5 integration with manual changes.
 
