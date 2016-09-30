@@ -100,11 +100,11 @@ class nfs::server (
 
   if $nfsv3 { include '::nfs::idmapd' }
 
-  concat_fragment { 'sysconfig_nfs+server':
+  simpcat_fragment { 'sysconfig_nfs+server':
     content => template('nfs/nfs_sysconfig_server.erb')
   }
 
-  concat_build { 'nfs':
+  simpcat_build { 'nfs':
     order  => '*.export',
     quiet  => true,
     target => '/etc/exports'
@@ -123,9 +123,9 @@ class nfs::server (
     require     => Package['nfs-utils']
   }
 
-  Concat_build['nfs'] -> File['/etc/exports']
+  Simpcat_build['nfs'] -> File['/etc/exports']
   File['/etc/exports'] ~> Exec['nfs_re-export']
-  Concat_build['nfs'] ~> Exec['nfs_re-export']
+  Simpcat_build['nfs'] ~> Exec['nfs_re-export']
 
   service { $::nfs::service_names::nfs_server :
     ensure     => 'running',
