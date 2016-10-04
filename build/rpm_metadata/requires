@@ -1,10 +1,16 @@
-Requires: pupmod-herculesteam-augeasproviders_sysctl
-Requires: pupmod-puppetlabs-stdlib
-Requires: pupmod-simp-autofs >= 4.1.0
-Requires: pupmod-simp-iptables >= 4.1.4
-Requires: pupmod-simp-krb5 >= 5.0.5
-Requires: pupmod-simp-simpcat >= 4.0.0-0
-Requires: pupmod-simp-simplib >= 1.0.0-0
-Requires: pupmod-simp-stunnel >= 4.2.0-0
-Requires: pupmod-simp-sysctl >= 4.1.0-2
 Obsoletes: pupmod-nfs-test >= 0.0.1
+Requires: pupmod-herculesteam-augeasproviders_sysctl < 3.0.0-0
+Requires: pupmod-herculesteam-augeasproviders_sysctl >= 2.1.0-0
+Requires: pupmod-puppetlabs-stdlib
+Requires: pupmod-simp-iptables < 5.0.0-0
+Requires: pupmod-simp-iptables >= 4.1.4-0
+Requires: pupmod-simp-krb5 < 6.0.0-0
+Requires: pupmod-simp-krb5 >= 5.0.7-0
+Requires: pupmod-simp-simpcat < 6.0.0-0
+Requires: pupmod-simp-simpcat >= 5.0.1-0
+Requires: pupmod-simp-simplib < 2.0.0-0
+Requires: pupmod-simp-simplib >= 1.3.1-0
+Requires: pupmod-simp-stunnel < 5.0.0-0
+Requires: pupmod-simp-stunnel >= 4.2.8-0
+Requires: pupmod-simp-sysctl < 5.0.0-0
+Requires: pupmod-simp-sysctl >= 4.2.0-0
