@@ -3,8 +3,8 @@ Requires: pupmod-herculesteam-augeasproviders_sysctl < 3.0.0-0
 Requires: pupmod-herculesteam-augeasproviders_sysctl >= 2.1.0-0
 Requires: pupmod-simp-autofs < 6.0.0-0
 Requires: pupmod-simp-autofs >= 5.0.0-0
-Requires: pupmod-simp-iptables < 5.0.0-0
-Requires: pupmod-simp-iptables >= 4.1.5-0
+Requires: pupmod-simp-iptables < 6.0.0-0
+Requires: pupmod-simp-iptables >= 5.0.0-0
 Requires: pupmod-simp-krb5 < 6.0.0-0
 Requires: pupmod-simp-krb5 >= 5.0.8-0
 Requires: pupmod-simp-simpcat < 7.0.0-0
