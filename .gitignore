@@ -1,14 +1,11 @@
 .*.sw?
-.yard*
+.yardoc
 dist
 /pkg
-!/spec/fixtures/
-/spec/fixtures/*
+/spec/fixtures
 /spec/rp_env
-!/spec/fixtures/hieradata
-!/spec/fixtures/hieradata/*.yaml
+!/spec/hieradata/default.yaml
 !/spec/fixtures/site.pp
-/spec/fixtures/hieradata/hiera.yaml
 /.rspec_system
 /.vagrant
 /.bundle
