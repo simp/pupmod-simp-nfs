@@ -28,7 +28,7 @@
     },
     {
       "name": "simp/krb5",
-      "version_requirement": ">= 5.0.8 < 6.0.0"
+      "version_requirement": ">= 6.0.0 < 7.0.0"
     },
     {
       "name": "simp/simpcat",
@@ -44,7 +44,7 @@
     },
     {
       "name": "simp/sysctl",
-      "version_requirement": ">= 4.2.1 < 5.0.0"
+      "version_requirement": ">= 5.0.0 < 6.0.0"
     }
   ],
   "operatingsystem_support": [
