@@ -54,8 +54,8 @@ describe 'nfs' do
           it { is_expected.to create_iptables__add_tcp_stateful_listen('nfs_client_tcp_ports') }
           it { is_expected.to create_iptables__add_udp_listen('nfs_client_udp_ports') }
           it { is_expected.to contain_service('sunrpc_tuning').with_require('File[/etc/init.d/sunrpc_tuning]') }
-          it { is_expected.to contain_sysctl__value('sunrpc.tcp_slot_table_entries') }
-          it { is_expected.to contain_sysctl__value('sunrpc.udp_slot_table_entries') }
+          it { is_expected.to contain_sysctl('sunrpc.tcp_slot_table_entries') }
+          it { is_expected.to contain_sysctl('sunrpc.udp_slot_table_entries') }
           it { is_expected.to contain_simpcat_fragment('sysconfig_nfs+server').without_content(%r(RPCSVCGSSDARGS=)) }
         end
 

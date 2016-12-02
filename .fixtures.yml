@@ -49,9 +49,6 @@ fixtures:
     svckill:
       repo: git://github.com/simp/pupmod-simp-svckill
       branch: master
-    sysctl:
-      repo: git://github.com/simp/pupmod-simp-sysctl
-      branch: master
     tcpwrappers:
       repo: git://github.com/simp/pupmod-simp-tcpwrappers
       branch: master

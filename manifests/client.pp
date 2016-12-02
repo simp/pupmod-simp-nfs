@@ -80,12 +80,13 @@ class nfs::client (
       Package['nfs-utils'],
       File['/etc/modprobe.d/nfs.conf']
     ],
-    notify  => Sysctl::Value['fs.nfs.nfs_callback_tcpport']
+    notify  => Sysctl['fs.nfs.nfs_callback_tcpport']
   }
 
-  sysctl::value { 'fs.nfs.nfs_callback_tcpport':
-    value  => $callback_port,
-    silent => true,
+  sysctl { 'fs.nfs.nfs_callback_tcpport':
+    ensure => 'present',
+    val    => $callback_port,
+    silent => true
   }
 
   file { '/etc/modprobe.d/nfs.conf':

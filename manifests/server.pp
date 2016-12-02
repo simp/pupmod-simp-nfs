@@ -207,14 +207,17 @@ class nfs::server (
     pattern => $client_ips
   }
 
-  sysctl::value { 'sunrpc.tcp_slot_table_entries':
-    value  => $sunrpc_tcp_slot_table_entries,
-    silent => true,
+
+  sysctl { 'sunrpc.tcp_slot_table_entries':
+    ensure => 'present',
+    val    => $sunrpc_tcp_slot_table_entries,
+    silent => true, 
     notify => Service[$::nfs::service_names::nfs_server]
   }
 
-  sysctl::value { 'sunrpc.udp_slot_table_entries':
-    value  => $sunrpc_udp_slot_table_entries,
+  sysctl { 'sunrpc.udp_slot_table_entries':
+    ensure => 'present',
+    val    => $sunrpc_udp_slot_table_entries,
     silent => true,
     notify => Service[$::nfs::service_names::nfs_server]
   }
@@ -231,9 +234,9 @@ class nfs::server (
       Service[$::nfs::service_names::rpcbind] -> Service[$::nfs::service_names::rpcsvcgssd]
     }
 
-    Service[$::nfs::service_names::rpcbind] -> Sysctl::Value['sunrpc.tcp_slot_table_entries']
-    Service[$::nfs::service_names::rpcbind] -> Sysctl::Value['sunrpc.udp_slot_table_entries']
-    Sysctl::Value['sunrpc.tcp_slot_table_entries'] ~> Service[$::nfs::service_names::nfs_lock]
-    Sysctl::Value['sunrpc.udp_slot_table_entries'] ~> Service[$::nfs::service_names::nfs_lock]
+    Service[$::nfs::service_names::rpcbind] -> Sysctl['sunrpc.tcp_slot_table_entries']
+    Service[$::nfs::service_names::rpcbind] -> Sysctl['sunrpc.udp_slot_table_entries']
+    Sysctl['sunrpc.tcp_slot_table_entries'] ~> Service[$::nfs::service_names::nfs_lock]
+    Sysctl['sunrpc.udp_slot_table_entries'] ~> Service[$::nfs::service_names::nfs_lock]
   }
 }
