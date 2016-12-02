@@ -183,7 +183,7 @@ class nfs (
       enable     => true,
       hasrestart => true,
       hasstatus  => true,
-      require => File['/etc/sysconfig/nfs']
+      require    => File['/etc/sysconfig/nfs']
     }
 
     if (!$is_server and $is_client and $use_stunnel) {
