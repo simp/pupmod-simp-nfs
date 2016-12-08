@@ -1,6 +1,6 @@
 # Provides the base segments for NFS server *and* client services.
 #
-# @param use_stunnel [Boolean] If set, wrap stunnel around the NFS server
+# @param stunnel [Boolean] If set, wrap stunnel around the NFS server
 #   connections. This is ideally suited for environments without a working
 #   Kerberos setup and may cause issues when used together.
 #
@@ -47,70 +47,60 @@
 #
 # @param ensure_lvm2_latest [Boolean] See nfs::lvm2 for further description.
 #
-# @param simp_krb5 [Boolean] Use the SIMP `krb5` module for Kerberos support.
+# @param kerberos [Boolean] Use the SIMP `krb5` module for Kerberos support.
 #   @note You may need to set variables in `::krb5::config` via Hiera or your
 #     ENC if you do not like the defaults.
 #
-# @param simp_keytab_on_puppet [Boolean] If set, and $simp_krb5 is true, then
+# @param simp_keytab_on_puppet [Boolean] If set, and $kerberos is true, then
 #   set the NFS server to pull its keytab directly from the Puppet server.
 #
-# @param simp_iptables [Boolean] If set, use the SIMP iptables module to manage
+# @param firewall [Boolean] If set, use the SIMP iptables module to manage
 #   firewall connections.
+#
+# @param tcpwrappers [Boolean] If set, use the SIMP tcpwrappers module to
+#   manage tcpwrappers.
 #
 # @author Trevor Vaughan <tvaughan@onyxpoint.com>
 # @author Kendall Moore <kendall.moore@onyxpoint.com>
 #
 class nfs (
-  $use_stunnel = false,
-  $is_server = false,
-  $is_client = true,
-  $nfsv3 = false,
-  $mountd_nfs_v1 = true,
-  $mountd_nfs_v2 = false,
-  $mountd_nfs_v3 = false,
-  $rquotad = '/usr/sbin/rpc.rquotad',
-  $rquotad_port = '875',
-  $lockd_tcpport = '32803',
-  $lockd_udpport = '32769',
-  $rpcnfsdargs = '-N 2',
-  $rpcnfsdcount = '8',
-  $nfsd_v4_grace = '90',
-  $mountd_port = '20048',
-  $statd_port = '662',
-  $statd_outgoing_port = '2020',
-  $secure_nfs = false,
-  $ensure_lvm2_latest = true,
-  $simp_krb5 = defined('$::simp_krb5') ? { true => getvar($::simp_krb5), default => hiera('simp_krb5', false) },
-  $simp_keytab_on_puppet = true,
-  $simp_iptables = defined('$::use_iptables') ? { true => getvar('::use_iptables'), default => hiera('use_iptables',true) }
+  Boolean                  $stunnel               = simplib::lookup('simp_options::stunnel', { 'default_value'     => false }),
+  Boolean                  $is_server             = false,
+  Boolean                  $is_client             = true,
+  Boolean                  $nfsv3                 = false,
+  Boolean                  $mountd_nfs_v1         = true,
+  Boolean                  $mountd_nfs_v2         = false,
+  Boolean                  $mountd_nfs_v3         = false,
+  Stdlib::Absolutepath     $rquotad               = '/usr/sbin/rpc.rquotad',
+  Stdlib::Compat::Integer  $rquotad_port          = '875',
+  Stdlib::Compat::Integer  $lockd_tcpport         = '32803',
+  Stdlib::Compat::Integer  $lockd_udpport         = '32769',
+  String                   $rpcnfsdargs           = '-N 2',
+  Stdlib::Compat::Integer  $rpcnfsdcount          = '8',
+  Stdlib::Compat::Integer  $nfsd_v4_grace         = '90',
+  Stdlib::Compat::Integer  $mountd_port           = '20048',
+  Stdlib::Compat::Integer  $statd_port            = '662',
+  Stdlib::Compat::Integer  $statd_outgoing_port   = '2020',
+  Boolean                  $secure_nfs            = false,
+  Boolean                  $ensure_lvm2_latest    = true,
+  Boolean                  $kerberos              = simplib::lookup('simp_options::kerberos', { 'default_value'    => false }),
+  Boolean                  $simp_keytab_on_puppet = true,
+  Boolean                  $firewall              = simplib::lookup('simp_options::firewall', { 'default_value'    => false }),
+  Boolean                  $tcpwrappers           = simplib::lookup('simp_options::tcpwrappers', { 'default_value' => false })
 ){
 
   include '::nfs::service_names'
 
-  validate_absolute_path($rquotad)
-  validate_bool($use_stunnel)
-  validate_bool($is_server)
-  validate_bool($is_client)
-  validate_bool($nfsv3)
-  validate_bool($mountd_nfs_v1)
-  validate_bool($mountd_nfs_v2)
-  validate_bool($mountd_nfs_v3)
-  validate_bool($secure_nfs)
-  validate_integer($rpcnfsdcount)
-  validate_integer($nfsd_v4_grace)
   validate_port($rquotad_port)
   validate_port($lockd_tcpport)
   validate_port($lockd_udpport)
   validate_port($mountd_port)
   validate_port($statd_port)
   validate_port($statd_outgoing_port)
-  validate_bool($ensure_lvm2_latest)
-  validate_bool($simp_keytab_on_puppet)
-  validate_bool($simp_krb5)
 
   include '::nfs::install'
 
-  if $simp_krb5 {
+  if $kerberos {
     include '::krb5'
 
     if $::operatingsystem in ['RedHat', 'CentOS'] {
@@ -147,7 +137,7 @@ class nfs (
 
     Class['nfs::install'] -> Class['nfs::server']
 
-    if $simp_krb5 {
+    if $kerberos {
       Class['krb5'] ~> Class['nfs::server']
 
       if $simp_keytab_on_puppet {
@@ -186,7 +176,7 @@ class nfs (
       require    => File['/etc/sysconfig/nfs']
     }
 
-    if (!$is_server and $is_client and $use_stunnel) {
+    if (!$is_server and $is_client and $stunnel) {
       service { $::nfs::service_names::rpcbind :
         ensure  => 'stopped',
         require => File['/etc/sysconfig/nfs']

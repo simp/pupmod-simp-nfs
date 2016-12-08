@@ -40,9 +40,12 @@ fixtures:
     simplib:
       repo: git://github.com/simp/pupmod-simp-simplib
       branch: master
+    simp_options:
+      repo: https://github.com/simp/pupmod-simp-simp_options
+      branch: master
     stdlib:
       repo: git://github.com/simp/puppetlabs-stdlib
-      branch: simp-master
+      branch: master
     stunnel:
       repo: git://github.com/simp/pupmod-simp-stunnel
       branch: master

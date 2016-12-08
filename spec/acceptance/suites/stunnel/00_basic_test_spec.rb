@@ -17,7 +17,7 @@ describe 'nfs basic' do
 
     iptables::add_tcp_stateful_listen { 'i_love_testing':
       order => '8',
-      client_nets => 'ALL',
+      trusted_nets => 'ALL',
       dports => '22'
     }
   EOM
@@ -39,10 +39,10 @@ nfs::server : '#NFS_SERVER#'
 
 # These two need to be paired in our case since we expect to manage the Kerberos
 # infrastructure for our tests.
-nfs::simp_krb5 : false
+nfs::kerberos : false
 nfs::secure_nfs : false
 nfs::is_server : #IS_SERVER#
-nfs::server::client_ips : 'ALL'
+nfs::server::trusted_nets : 'ALL'
     EOM
 
   }

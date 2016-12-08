@@ -33,20 +33,19 @@
 # @author Kendall Moore <kendall.moore@onyxpoint.com>
 #
 class nfs::client::stunnel(
-  $nfs_server = $::nfs::client::nfs_server,
-  $version = '4',
-  $nfs_accept_port = '2049',
-  $nfs_connect_port = '20490',
-  $portmapper_accept_port = '111',
-  $portmapper_connect_port = '1110',
-  $rquotad_connect_port = '8750',
-  $lockd_connect_port = '32804',
-  $mountd_connect_port = '8920',
-  $statd_connect_port = '6620',
+  String                   $nfs_server              = $::nfs::client::nfs_server,
+  Stdlib::Compat::Integer  $version                 = '4',
+  Stdlib::Compat::Integer  $nfs_accept_port         = '2049',
+  Stdlib::Compat::Integer  $nfs_connect_port        = '20490',
+  Stdlib::Compat::Integer  $portmapper_accept_port  = '111',
+  Stdlib::Compat::Integer  $portmapper_connect_port = '1110',
+  Stdlib::Compat::Integer  $rquotad_connect_port    = '8750',
+  Stdlib::Compat::Integer  $lockd_connect_port      = '32804',
+  Stdlib::Compat::Integer  $mountd_connect_port     = '8920',
+  Stdlib::Compat::Integer  $statd_connect_port      = '6620',
 ) inherits ::nfs::client {
 
   validate_net_list($nfs_server)
-  validate_integer($version)
   validate_port($nfs_accept_port)
   validate_port($nfs_connect_port)
   validate_port($portmapper_accept_port)

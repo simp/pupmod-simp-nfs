@@ -6,4 +6,5 @@ ldap::uri:
 ldap::bind_dn: 'cn=hostAuth,ou=Hosts,dc=example,dc=domain'
 ldap::bind_pw: 'LKJSDAGFJ891734jk!($+(COKIHASMBNFS'
 nfs::server: "%{fqdn}"
-nfs::server::client_ips: '1.2.3.4/32'
+nfs::server::trusted_nets:
+  - '1.2.3.4/32'

@@ -18,38 +18,34 @@
 #
 # @param callback_port [Port] The callback port.
 #
-# @param use_stunnel [Boolean] If set, will *attempt* to determine if the
+# @param stunnel [Boolean] If set, will *attempt* to determine if the
 #   server is trying to connect to itself. If connecting to itself, will not
 #   use stunnel, otherwise will use stunnel.
 #
 #   @note If you are using host aliases for your NFS server names, this check
-#     may fail and you may need to disable `$use_stunnel` explicitly.
+#     may fail and you may need to disable `$stunnel` explicitly.
 #
-# @param simp_iptables [Boolean] If set, use the SIMP IPTables module to
+# @param firewall [Boolean] If set, use the SIMP IPTables module to
 #   manipulate the firewall settings.
 #
 # @author Trevor Vaughan <tvaughan@onyxpoint.com>
 # @author Kendall Moore <kendall.moore@onyxpoint.com>
 #
 class nfs::client (
-  $nfs_server = defined('$::nfs::server') ? { true => getvar('::nfs_server') , default => hiera('nfs::server') },
-  $is_server = $::nfs::is_server,
-  $callback_port = '876',
-  $use_stunnel = $::nfs::use_stunnel,
-  $simp_iptables = $::nfs::simp_iptables,
-  # FIXME: `$sec` appears to be unused
-  $sec = $::nfs::simp_krb5
+  String                   $nfs_server    = defined('$::nfs::server') ? { true => getvar('::nfs_server') , default => hiera('nfs::server') },
+  Boolean                  $is_server     = $::nfs::is_server,
+  Stdlib::Compat::Integer  $callback_port = '876',
+  Boolean                  $stunnel       = $::nfs::stunnel,
+  Boolean                  $firewall      = $::nfs::firewall,
 ) inherits ::nfs {
 
   validate_net_list($nfs_server)
   validate_port($callback_port)
-  validate_bool($use_stunnel)
-  validate_bool($simp_iptables)
 
-  $_is_server = ($is_server or (host_is_me($nfs_server) and $use_stunnel))
+  $_is_server = ($is_server or (host_is_me($nfs_server) and $stunnel))
 
   if !$_is_server {
-    if $use_stunnel { include '::nfs::client::stunnel' }
+    if $stunnel { include '::nfs::client::stunnel' }
 
     # If this explodes, your system has been unable to determine whether or not
     # it is the NFS server is question and you'll need to rectify that
@@ -64,12 +60,12 @@ class nfs::client (
     }
   }
 
-  if $simp_iptables {
+  if $firewall {
     include '::iptables'
 
     iptables::add_tcp_stateful_listen { 'nfs4_callback_port':
-      client_nets => $nfs_server,
-      dports      => $callback_port
+      trusted_nets => $nfs_server,
+      dports       => $callback_port
     }
   }
 

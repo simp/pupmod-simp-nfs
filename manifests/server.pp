@@ -3,7 +3,7 @@
 #
 # This defaults to NFSv4.
 #
-# @param client_ips [Net List] The systems that are allowed to connect to this
+# @param trusted_nets [Net List] The systems that are allowed to connect to this
 #   service, as an array. Set to 'any' or 'ALL' to allow the world.
 #
 # @param nfsv3 [Boolean] If set, this server serves out NFSv3 shares.
@@ -49,54 +49,53 @@
 # @note The rpcbind port and the rpc.quotad ports are open to the client
 #   networks so that the 'quota' command works on the clients.
 #
-# @param simp_iptables [Boolean] If set, use the SIMP iptables module to manage
+# @param firewall [Boolean] If set, use the SIMP iptables module to manage
 #   firewall connections.
+#
+# @param stunnel [Boolean] If set, use the SIMP stunnel module to manage
+#   stunnel.
+#
+# @param tcpwrappers [Boolean] If set, use the SIMP tcpwrappers module to
+#   manage tcpwrappers.
 #
 # @author Trevor Vaughan <tvaughan@onyxpoint.com>
 # @author Morgan Rhodes <morgan@puppet.com>
 # @author Kendall Moore <kendall.moore@onyxpoint.com>
 #
 class nfs::server (
-  $client_ips,
-  $nfsv3 = $::nfs::nfsv3,
-  $rpcrquotadopts= '',
-  $lockd_arg = '',
-  $nfsd_module = '',
-  $rpcmountdopts = '',
-  $statdarg = '',
-  $statd_ha_callout = '',
-  $rpcidmapdargs = '',
-  $rpcgssdargs = '',
-  $rpcsvcgssdargs = '',
-  $sunrpc_udp_slot_table_entries = '128',
-  $sunrpc_tcp_slot_table_entries = '128',
-  $simp_iptables = $::nfs::simp_iptables
+  Array[String]                           $trusted_nets,
+  Boolean                                 $nfsv3                         = $::nfs::nfsv3,
+  String                                  $rpcrquotadopts                = '',
+  String                                  $lockd_arg                     = '',
+  String                                  $nfsd_module                   = '',
+  String                                  $rpcmountdopts                 = '',
+  String                                  $statdarg                      = '',
+  Variant[Enum[''],Stdlib::Absolutepath]  $statd_ha_callout              = '',
+  String                                  $rpcidmapdargs                 = '',
+  String                                  $rpcgssdargs                   = '',
+  String                                  $rpcsvcgssdargs                = '',
+  Stdlib::Compat::Integer                 $sunrpc_udp_slot_table_entries = '128',
+  Stdlib::Compat::Integer                 $sunrpc_tcp_slot_table_entries = '128',
+  Boolean                                 $firewall                      = $::nfs::firewall,
+  Boolean                                 $stunnel                       = $nfs::stunnel,
+  Boolean                                 $tcpwrappers                   = $nfs::tcpwrappers
 ) inherits ::nfs {
 
-  include '::tcpwrappers'
+  validate_net_list($trusted_nets)
 
-  if $::nfs::use_stunnel {
+  if $tcpwrappers {
+    include '::tcpwrappers'
+  }
+
+  if $stunnel {
     include '::nfs::server::stunnel'
 
     # This is here due to some bug where allowing things through regularly
     # isn't working correctly.
-    tcpwrappers::allow { 'nfs': pattern => 'ALL' }
+    if $tcpwrappers {
+      tcpwrappers::allow { 'nfs': pattern => 'ALL' }
+    }
   }
-
-  validate_net_list($client_ips)
-  validate_bool($nfsv3)
-  validate_string($rpcrquotadopts)
-  validate_string($lockd_arg)
-  validate_string($nfsd_module)
-  validate_string($rpcmountdopts)
-  validate_string($statdarg)
-  if !empty($statd_ha_callout) { validate_absolute_path($statd_ha_callout) }
-  validate_string($rpcidmapdargs)
-  validate_string($rpcgssdargs)
-  validate_string($rpcsvcgssdargs)
-  validate_integer($sunrpc_udp_slot_table_entries)
-  validate_integer($sunrpc_tcp_slot_table_entries)
-  validate_bool($simp_iptables)
 
   if $nfsv3 { include '::nfs::idmapd' }
 
@@ -147,17 +146,17 @@ class nfs::server (
   }
 
   # $stunnel_port_override is a value that is set by the stunnel overlay.
-  if $::nfs::use_stunnel and $::nfs::server::stunnel::stunnel_port_override {
-    if $simp_iptables {
+  if $stunnel and $::nfs::server::stunnel::stunnel_port_override {
+    if $firewall {
       include '::iptables'
 
       iptables::add_tcp_stateful_listen { 'nfs_client_tcp_ports':
-        client_nets => $client_ips,
-        dports      => $::nfs::server::stunnel::stunnel_port_override
+        trusted_nets => $trusted_nets,
+        dports       => $::nfs::server::stunnel::stunnel_port_override
       }
       iptables::add_udp_listen { 'nfs_client_udp_ports':
-        client_nets => $client_ips,
-        dports      => $::nfs::server::stunnel::stunnel_port_override
+        trusted_nets => $trusted_nets,
+        dports       => $::nfs::server::stunnel::stunnel_port_override
       }
     }
   }
@@ -180,14 +179,15 @@ class nfs::server (
       ]
     }
 
-    if $simp_iptables {
+    if $firewall {
+      include '::iptables'
       iptables::add_tcp_stateful_listen { 'nfs_client_tcp_ports':
-        client_nets => $client_ips,
-        dports      => $lports
+        trusted_nets => $trusted_nets,
+        dports       => $lports
       }
       iptables::add_udp_listen { 'nfs_client_udp_ports':
-        client_nets => $client_ips,
-        dports      => $lports
+        trusted_nets => $trusted_nets,
+        dports       => $lports
       }
     }
   }
@@ -197,21 +197,23 @@ class nfs::server (
     require => File['/etc/init.d/sunrpc_tuning']
   }
 
-  tcpwrappers::allow { [
-    'mountd',
-    'statd',
-    'rquotad',
-    'lockd',
-    'rpcbind'
-    ]:
-    pattern => $client_ips
+  if $tcpwrappers {
+    tcpwrappers::allow { [
+      'mountd',
+      'statd',
+      'rquotad',
+      'lockd',
+      'rpcbind'
+      ]:
+      pattern => $trusted_nets
+    }
   }
 
 
   sysctl { 'sunrpc.tcp_slot_table_entries':
     ensure => 'present',
     val    => $sunrpc_tcp_slot_table_entries,
-    silent => true, 
+    silent => true,
     notify => Service[$::nfs::service_names::nfs_server]
   }
 

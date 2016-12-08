@@ -38,14 +38,14 @@
 # * Trevor Vaughan <mailto:tvaughan@onyxpoint.com>
 #
 class nfs::idmapd (
-  $verbosity = '',
-  $domain = $::domain,
-  $local_realms = '',
-  $nobody_user = 'nobody',
-  $nobody_group = 'nobody',
-  $trans_method = 'nsswitch',
-  $gss_methods = '',
-  $static_translation = ''
+  Variant[Enum[''],Stdlib::Compat::Integer]  $verbosity          = '',
+  String                                     $domain             = $::domain,
+  Variant[String, Array[String]]             $local_realms       = '',
+  String                                     $nobody_user        = 'nobody',
+  String                                     $nobody_group       = 'nobody',
+  String                                     $trans_method       = 'nsswitch',
+  Variant[String, Array[String]]             $gss_methods        = '',
+  Variant[Enum[''],Hash]                     $static_translation = ''
 ) {
 
   file { '/etc/idmapd.conf':

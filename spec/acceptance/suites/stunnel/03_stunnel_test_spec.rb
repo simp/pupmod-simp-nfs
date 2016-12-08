@@ -20,7 +20,7 @@ describe 'nfs stunnel' do
 
     iptables::add_tcp_stateful_listen { 'i_love_testing':
       order => '8',
-      client_nets => 'ALL',
+      trusted_nets => 'ALL',
       dports => '22'
     }
   EOM
@@ -38,7 +38,7 @@ describe 'nfs stunnel' do
 ---
 # Need to test that our iptables works properly with this stuff
 
-use_iptables : true
+firewall : true
 
 pki_dir : '/etc/pki/simp-testing/pki'
 
@@ -47,18 +47,18 @@ pki::public_key_source : "file://%{hiera('pki_dir')}/public/%{::fqdn}.pub"
 pki::cacerts_sources :
   - "file://%{hiera('pki_dir')}/cacerts"
 
-enable_auditing : false
+auditd : false
 
-nfs::use_stunnel : true
+nfs::stunnel : true
 nfs::server : '#NFS_SERVER#'
 # Set us up for a basic server for right now (no Kerberos)
 
 # These two need to be paired in our case since we expect to manage the Kerberos
 # infrastructure for our tests.
-nfs::simp_krb5 : false
+nfs::kerberos : false
 nfs::secure_nfs : false
 nfs::is_server : #IS_SERVER#
-nfs::server::client_ips : 'ALL'
+nfs::server::trusted_nets : 'ALL'
     EOM
   }
 

@@ -7,7 +7,7 @@ describe 'nfs krb5' do
   servers = hosts_with_role( hosts, 'nfs_server' )
   clients = hosts_with_role( hosts, 'nfs_client' )
 
-  def client_nets(target_hosts = hosts)
+  def trusted_nets(target_hosts = hosts)
     host_ipaddresses = []
 
     target_hosts.each do |host|
@@ -44,7 +44,7 @@ describe 'nfs krb5' do
 
     iptables::add_tcp_stateful_listen { 'i_love_testing':
       order => '8',
-      client_nets => 'ALL',
+      trusted_nets => 'ALL',
       dports => '22'
     }
   EOM
@@ -61,10 +61,10 @@ describe 'nfs krb5' do
   let(:hieradata) {
     <<-EOM
 ---
-client_nets :
-#{client_nets.map{|ip| ip = %(  - '#{ip}')}.join("\n")}
+trusted_nets :
+#{trusted_nets.map{|ip| ip = %(  - '#{ip}')}.join("\n")}
 
-use_iptables : true
+firewall : true
 
 pki_dir : '/etc/pki/simp-testing/pki'
 
@@ -73,9 +73,9 @@ pki::public_key_source : "file://%{hiera('pki_dir')}/public/%{::fqdn}.pub"
 pki::cacerts_sources :
   - "file://%{hiera('pki_dir')}/cacerts"
 
-enable_auditing : false
+auditd : false
 
-krb5::kdc::use_ldap : false
+krb5::kdc::ldap : false
 krb5::keytab::keytab_source : 'file:///tmp/keytabs'
 
 # Generate keytabs for everyone
@@ -90,9 +90,9 @@ nfs::server : '#NFS_SERVERS#'
 # These two need to be paired in our case since we expect to manage the Kerberos
 # infrastructure for our tests.
 nfs::secure_nfs : true
-nfs::simp_krb5 : true
+nfs::kerberos : true
 nfs::is_server : #IS_SERVER#
-nfs::server::client_ips : 'ALL'
+nfs::server::trusted_nets : 'ALL'
     EOM
   }
 

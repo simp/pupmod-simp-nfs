@@ -4,7 +4,7 @@
 # It will be removed once the bug is fixed upstream.
 #
 class nfs::lvm2(
-  $ensure = 'latest'
+  String $ensure = 'latest'
 ) {
   package { 'lvm2':
     ensure => $ensure

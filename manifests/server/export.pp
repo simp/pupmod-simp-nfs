@@ -70,58 +70,31 @@
 # @author Trevor Vaughan <mailto:tvaughan@onyxpoint.com>
 #
 define nfs::server::export (
-  $export_path,
-  $client,
-  $comment = '',
-  $insecure = false,
-  $rw = false,
-  $async = false,
-  $no_wdelay = false,
-  $nohide = false,
-  $crossmnt = false,
-  $subtree_check = false,
-  $insecure_locks = false,
-  $mountpoint = '',
-  $fsid = '',
-  $nordirplus = false,
-  $refer = '',
-  $sec = ['sys'],
-  $no_root_squash = false,
-  $all_squash = false,
-  $anonuid = '65534',
-  $anongid = '65534',
-  $custom = ''
+  Stdlib::Absolutepath                           $export_path,
+  Array[String]                                  $client,
+  String                                         $comment        = '',
+  Boolean                                        $insecure       = false,
+  Boolean                                        $rw             = false,
+  Boolean                                        $async          = false,
+  Boolean                                        $no_wdelay      = false,
+  Boolean                                        $nohide         = false,
+  Boolean                                        $crossmnt       = false,
+  Boolean                                        $subtree_check  = false,
+  Boolean                                        $insecure_locks = false,
+  Variant[Enum[''],Stdlib::Absolutepath]         $mountpoint     = '',
+  String                                         $fsid           = '',
+  Boolean                                        $nordirplus     = false,
+  String                                         $refer          = '',
+  Tuple[Enum['sys','krb5','krb5i','krb5p'],1,2]  $sec            = ['sys'],
+  Boolean                                        $no_root_squash = false,
+  Boolean                                        $all_squash     = false,
+  Stdlib::Compat::Integer                        $anonuid        = '65534',
+  Stdlib::Compat::Integer                        $anongid        = '65534',
+  String                                         $custom         = ''
 ) {
   include '::nfs::server'
 
   validate_absolute_path($export_path)
-  validate_array($client)
-  validate_string($comment)
-  validate_bool($insecure)
-  validate_bool($rw)
-  validate_bool($async)
-  validate_bool($no_wdelay)
-  validate_bool($nohide)
-  validate_bool($crossmnt)
-  validate_bool($subtree_check)
-  validate_bool($insecure_locks)
-  if is_string($mountpoint) {
-    if !empty($mountpoint) {
-      validate_absolute_path($mountpoint)
-    }
-  }
-  else {
-    validate_bool($mountpoint)
-  }
-  validate_string($fsid)
-  validate_bool($nordirplus)
-  validate_string($refer)
-  validate_array_member($sec, ['sys','krb5','krb5i','krb5p'])
-  validate_bool($no_root_squash)
-  validate_bool($all_squash)
-  validate_integer($anonuid)
-  validate_integer($anongid)
-  validate_string($custom)
 
   $_name = inline_template('<%= @name.gsub("/","|") -%>')
 
