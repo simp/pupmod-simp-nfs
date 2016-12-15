@@ -3,42 +3,41 @@
 #
 # This defaults to NFSv4.
 #
-# @param trusted_nets [Net List] The systems that are allowed to connect to this
+# @param trusted_nets The systems that are allowed to connect to this
 #   service, as an array. Set to 'any' or 'ALL' to allow the world.
 #
-# @param nfsv3 [Boolean] If set, this server serves out NFSv3 shares.
+# @param nfsv3 If set, this server serves out NFSv3 shares.
 #
-# @param rpcrquotadopts [String] Options that should be passed to rquotad at
+# @param rpcrquotadopts Options that should be passed to rquotad at
 #   start time.
 #
-# @param lockd_arg [String] Arbitrary options that should be passed to lockd.
+# @param lockd_arg Arbitrary options that should be passed to lockd.
 #
-# @param nfsd_module [String] If set to 'noload' will prevent the nfsd module
+# @param nfsd_module If set to 'noload' will prevent the nfsd module
 #   from being pre-loaded.
 #   Valid Options: 'noload'
-# NOTE: if this is set to _anything_ other than an empty string, the template
-# will say 'noload'
+# NOTE: if this is set to _anything_, the template will say 'noload'
 #
-# @param rpcmountdopts [String] An arbitrary string of options to pass to
+# @param rpcmountdopts An arbitrary string of options to pass to
 #   mountd.
 #
-# @param statdarg [String] An arbitrary string of options to pass to statd.
+# @param statdarg An arbitrary string of options to pass to statd.
 #
-# @param statd_ha_callout [AbsolutePath] The fully path of an application that
-#   should be used for statd HA.
+# @param statd_ha_callout The fully qualified path of an application
+#   that should be used for statd HA.
 #
-# @param rpcidmapdargs [String] Artibrary arguments to pass to idmapd.
+# @param rpcidmapdargs Artibrary arguments to pass to idmapd.
 #
-# @param rpcgssdargs [String] Arbitrary arguments to pass to gssd.
+# @param rpcgssdargs Arbitrary arguments to pass to gssd.
 #
-# @param rpcsvcgssdargs [String] Arbitrary arguments to pass to svcgssd.
+# @param rpcsvcgssdargs Arbitrary arguments to pass to svcgssd.
 #
-# @param sunrpc_udp_slot_table_entries [Integer] Raise the default udp slot
+# @param sunrpc_udp_slot_table_entries Raise the default udp slot
 #   table entries in the kernel.  Most NFS server performance guides seem to
 #   recommend this setting.  If you have a low memory system, you may want to
 #   reduce this.
 #
-# @param sunrpc_tcp_slot_table_entries [Integer] Raise the default tcp slot
+# @param sunrpc_tcp_slot_table_entries Raise the default tcp slot
 #   table entries in the kernel.  Most NFS server performance guides seem to
 #   recommend this setting.  If you have a low memory system, you may want to
 #   reduce this.
@@ -49,13 +48,13 @@
 # @note The rpcbind port and the rpc.quotad ports are open to the client
 #   networks so that the 'quota' command works on the clients.
 #
-# @param firewall [Boolean] If set, use the SIMP iptables module to manage
+# @param firewall If set, use the SIMP iptables module to manage
 #   firewall connections.
 #
-# @param stunnel [Boolean] If set, use the SIMP stunnel module to manage
+# @param stunnel If set, use the SIMP stunnel module to manage
 #   stunnel.
 #
-# @param tcpwrappers [Boolean] If set, use the SIMP tcpwrappers module to
+# @param tcpwrappers If set, use the SIMP tcpwrappers module to
 #   manage tcpwrappers.
 #
 # @author Trevor Vaughan <tvaughan@onyxpoint.com>
@@ -63,22 +62,22 @@
 # @author Kendall Moore <kendall.moore@onyxpoint.com>
 #
 class nfs::server (
-  Array[String]                           $trusted_nets,
-  Boolean                                 $nfsv3                         = $::nfs::nfsv3,
-  String                                  $rpcrquotadopts                = '',
-  String                                  $lockd_arg                     = '',
-  String                                  $nfsd_module                   = '',
-  String                                  $rpcmountdopts                 = '',
-  String                                  $statdarg                      = '',
-  Variant[Enum[''],Stdlib::Absolutepath]  $statd_ha_callout              = '',
-  String                                  $rpcidmapdargs                 = '',
-  String                                  $rpcgssdargs                   = '',
-  String                                  $rpcsvcgssdargs                = '',
-  Stdlib::Compat::Integer                 $sunrpc_udp_slot_table_entries = '128',
-  Stdlib::Compat::Integer                 $sunrpc_tcp_slot_table_entries = '128',
-  Boolean                                 $firewall                      = $::nfs::firewall,
-  Boolean                                 $stunnel                       = $nfs::stunnel,
-  Boolean                                 $tcpwrappers                   = $nfs::tcpwrappers
+  Array[String]                   $trusted_nets,
+  Boolean                         $nfsv3                         = $::nfs::nfsv3,
+  Optional[String]                $rpcrquotadopts                = undef,
+  Optional[String]                $lockd_arg                     = undef,
+  Optional[String]                $nfsd_module                   = undef,
+  Optional[String]                $rpcmountdopts                 = undef,
+  Optional[String]                $statdarg                      = undef,
+  Optional[Stdlib::Absolutepath]  $statd_ha_callout              = undef,
+  Optional[String]                $rpcidmapdargs                 = undef,
+  Optional[String]                $rpcgssdargs                   = undef,
+  Optional[String]                $rpcsvcgssdargs                = undef,
+  Stdlib::Compat::Integer         $sunrpc_udp_slot_table_entries = '128',
+  Stdlib::Compat::Integer         $sunrpc_tcp_slot_table_entries = '128',
+  Boolean                         $firewall                      = $::nfs::firewall,
+  Boolean                         $stunnel                       = $::nfs::stunnel,
+  Boolean                         $tcpwrappers                   = $::nfs::tcpwrappers
 ) inherits ::nfs {
 
   validate_net_list($trusted_nets)

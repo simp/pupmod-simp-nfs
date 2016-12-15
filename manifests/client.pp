@@ -4,10 +4,10 @@
 # If using the nfs::client::stunnel::connect define, this will be automatically
 # called for you.
 #
-# @param nfs_server [Net List] *Required* - Array of NFS servers that will be
+# @param nfs_server Array of NFS servers that will be
 #   calling back to the callback port for NFSv4.
 #
-# @param is_server [Boolean] - If set, lets this class know *explicitly* that
+# @param is_server If set, lets this class know *explicitly* that
 #   the `$nfs_server` is the host that the class is applying on. This is
 #   important to avoid conflicts with the target server running on the same
 #   host under a different hostname/alias.
@@ -16,16 +16,16 @@
 #     that is both a server and client for itself but can't determine that from
 #     introspection.
 #
-# @param callback_port [Port] The callback port.
+# @param callback_port The callback port.
 #
-# @param stunnel [Boolean] If set, will *attempt* to determine if the
+# @param stunnel If set, will *attempt* to determine if the
 #   server is trying to connect to itself. If connecting to itself, will not
 #   use stunnel, otherwise will use stunnel.
 #
 #   @note If you are using host aliases for your NFS server names, this check
 #     may fail and you may need to disable `$stunnel` explicitly.
 #
-# @param firewall [Boolean] If set, use the SIMP IPTables module to
+# @param firewall If set, use the SIMP IPTables module to
 #   manipulate the firewall settings.
 #
 # @author Trevor Vaughan <tvaughan@onyxpoint.com>

@@ -1,63 +1,65 @@
 # Provides the base segments for NFS server *and* client services.
 #
-# @param stunnel [Boolean] If set, wrap stunnel around the NFS server
+# @param stunnel If set, wrap stunnel around the NFS server
 #   connections. This is ideally suited for environments without a working
 #   Kerberos setup and may cause issues when used together.
 #
-# @param is_server [Boolean] Explicitly state that this system should be an NFS
+# @param is_server Explicitly state that this system should be an NFS
 #   server. Further configuration will need to be made via the `nfs::server`
 #   classes.
 #
-# @param is_client [Boolean] Explicitly stat that this system should be an NFS
+# @param is_client Explicitly stat that this system should be an NFS
 #   client. Further configuration will need to be made via the `nfs::client`
 #   classes.
 #
-# @param mountd_nfs_v1 [Boolean] Whether or not to act as an NFSv1 server. Due
+# @param nfsv3
+#
+# @param mountd_nfs_v1 Whether or not to act as an NFSv1 server. Due
 #   to current issues in RHEL/CentOS this must be set to 'yes' to properly
 #   unmount.
 #
-# @param mountd_nfs_v2 [Boolean] Whether or not to act as an NFSv2 server.
+# @param mountd_nfs_v2 Whether or not to act as an NFSv2 server.
 #
-# @param mountd_nfs_v3 [Boolean] Whether or not to act as an NFSv3 server.
+# @param mountd_nfs_v3 Whether or not to act as an NFSv3 server.
 #
-# @param rquotad [AbsolutePath] The path to the rquotad executable.
+# @param rquotad The path to the rquotad executable.
 #
-# @param rquotad_port [Integer] The port upon which rquotad should listen.
+# @param rquotad_port The port upon which rquotad should listen.
 #
-# @param lockd_tcpport [Integer] The TCP port upon which lockd should listen.
+# @param lockd_tcpport The TCP port upon which lockd should listen.
 #
-# @param lockd_udpport [Integer] The UDP port upon which lockd should listen.
+# @param lockd_udpport The UDP port upon which lockd should listen.
 #
-# @param rpcnfsdargs [String] Arbitrary arguments to pass to nfsd. The defaults
+# @param rpcnfsdargs Arbitrary arguments to pass to nfsd. The defaults
 #   disable NFSv2 from being served to clients.
 #
-# @param rpcnfsdcount [Integer] The number of NFS server threads to start by
+# @param rpcnfsdcount The number of NFS server threads to start by
 #   default.
 #
-# @param nfsd_v4_grace [Integer] The V4 grace period in seconds.
+# @param nfsd_v4_grace The V4 grace period in seconds.
 #
-# @param mountd_port [Port] The port upon which mountd should listen.
+# @param mountd_port The port upon which mountd should listen.
 #
-# @param statd_port [Port] The port upon which statd should listen.
+# @param statd_port The port upon which statd should listen.
 #
-# @param statd_outgoing_port [Port] The port that statd will use when
+# @param statd_outgoing_port The port that statd will use when
 #   connecting to client systems.
 #
-# @param secure_nfs [Boolean] Enable secure NFS mounts.
+# @param secure_nfs Enable secure NFS mounts.
 #
-# @param ensure_lvm2_latest [Boolean] See nfs::lvm2 for further description.
+# @param ensure_lvm2_latest See nfs::lvm2 for further description.
 #
-# @param kerberos [Boolean] Use the SIMP `krb5` module for Kerberos support.
+# @param kerberos Use the SIMP `krb5` module for Kerberos support.
 #   @note You may need to set variables in `::krb5::config` via Hiera or your
 #     ENC if you do not like the defaults.
 #
-# @param simp_keytab_on_puppet [Boolean] If set, and $kerberos is true, then
+# @param simp_keytab_on_puppet If set, and $kerberos is true, then
 #   set the NFS server to pull its keytab directly from the Puppet server.
 #
-# @param firewall [Boolean] If set, use the SIMP iptables module to manage
+# @param firewall If set, use the SIMP iptables module to manage
 #   firewall connections.
 #
-# @param tcpwrappers [Boolean] If set, use the SIMP tcpwrappers module to
+# @param tcpwrappers If set, use the SIMP tcpwrappers module to
 #   manage tcpwrappers.
 #
 # @author Trevor Vaughan <tvaughan@onyxpoint.com>

@@ -4,32 +4,32 @@ RQUOTAD="<%= scope.lookupvar('::nfs::rquotad') %>"
 RQUOTAD=no
 <% end -%>
 RQUOTAD_PORT=<%= scope.lookupvar('::nfs::rquotad_port') %>
-<% if @rpcrquotadopts && has_variable?('rpcrquotadopts') && !@rpcrquotadopts.empty? -%>
+<% if @rpcrquotadopts -%>
 RPCRQUOTADOPTS="<%= @rpcrquotadopts %>"
 <% end -%>
-<% if @lockd_arg && has_variable?('lockd_arg') && !@lockd_arg.empty? -%>
+<% if @lockd_arg -%>
 LOCKD_ARG="<= lockd_arg %>"
 <% end -%>
 LOCKD_TCPPORT=<%= scope.lookupvar('::nfs::lockd_tcpport') %>
 LOCKD_UDPPORT=<%= scope.lookupvar('::nfs::lockd_udpport') %>
-<% if has_variable?('nfsd_module') && !@nfsd_module.empty? -%>
+<% if @nfsd_module -%>
 NFSD_MODULE="noload"
-<% end %>
-<% if has_variable?('rpcmountdopts') && !@rpcmountdopts.empty? -%>
+<% end -%>
+<% if @rpcmountdopts -%>
 RPCMOUNTDOPTS="<%= @rpcmountdopts %>"
 <% end -%>
-<% if has_variable?('statdarg') && !@statdarg.empty? -%>
-STATDARG=""
+<% if @statdarg -%>
+STATDARG="<%= @statdarg %>"
 <% end -%>
-<% if has_variable?('statd_ha_callout') && !@statd_ha_callout.empty? -%>
+<% if @statd_ha_callout -%>
 STATD_HA_CALLOUT="<%= @statd_ha_callout %>"
 <% end -%>
-<% if has_variable?('rpcidmapdargs') && !@rpcidmapdargs.empty? -%>
+<% if @rpcidmapdargs -%>
 RPCIDMAPDARGS="<%= @rpcidmapdargs %>"
 <% end -%>
-<% if has_variable?('rpcgssdargs') && !@rpcgssdargs.empty? -%>
+<% if @rpcgssdargs -%>
 RPCGSSDARGS="<%= @rpcgssdargs %>"
 <% end -%>
-<% if has_variable?('rpcsvcgssdargs') && !@rpcsvcgssdargs.empty? -%>
+<% if @rpcsvcgssdargs -%>
 RPCSVCGSSDARGS="<%= @rpcsvcgssdargs %>"
 <% end -%>

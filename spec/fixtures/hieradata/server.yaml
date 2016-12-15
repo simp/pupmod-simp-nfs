@@ -1,0 +1,6 @@
+---
+nfs::is_server : true
+nfs::nfsv3 : false
+nfs::firewall : false
+nfs::stunnel : false
+nfs::tcpwrappers : false

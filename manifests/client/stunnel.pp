@@ -11,23 +11,26 @@
 # environment. If you need encrypted connections to multiple systems, you can
 # either inheirit and enhance this class or you can use Kerberos (preferred).
 #
-# @param version [Integer] The version of NFS to use.  This has been tested for
+# @param nfs_server
+#
+# @param version The version of NFS to use.  This has been tested for
 #   NFS versions 3 and 4
-# @param nfs_accept_port [Port] The stunnel local accept port.
 #
-# @param nfs_connect_port [Port] The stunnel remote connection port.
+# @param nfs_accept_port The stunnel local accept port.
 #
-# @param portmapper_accept_port [Port] The portmapper local accept port.
+# @param nfs_connect_port The stunnel remote connection port.
 #
-# @param portmapper_connect_port [Port] The portmapper remote connection port.
+# @param portmapper_accept_port The portmapper local accept port.
 #
-# @param rquotad_connect_port [Port] The rquotad remote connection port.
+# @param portmapper_connect_port The portmapper remote connection port.
 #
-# @param lockd_connect_port [Port] The lockd remote connection port.
+# @param rquotad_connect_port The rquotad remote connection port.
 #
-# @param mountd_connect_port [Port] The mountd remote connection port.
+# @param lockd_connect_port The lockd remote connection port.
 #
-# @param statd_connect_port [Port] The statd remote connection port.
+# @param mountd_connect_port The mountd remote connection port.
+#
+# @param statd_connect_port The statd remote connection port.
 #
 # @author Trevor Vaughan <tvaughan@onyxpoint.com>
 # @author Kendall Moore <kendall.moore@onyxpoint.com>

@@ -13,11 +13,53 @@ describe 'nfs::server::export' do
           :client => ['0.0.0.0/0']
         }
 
-        let(:params) { base_params }
 
-        it { is_expected.to compile.with_all_deps }
-        it { is_expected.to contain_class('nfs::server') }
-        it { is_expected.to create_simpcat_fragment("nfs+#{title}.export") }
+        context 'with default parameters' do
+          let(:params) { base_params }
+          it { is_expected.to compile.with_all_deps }
+          it { is_expected.to contain_class('nfs::server') }
+          it { is_expected.to create_simpcat_fragment("nfs+#{title}.export").with_content( <<EOM
+/foo/bar/baz 0.0.0.0/0(sync,sec=sys,anonuid=65534,anongid=65534)
+/foo/bar/baz 127.0.0.1(sync,sec=sys,anonuid=65534,anongid=65534,insecure)
+EOM
+          ) }
+        end
+
+        context 'with optional parameters set and mountpoint is a path' do
+          let(:params) { base_params.merge({
+            :comment => 'some comment',
+            :mountpoint => '/mount/point/path',
+            :fsid => 'test_vsid',
+            :refer => 'test_refer'
+          }) }
+          it { is_expected.to compile.with_all_deps }
+          it { is_expected.to create_simpcat_fragment("nfs+#{title}.export").with_content( <<EOM
+# some comment
+/foo/bar/baz 0.0.0.0/0(sync,mp=/mount/point/path,fsid=test_vsid,refer=test_refer,sec=sys,anonuid=65534,anongid=65534)
+/foo/bar/baz 127.0.0.1(sync,mp=/mount/point/path,fsid=test_vsid,refer=test_refer,sec=sys,anonuid=65534,anongid=65534,insecure)
+EOM
+          ) }
+        end
+
+        context 'with mountpoint is a true' do
+          let(:params) { base_params.merge({ :mountpoint => true }) }
+          it { is_expected.to compile.with_all_deps }
+          it { is_expected.to create_simpcat_fragment("nfs+#{title}.export").with_content( <<EOM
+/foo/bar/baz 0.0.0.0/0(sync,mp,sec=sys,anonuid=65534,anongid=65534)
+/foo/bar/baz 127.0.0.1(sync,mp,sec=sys,anonuid=65534,anongid=65534,insecure)
+EOM
+          ) }
+        end
+        
+        context 'with custom set' do
+          let(:params) { base_params.merge({ :custom => 'some custom setting' }) }
+          it { is_expected.to compile.with_all_deps }
+          it { is_expected.to create_simpcat_fragment("nfs+#{title}.export").with_content( <<EOM
+/foo/bar/baz 0.0.0.0/0(somecustomsetting)
+/foo/bar/baz 127.0.0.1(somecustomsetting,insecure)
+EOM
+          ) }
+        end
 
         context 'when sec includes "sys"' do
           let(:params) {
@@ -28,6 +70,11 @@ describe 'nfs::server::export' do
           }
 
           it { is_expected.to compile.with_all_deps }
+          it { is_expected.to create_simpcat_fragment("nfs+#{title}.export").with_content( <<EOM
+/foo/bar/baz 0.0.0.0/0(sync,sec=sys:krb5,anonuid=65534,anongid=65534)
+/foo/bar/baz 127.0.0.1(sync,sec=sys:krb5,anonuid=65534,anongid=65534,insecure)
+EOM
+          ) }
 
           if ['RedHat','CentOS'].include?(facts[:operatingsystem]) && facts[:operatingsystemmajrelease].to_s > '6'
             it { is_expected.to contain_selboolean('nfsd_anon_write') }
@@ -35,6 +82,7 @@ describe 'nfs::server::export' do
             it { is_expected.to_not contain_selboolean('nfsd_anon_write') }
           end
         end
+
       end
     end
   end

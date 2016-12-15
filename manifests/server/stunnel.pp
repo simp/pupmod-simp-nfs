@@ -1,40 +1,34 @@
-# == Define: nfs::server::stunnel
+# define nfs::server::stunnel
 #
 # Configures a server for NFS over stunnel.  Known to work with NFSv3 and
 # NFSv4.
 #
-# == Parameters
+# @param version The version of NFS to use.  This has been tested with
+#   NFSv3 and NFSv4. 'version' should be set to the numerical version
+#   of NFS to use.
 #
-# [*version*]
-#   The version of NFS to use.  This has been tested with NFSv3 and NFSv4.
-#   'version' should be set to the numerical version of NFS to use.
+# @param trusted_nets The systems that are allowed to connect to this
+#   service, as an array. Set to 'any' or 'ALL' to allow the world.
 #
-# [*trusted_nets*]
-#   The systems that are allowed to connect to this service, as an array. Set
-#   to 'any' or 'ALL' to allow the world.
+# @param nfs_accept_address The address upon which the NFS server will
+#   listen. You should be able to set this to 0.0.0.0 for all interfaces.
 #
-# [*rquotad_port*]
-# [*lockd_tcpport*]
-# [*mountd_port*]
-# [*statd_port*]
-# [*nfs_accept_address*]
-#   The address upon which the NFS server will listen. You should be able to
-#   set this to 0.0.0.0 for all interfaces.
-#
-# [*nfs_accept_port*]
+# @param nfs_accept_port
 #
 # Note: All *_accept_port variables other than $nfs_accept_port do not apply
 #
-# [*portmapper_accept_port*]
-# [*rquotad_accept_port*]
-# [*nlockmgr_accept_port*]
-# [*mountd_accept_port*]
-# [*status_accept_port*]
+# @param portmapper_accept_port
 #
-# == Authors
+# @param rquotad_accept_port
 #
-# * Trevor Vaughan <mailto:tvaughan@onyxpoint.com>
-# * Kendall Moore <mailto:kmoore@keywcorp.com>
+# @param nlockmgr_accept_port
+#
+# @param mountd_accept_port
+#
+# @param status_accept_port
+#
+# @author Trevor Vaughan <mailto:tvaughan@onyxpoint.com>
+# @author Kendall Moore <mailto:kmoore@keywcorp.com>
 #
 class nfs::server::stunnel (
   Stdlib::Compat::Integer  $version                = '4',
