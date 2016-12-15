@@ -8,7 +8,7 @@ RQUOTAD_PORT=<%= scope.lookupvar('::nfs::rquotad_port') %>
 RPCRQUOTADOPTS="<%= @rpcrquotadopts %>"
 <% end -%>
 <% if @lockd_arg -%>
-LOCKD_ARG="<= lockd_arg %>"
+LOCKD_ARG="<%= @lockd_arg %>"
 <% end -%>
 LOCKD_TCPPORT=<%= scope.lookupvar('::nfs::lockd_tcpport') %>
 LOCKD_UDPPORT=<%= scope.lookupvar('::nfs::lockd_udpport') %>

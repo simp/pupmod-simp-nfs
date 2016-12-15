@@ -45,7 +45,7 @@ EOM
 RQUOTAD="/usr/sbin/rpc.rquotad"
 RQUOTAD_PORT=875
 RPCRQUOTADOPTS="some rpcrquotad opts"
-LOCKD_ARG="<= lockd_arg %>"
+LOCKD_ARG="some lockd args"
 LOCKD_TCPPORT=32803
 LOCKD_UDPPORT=32769
 NFSD_MODULE="noload"
