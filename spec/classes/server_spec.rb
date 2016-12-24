@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 # most of server class is tested in init_spec.rb.  Here we are focusing on the
-# content of the simpcat_fragment
+# content of the concat fragment
 describe 'nfs::server' do
   context 'supported operating systems' do
     on_supported_os.each do |os, facts|
@@ -12,12 +12,7 @@ describe 'nfs::server' do
         context 'with default parameters' do
           let(:hieradata) { 'server' }
           it { is_expected.to compile.with_all_deps }
-=begin
-          it { is_expected.to contain_simpcat_fragment('sysconfig_nfs+server').with_content(<<EOM
-EOM
-          ) }
-=end
-          it { is_expected.to contain_simpcat_fragment('sysconfig_nfs+server').with_content(<<EOM
+          it { is_expected.to contain_concat__fragment('nfs_init_server').with_content(<<EOM
 RQUOTAD=no
 RQUOTAD_PORT=875
 LOCKD_TCPPORT=32803
@@ -41,7 +36,7 @@ EOM
             :rpcsvcgssdargs   => 'some rpcsvcgssd args'
           }}
           it { is_expected.to compile.with_all_deps }
-          it { is_expected.to contain_simpcat_fragment('sysconfig_nfs+server').with_content(<<EOM
+          it { is_expected.to contain_concat__fragment('nfs_init_server').with_content(<<EOM
 RQUOTAD="/usr/sbin/rpc.rquotad"
 RQUOTAD_PORT=875
 RPCRQUOTADOPTS="some rpcrquotad opts"

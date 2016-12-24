@@ -1,12 +1,13 @@
-# This class provides a hotfix for a broken SELinux policy in EL7.
-# The OS confinement of this class should be done elsewhere.
+# **NOTE: THIS IS A [PRIVATE](https://github.com/puppetlabs/puppetlabs-stdlib#assert_private) CLASS**
 #
-# @private
+# This class provides a hotfix for a broken SELinux policy in EL7
+#
+# The OS confinement of this class should be done elsewhere
 #
 class nfs::selinux_hotfix {
   assert_private()
 
-  if defined('$::selinux_current_mode') and getvar('::selinux_current_mode') != 'disabled' {
+  if $facts['selinux_current_mode'] and $facts['selinux_current_mode'] != 'disabled' {
     $hotfix_dir = '/usr/share/selinux/simp_hotfix'
 
     ensure_resource('file', $hotfix_dir, {
@@ -32,7 +33,7 @@ class nfs::selinux_hotfix {
       owner   => 'root',
       group   => 'root',
       mode    => '0600',
-      content => template("${module_name}/selinux/gss_hotfix.te.erb")
+      content => file("${module_name}/selinux/gss_hotfix.te.erb")
     }
 
     exec { 'gss_selinux_hotfix_build_module':

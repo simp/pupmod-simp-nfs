@@ -1,14 +1,19 @@
 # This file is managed by Puppet. Any changes made to the file will be
 # overwritten at the next Puppet run.
+<% if @content -%>
+<%= @content -%>
+<% else -%>
 [General]
 
-<% if @verbosity then -%>
+<%  if @verbosity -%>
 Verbosity = <%= @verbosity %>
-<% end -%>
+<%  end -%>
+<%  if @domain -%>
 Domain = <%= @domain %>
-<% if @local_realms then -%>
+<%  end -%>
+<%  if @local_realms -%>
 Local-Realms = <%= Array(@local_realms).join(',') %>
-<% end -%>
+<%  end -%>
 
 [Mapping]
 
@@ -18,21 +23,22 @@ Nobody-Group = <%= @nobody_group %>
 [Translation]
 
 Method = <%= Array(@trans_method).join(',') %>
-<% if @gss_methods then -%>
+<%  if @gss_methods -%>
 GSS-Methods = <%= Array(@gss_methods).join(',') %>
-<% end -%>
+<%  end -%>
 
 [Static]
 <%
-if @static_translation then
-  @static_translation.each_pair do |k,v|
+  if @static_translation
+    @static_translation.each_pair do |k,v|
 -%>
 <%= k %> = <%= v %>
 <%
+    end
   end
-end
 -%>
 
 [UMICH_SCHEMA]
 
 # This is not yet supported by the SIMP configuration.
+<% end -%>

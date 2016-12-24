@@ -16,9 +16,9 @@ describe 'nfs basic' do
     }
 
     iptables::add_tcp_stateful_listen { 'i_love_testing':
-      order => '8',
+      order        => 8,
       trusted_nets => 'ALL',
-      dports => '22'
+      dports       => 22
     }
   EOM
 
@@ -95,7 +95,7 @@ nfs::server::trusted_nets : 'ALL'
           nfs::server::export { 'nfs4_root':
             client      => ['*'],
             export_path => '/srv/nfs_share',
-            sec         => ['sys'],
+            sec         => ['sys']
           }
 
           File['/srv/nfs_share'] -> Nfs::Server::Export['nfs4_root']

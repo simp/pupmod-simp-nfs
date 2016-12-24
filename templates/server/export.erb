@@ -46,10 +46,10 @@ else
   end
 
   if @mountpoint
-    if @mountpoint.to_s =~ %r(^/)
-      _options.push("mp=#{@mountpoint}")
-    else
+    if @mountpoint.is_a?(TrueClass)
       _options.push('mp')
+    else
+      _options.push("mp=#{@mountpoint}")
     end
   end
 
@@ -58,7 +58,11 @@ else
   end
 
   if @refer
-    _options.push("refer=#{@refer}")
+    _options.push("refer=#{Array(@refer).join(':')}")
+  end
+
+  if @nordirplus
+    _options.push('nordirplus')
   end
 
   _options.push("sec=#{Array(@sec).join(':')}")
@@ -79,7 +83,7 @@ end
 
 _output = Array.new
 # Put it all together
-_client = Array(@client.dup).flatten
+_client = Array(@clients.dup).flatten
 _client.map! { |cl| (['ALL','all','ANY','any'].include? cl) ? '*' : cl }.flatten!
 _client.push("127.0.0.1")
 _client.uniq.sort.each do |cl|

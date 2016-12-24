@@ -19,8 +19,7 @@ describe 'nfs' do
 
         if os =~ /(?:redhat|centos)-(\d+)/
           it_behaves_like "a fact set"
-          it { is_expected.to contain_simpcat_fragment('sysconfig_nfs+init').with_content(%r(MOUNTD_PORT=20048)) }
-          it { is_expected.to create_file('/etc/sysconfig/nfs') }
+          it { is_expected.to contain_concat__fragment('nfs_init').with_content(%r(MOUNTD_PORT=20048)) }
         end
 
         context "as a server with default params" do
@@ -33,7 +32,7 @@ describe 'nfs' do
           it { is_expected.to_not contain_class('tcpwrappers') }
           it { is_expected.to_not contain_class('stunnel') }
           it { is_expected.to_not contain_class('krb5') }
-          it { is_expected.to create_simpcat_build('nfs').with_order('*.export') }
+          it { is_expected.to create_concat('/etc/sysconfig/nfs') }
           it { is_expected.to create_exec('nfs_re-export').with({
               :command     => '/usr/sbin/exportfs -ra',
               :refreshonly => true,
@@ -59,7 +58,7 @@ describe 'nfs' do
           it { is_expected.to contain_service('sunrpc_tuning').with_require('File[/etc/init.d/sunrpc_tuning]') }
           it { is_expected.to contain_sysctl('sunrpc.tcp_slot_table_entries') }
           it { is_expected.to contain_sysctl('sunrpc.udp_slot_table_entries') }
-          it { is_expected.to contain_simpcat_fragment('sysconfig_nfs+server').without_content(%r(RPCSVCGSSDARGS=)) }
+          it { is_expected.to contain_concat__fragment('nfs_init_server').without_content(%r(RPCSVCGSSDARGS=)) }
         end
 
         context "as a server with custom args" do
@@ -74,7 +73,7 @@ describe 'nfs' do
           it { is_expected.to compile.with_all_deps }
           it { is_expected.to contain_class('nfs') }
           it { is_expected.to contain_class('nfs::server') }
-          it { is_expected.to contain_simpcat_fragment('sysconfig_nfs+server').with_content(%r(\nRPCSVCGSSDARGS="-n -vvvvv -rrrrr -iiiiii")) }
+          it { is_expected.to contain_concat__fragment('nfs_init_server').with_content(%r(\nRPCSVCGSSDARGS="-n -vvvvv -rrrrr -iiiiii")) }
           it { is_expected.to contain_class('tcpwrappers') }
           it { is_expected.to contain_class('stunnel') }
           it { is_expected.to contain_tcpwrappers__allow('nfs') }

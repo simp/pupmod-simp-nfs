@@ -1,86 +1,98 @@
 # Configure a NFS server with a default configuration that nails up the ports
-# so that you can pass them through iptables.
+# so that you can pass them through ``iptables``.
 #
-# This defaults to NFSv4.
+# This defaults to ``NFSv4``.
 #
-# @param trusted_nets The systems that are allowed to connect to this
-#   service, as an array. Set to 'any' or 'ALL' to allow the world.
+# @param trusted_nets
+#   The systems that are allowed to connect to this service
 #
-# @param nfsv3 If set, this server serves out NFSv3 shares.
+#   * Set to ``any`` or ``ALL`` to allow the world
 #
-# @param rpcrquotadopts Options that should be passed to rquotad at
-#   start time.
+# @param nfsv3
+#   Serve out ``NFSv3`` shares
 #
-# @param lockd_arg Arbitrary options that should be passed to lockd.
+# @param rpcrquotadopts
+#   Options that should be passed to ``rquotad`` at start time
 #
-# @param nfsd_module If set to 'noload' will prevent the nfsd module
-#   from being pre-loaded.
-#   Valid Options: 'noload'
-# NOTE: if this is set to _anything_, the template will say 'noload'
+# @param lockd_arg
+#   Options that should be passed to ``lockd`` at start time
 #
-# @param rpcmountdopts An arbitrary string of options to pass to
-#   mountd.
+# @param nfsd_module
+#   If set to ``noload`` will prevent the ``nfsd`` kernel module from being
+#   pre-loaded
 #
-# @param statdarg An arbitrary string of options to pass to statd.
+#   * **NOTE:** if this is set to _anything_, the template will say ``noload``
 #
-# @param statd_ha_callout The fully qualified path of an application
-#   that should be used for statd HA.
+# @param rpcmountdopts
+#   An arbitrary string of options to pass to ``mountd`` at start time
 #
-# @param rpcidmapdargs Artibrary arguments to pass to idmapd.
+# @param statdarg
+#   An arbitrary string of options to pass to ``statd`` at start time
 #
-# @param rpcgssdargs Arbitrary arguments to pass to gssd.
+# @param statd_ha_callout
+#   The path to an application that should be used for ``statd`` HA
 #
-# @param rpcsvcgssdargs Arbitrary arguments to pass to svcgssd.
+# @param rpcidmapdargs
+#   Artibrary arguments to pass to ``idmapd`` at start time
 #
-# @param sunrpc_udp_slot_table_entries Raise the default udp slot
-#   table entries in the kernel.  Most NFS server performance guides seem to
-#   recommend this setting.  If you have a low memory system, you may want to
-#   reduce this.
+# @param rpcgssdargs
+#   Arbitrary arguments to pass to ``gssd`` at start time
 #
-# @param sunrpc_tcp_slot_table_entries Raise the default tcp slot
-#   table entries in the kernel.  Most NFS server performance guides seem to
-#   recommend this setting.  If you have a low memory system, you may want to
-#   reduce this.
+# @param rpcsvcgssdargs
+#   Arbitrary arguments to pass to ``svcgssd`` at start time
 #
-# @note Due to some bug in Red Hat, $mountd_nfs_v1 must be set to 'yes' to
-#   properly unmount.
+# @param sunrpc_udp_slot_table_entries
 #
-# @note The rpcbind port and the rpc.quotad ports are open to the client
-#   networks so that the 'quota' command works on the clients.
+#   Set the default UDP slot table entries in the kernel
 #
-# @param firewall If set, use the SIMP iptables module to manage
-#   firewall connections.
+#   * Most NFS server performance guides seem to recommend this setting
 #
-# @param stunnel If set, use the SIMP stunnel module to manage
-#   stunnel.
+#   * If you have a low memory system, you may want to reduce this
 #
-# @param tcpwrappers If set, use the SIMP tcpwrappers module to
-#   manage tcpwrappers.
+# @param sunrpc_tcp_slot_table_entries
+#
+#   Set the default TCP slot table entries in the kernel
+#
+#   * Most NFS server performance guides seem to recommend this setting
+#
+#   * If you have a low memory system, you may want to reduce this
+#
+# @note Due to a bug in EL, ``$mountd_nfs_v1`` must be set to ``yes`` to
+#   properly unmount
+#
+# @note The ``rpcbind`` port and the ``rpc.quotad`` ports are open to the
+#   trusted networks so that the ``quota`` command works on the clients
+#
+# @param firewall
+#   Use the SIMP ``iptables`` module to manage firewall connections
+#
+# @param stunnel Use the SIMP ``stunnel`` module to manage stunnel
+#
+# @param tcpwrappersU
+#   Use the SIMP ``tcpwrappers`` module to manage tcpwrappers
 #
 # @author Trevor Vaughan <tvaughan@onyxpoint.com>
 # @author Morgan Rhodes <morgan@puppet.com>
 # @author Kendall Moore <kendall.moore@onyxpoint.com>
 #
 class nfs::server (
-  Array[String]                   $trusted_nets,
-  Boolean                         $nfsv3                         = $::nfs::nfsv3,
-  Optional[String]                $rpcrquotadopts                = undef,
-  Optional[String]                $lockd_arg                     = undef,
-  Optional[String]                $nfsd_module                   = undef,
-  Optional[String]                $rpcmountdopts                 = undef,
-  Optional[String]                $statdarg                      = undef,
-  Optional[Stdlib::Absolutepath]  $statd_ha_callout              = undef,
-  Optional[String]                $rpcidmapdargs                 = undef,
-  Optional[String]                $rpcgssdargs                   = undef,
-  Optional[String]                $rpcsvcgssdargs                = undef,
-  Stdlib::Compat::Integer         $sunrpc_udp_slot_table_entries = '128',
-  Stdlib::Compat::Integer         $sunrpc_tcp_slot_table_entries = '128',
-  Boolean                         $firewall                      = $::nfs::firewall,
-  Boolean                         $stunnel                       = $::nfs::stunnel,
-  Boolean                         $tcpwrappers                   = $::nfs::tcpwrappers
+  Simplib::Netlist               $trusted_nets,
+  Boolean                        $nfsv3                         = $::nfs::nfsv3,
+  Optional[String]               $rpcrquotadopts                = undef,
+  Optional[String]               $lockd_arg                     = undef,
+  Optional[String]               $nfsd_module                   = undef,
+  Optional[String]               $rpcmountdopts                 = undef,
+  Optional[String]               $statdarg                      = undef,
+  Optional[Stdlib::Absolutepath] $statd_ha_callout              = undef,
+  Optional[String]               $rpcidmapdargs                 = undef,
+  Optional[String]               $rpcgssdargs                   = undef,
+  Optional[String]               $rpcsvcgssdargs                = undef,
+  Integer[1]                     $sunrpc_udp_slot_table_entries = 128,
+  Integer[1]                     $sunrpc_tcp_slot_table_entries = 128,
+  Boolean                        $firewall                      = $::nfs::firewall,
+  Boolean                        $stunnel                       = $::nfs::stunnel,
+  Boolean                        $tcpwrappers                   = $::nfs::tcpwrappers
 ) inherits ::nfs {
-
-  validate_net_list($trusted_nets)
 
   if $tcpwrappers {
     include '::tcpwrappers'
@@ -98,21 +110,18 @@ class nfs::server (
 
   if $nfsv3 { include '::nfs::idmapd' }
 
-  simpcat_fragment { 'sysconfig_nfs+server':
-    content => template('nfs/nfs_sysconfig_server.erb')
+  concat::fragment { 'nfs_init_server':
+    target  => '/etc/sysconfig/nfs',
+    content => template("${module_name}/etc/sysconfig/nfs_server.erb")
   }
 
-  simpcat_build { 'nfs':
-    order  => '*.export',
-    quiet  => true,
-    target => '/etc/exports'
-  }
-
-  file { '/etc/exports':
-    ensure => 'file',
-    mode   => '0644',
-    owner  => 'root',
-    group  => 'root'
+  concat { '/etc/exports':
+    owner          => 'root',
+    group          => 'root',
+    mode           => '0644',
+    ensure_newline => true,
+    warn           => true,
+    notify         => Exec['nfs_re-export']
   }
 
   exec { 'nfs_re-export':
@@ -120,10 +129,6 @@ class nfs::server (
     refreshonly => true,
     require     => Package['nfs-utils']
   }
-
-  Simpcat_build['nfs'] -> File['/etc/exports']
-  File['/etc/exports'] ~> Exec['nfs_re-export']
-  Simpcat_build['nfs'] ~> Exec['nfs_re-export']
 
   service { $::nfs::service_names::nfs_server :
     ensure     => 'running',
@@ -141,7 +146,7 @@ class nfs::server (
     owner   => 'root',
     group   => 'root',
     mode    => '0754',
-    content => template('nfs/sunrpc_tuning.erb')
+    content => template("${module_name}/server/sunrpc_tuning.erb")
   }
 
   # $stunnel_port_override is a value that is set by the stunnel overlay.
@@ -161,9 +166,9 @@ class nfs::server (
   }
   else {
     if ( $::nfs::mountd_nfs_v2 ) or ( $::nfs::mountd_nfs_v3 ) {
-      $lports = [
-        '111',
-        '2049',
+      $_ports = [
+        111,
+        2049,
         $::nfs::rquotad_port,
         $::nfs::lockd_tcpport,
         $::nfs::mountd_port,
@@ -171,9 +176,9 @@ class nfs::server (
       ] # <-- End ports
     }
     else {
-      $lports = [
-        '111',
-        '2049',
+      $_ports = [
+        111,
+        2049,
         $::nfs::rquotad_port
       ]
     }
@@ -182,11 +187,11 @@ class nfs::server (
       include '::iptables'
       iptables::add_tcp_stateful_listen { 'nfs_client_tcp_ports':
         trusted_nets => $trusted_nets,
-        dports       => $lports
+        dports       => $_ports
       }
       iptables::add_udp_listen { 'nfs_client_udp_ports':
         trusted_nets => $trusted_nets,
-        dports       => $lports
+        dports       => $_ports
       }
     }
   }
@@ -207,7 +212,6 @@ class nfs::server (
       pattern => $trusted_nets
     }
   }
-
 
   sysctl { 'sunrpc.tcp_slot_table_entries':
     ensure => 'present',

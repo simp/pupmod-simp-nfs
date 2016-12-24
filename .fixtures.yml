@@ -13,6 +13,7 @@ fixtures:
     augeasproviders_sysctl:
       repo: git://github.com/simp/augeasproviders_sysctl
       branch: simp-master
+    concat: https://github.com/simp/puppetlabs-concat
     haveged:
       repo: https://github.com/simp/puppet-haveged
       branch: simp-master
@@ -34,27 +35,27 @@ fixtures:
     selinux:
       repo: git://github.com/simp/pupmod-simp-selinux
       branch: master
-    simpcat:
-      repo: git://github.com/simp/pupmod-simp-concat
-      branch: master
-    simplib:
-      repo: git://github.com/simp/pupmod-simp-simplib
-      branch: master
+    #simplib:
+    #  repo: git://github.com/simp/pupmod-simp-simplib
+    #  branch: master
     simp_options:
       repo: https://github.com/simp/pupmod-simp-simp_options
       branch: master
     stdlib:
       repo: git://github.com/simp/puppetlabs-stdlib
       branch: master
-    stunnel:
-      repo: git://github.com/simp/pupmod-simp-stunnel
-      branch: master
-    svckill:
-      repo: git://github.com/simp/pupmod-simp-svckill
-      branch: master
-    tcpwrappers:
-      repo: git://github.com/simp/pupmod-simp-tcpwrappers
-      branch: master
-
+    #stunnel:
+    #  repo: git://github.com/simp/pupmod-simp-stunnel
+    #  branch: master
+    #svckill:
+    #  repo: git://github.com/simp/pupmod-simp-svckill
+    #  branch: master
+    #tcpwrappers:
+      #repo: git://github.com/simp/pupmod-simp-tcpwrappers
+      #branch: master
   symlinks:
     nfs: "#{source_dir}"
+    tcpwrappers: "#{source_dir}/../tcpwrappers"
+    stunnel: "#{source_dir}/../stunnel"
+    simplib: "#{source_dir}/../simplib"
+    svckill: "#{source_dir}/../svckill"

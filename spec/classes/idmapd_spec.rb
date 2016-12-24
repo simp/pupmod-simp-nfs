@@ -1,6 +1,12 @@
 require 'spec_helper'
 
 describe 'nfs::idmapd' do
+  before(:each) do
+    Puppet::Parser::Functions.newfunction('assert_private') do |f|
+      f.stubs(:call).returns(true)
+    end
+  end
+
   context 'supported operating systems' do
     on_supported_os.each do |os, facts|
       context "on #{os}" do
@@ -16,7 +22,6 @@ describe 'nfs::idmapd' do
 # overwritten at the next Puppet run.
 [General]
 
-Domain = example.com
 
 [Mapping]
 
@@ -38,9 +43,9 @@ EOM
 
         context 'with optional parameters set' do
           let(:params) {{
-            :verbosity => 2,
-            :local_realms => ['realm1', 'realm2'],
-            :gss_methods => 'nsswitch',
+            :verbosity          => 2,
+            :local_realms       => ['realm1', 'realm2'],
+            :gss_methods        => ['nsswitch'],
             :static_translation => { 'key1' => 'value1', 'key2' => 'value2' }
           }}
           it { is_expected.to compile.with_all_deps }
@@ -51,7 +56,6 @@ EOM
 [General]
 
 Verbosity = 2
-Domain = example.com
 Local-Realms = realm1,realm2
 
 [Mapping]

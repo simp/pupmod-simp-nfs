@@ -15,6 +15,14 @@
   ],
   "dependencies": [
     {
+      "name": "puppetlabs/concat",
+      "version_requirement": ">= 2.2.0 < 3.0.0"
+    },
+    {
+      "name": "puppetlabs/stdlib",
+      "version_requirement": ">= 4.9.0 < 5.0.0"
+    },
+    {
       "name": "simp/autofs",
       "version_requirement": ">= 5.0.0 < 6.0.0"
     },
@@ -31,16 +39,8 @@
       "version_requirement": ">= 6.0.0 < 7.0.0"
     },
     {
-      "name": "simp/simpcat",
-      "version_requirement": ">= 6.0.0 < 7.0.0"
-    },
-    {
       "name": "simp/simplib",
       "version_requirement": ">= 2.1.0 < 3.0.0"
-    },
-    {
-      "name": "puppetlabs/stdlib",
-      "version_requirement": ">= 4.9.0 < 5.0.0"
     },
     {
       "name": "simp/stunnel",

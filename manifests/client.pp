@@ -1,48 +1,49 @@
 # Set up the iptables hooks and the sysctl settings that are required for NFS
 # to function properly on a client system.
 #
-# If using the nfs::client::stunnel::connect define, this will be automatically
-# called for you.
+# If using the ``nfs::client::stunnel::connect`` define, this will be
+# automatically called for you.
 #
-# @param nfs_server Array of NFS servers that will be
-#   calling back to the callback port for NFSv4.
+# @param nfs_servers
+#   NFS servers that will be calling back to the callback port for NFSv4
 #
-# @param is_server If set, lets this class know *explicitly* that
-#   the `$nfs_server` is the host that the class is applying on. This is
-#   important to avoid conflicts with the target server running on the same
-#   host under a different hostname/alias.
+# @param is_server
+#   Lets this class know *explicitly* that the ``$nfs_servers`` contains the
+#   host that the class is applying on. This is important to avoid conflicts
+#   with the target server running on the same host under a different
+#   hostname/alias.
 #
-#   @note The `File[/etc/exports]` resource will conflict if you have a system
-#     that is both a server and client for itself but can't determine that from
-#     introspection.
+#   * The ``File[/etc/exports]`` resource will conflict if you have a system that
+#     is both a server and client for itself but can't determine that from
+#     introspection
 #
-# @param callback_port The callback port.
+# @param callback_port
+#   The callback port
 #
-# @param stunnel If set, will *attempt* to determine if the
-#   server is trying to connect to itself. If connecting to itself, will not
-#   use stunnel, otherwise will use stunnel.
+# @param stunnel
+#   Enable ``stunnel`` connections for this system
 #
-#   @note If you are using host aliases for your NFS server names, this check
-#     may fail and you may need to disable `$stunnel` explicitly.
+#   * Will *attempt* to determine if the server is trying to connect to itself
 #
-# @param firewall If set, use the SIMP IPTables module to
-#   manipulate the firewall settings.
+#   * If connecting to itself, will not use stunnel, otherwise will use stunnel
+#
+#   * If you are using host aliases for your NFS server names, this check
+#     may fail and you may need to disable ``$stunnel`` explicitly
+#
+# @param firewall
+#   Use the SIMP IPTables module to manipulate the firewall settings
 #
 # @author Trevor Vaughan <tvaughan@onyxpoint.com>
 # @author Kendall Moore <kendall.moore@onyxpoint.com>
 #
 class nfs::client (
-  String                   $nfs_server    = defined('$::nfs::server') ? { true => getvar('::nfs_server') , default => hiera('nfs::server') },
-  Boolean                  $is_server     = $::nfs::is_server,
-  Stdlib::Compat::Integer  $callback_port = '876',
-  Boolean                  $stunnel       = $::nfs::stunnel,
-  Boolean                  $firewall      = $::nfs::firewall,
+  Optional[Simplib::Netlist] $nfs_servers   = undef,
+  Boolean                    $is_server     = $::nfs::is_server,
+  Simplib::Port              $callback_port = 876,
+  Boolean                    $stunnel       = $::nfs::stunnel,
+  Boolean                    $firewall      = $::nfs::firewall,
 ) inherits ::nfs {
-
-  validate_net_list($nfs_server)
-  validate_port($callback_port)
-
-  $_is_server = ($is_server or (host_is_me($nfs_server) and $stunnel))
+  $_is_server = ($is_server or (host_is_me($nfs_servers) and $stunnel))
 
   if !$_is_server {
     if $stunnel { include '::nfs::client::stunnel' }
@@ -64,7 +65,7 @@ class nfs::client (
     include '::iptables'
 
     iptables::add_tcp_stateful_listen { 'nfs4_callback_port':
-      trusted_nets => $nfs_server,
+      trusted_nets => $nfs_servers,
       dports       => $callback_port
     }
   }
