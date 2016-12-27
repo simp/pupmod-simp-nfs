@@ -64,7 +64,7 @@ class nfs::client (
   if $firewall {
     include '::iptables'
 
-    iptables::add_tcp_stateful_listen { 'nfs4_callback_port':
+    iptables::listen::tcp_stateful { 'nfs4_callback_port':
       trusted_nets => $nfs_servers,
       dports       => $callback_port
     }

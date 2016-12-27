@@ -76,7 +76,7 @@
 # @author Kendall Moore <kendall.moore@onyxpoint.com>
 #
 class nfs::server (
-  Simplib::Netlist               $trusted_nets,
+  Simplib::Netlist               $trusted_nets                  = simplib::lookup('simp_options::trusted_nets', { 'default_value' => ['127.0.0.1'] }),
   Boolean                        $nfsv3                         = $::nfs::nfsv3,
   Optional[String]               $rpcrquotadopts                = undef,
   Optional[String]               $lockd_arg                     = undef,
@@ -154,11 +154,11 @@ class nfs::server (
     if $firewall {
       include '::iptables'
 
-      iptables::add_tcp_stateful_listen { 'nfs_client_tcp_ports':
+      iptables::listen::tcp_stateful{ 'nfs_client_tcp_ports':
         trusted_nets => $trusted_nets,
         dports       => $::nfs::server::stunnel::stunnel_port_override
       }
-      iptables::add_udp_listen { 'nfs_client_udp_ports':
+      iptables::listen::udp { 'nfs_client_udp_ports':
         trusted_nets => $trusted_nets,
         dports       => $::nfs::server::stunnel::stunnel_port_override
       }
@@ -185,11 +185,12 @@ class nfs::server (
 
     if $firewall {
       include '::iptables'
-      iptables::add_tcp_stateful_listen { 'nfs_client_tcp_ports':
+
+      iptables::listen::tcp_stateful { 'nfs_client_tcp_ports':
         trusted_nets => $trusted_nets,
         dports       => $_ports
       }
-      iptables::add_udp_listen { 'nfs_client_udp_ports':
+      iptables::listen::udp { 'nfs_client_udp_ports':
         trusted_nets => $trusted_nets,
         dports       => $_ports
       }
@@ -198,7 +199,10 @@ class nfs::server (
 
   service { 'sunrpc_tuning':
     enable  => true,
-    require => File['/etc/init.d/sunrpc_tuning']
+    require => [
+      File['/etc/init.d/sunrpc_tuning'],
+      Service[$::nfs::service_names::nfs_server]
+    ]
   }
 
   if $tcpwrappers {

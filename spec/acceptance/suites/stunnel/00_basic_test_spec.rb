@@ -4,6 +4,21 @@ test_name 'nfs basic'
 
 describe 'nfs basic' do
 
+  before(:context) do
+    hosts.each do |host|
+      interfaces = fact_on(host, 'interfaces').strip.split(',')
+      interfaces.delete_if do |x|
+        x =~ /^lo/
+      end
+
+      interfaces.each do |iface|
+        if fact_on(host, "ipaddress_#{iface}").strip.empty?
+          on(host, "ifup #{iface}", :accept_all_exit_codes => true)
+        end
+      end
+    end
+  end
+
   servers = hosts_with_role( hosts, 'nfs_server' )
   clients = hosts_with_role( hosts, 'client' )
 
@@ -15,10 +30,10 @@ describe 'nfs basic' do
       pattern => 'ALL'
     }
 
-    iptables::add_tcp_stateful_listen { 'i_love_testing':
-      order => '8',
-      trusted_nets => 'ALL',
-      dports => '22'
+    iptables::listen::tcp_stateful { 'i_love_testing':
+      order        => 8,
+      trusted_nets => ['ALL'],
+      dports       => 22
     }
   EOM
 
@@ -33,8 +48,16 @@ describe 'nfs basic' do
   let(:hieradata) {
     <<-EOM
 ---
-nfs::simp_iptables : true
-nfs::server : '#NFS_SERVER#'
+simp_options::firewall : true
+simp_options::tcpwrappers : true
+simp_options::kerberos : false
+simp_options::pki : true
+simp_options::haveged : true
+simp_options::trusted_nets : ['ALL']
+
+nfs::client::nfs_servers :
+  - '#NFS_SERVER#'
+
 # Set us up for a basic server for right now (no Kerberos)
 
 # These two need to be paired in our case since we expect to manage the Kerberos
@@ -42,7 +65,6 @@ nfs::server : '#NFS_SERVER#'
 nfs::kerberos : false
 nfs::secure_nfs : false
 nfs::is_server : #IS_SERVER#
-nfs::server::trusted_nets : 'ALL'
     EOM
 
   }
@@ -93,7 +115,7 @@ nfs::server::trusted_nets : 'ALL'
           }
 
           nfs::server::export { 'nfs4_root':
-            client      => ['*'],
+            clients     => ['*'],
             export_path => '/srv/nfs_share',
             sec         => ['sys'],
           }

@@ -53,8 +53,8 @@ describe 'nfs' do
           end
           it { is_expected.to create_file('/etc/init.d/sunrpc_tuning').with_content(/128/) }
           it { is_expected.to_not contain_class('iptables') }
-          it { is_expected.to_not create_iptables__add_tcp_stateful_listen('nfs_client_tcp_ports') }
-          it { is_expected.to_not create_iptables__add_udp_listen('nfs_client_udp_ports') }
+          it { is_expected.to_not create_iptables__listen__tcp_stateful('nfs_client_tcp_ports') }
+          it { is_expected.to_not create_iptables__listen__udp('nfs_client_udp_ports') }
           it { is_expected.to contain_service('sunrpc_tuning').with_require('File[/etc/init.d/sunrpc_tuning]') }
           it { is_expected.to contain_sysctl('sunrpc.tcp_slot_table_entries') }
           it { is_expected.to contain_sysctl('sunrpc.udp_slot_table_entries') }
@@ -84,8 +84,8 @@ describe 'nfs' do
           it { is_expected.to contain_tcpwrappers__allow('rpcbind') }
           it { is_expected.to contain_class('krb5') }
           it { is_expected.to contain_class('iptables') }
-          it { is_expected.to create_iptables__add_tcp_stateful_listen('nfs_client_tcp_ports') }
-          it { is_expected.to create_iptables__add_udp_listen('nfs_client_udp_ports') }
+          it { is_expected.to create_iptables__listen__tcp_stateful('nfs_client_tcp_ports') }
+          it { is_expected.to create_iptables__listen__udp('nfs_client_udp_ports') }
         end
       end
     end
