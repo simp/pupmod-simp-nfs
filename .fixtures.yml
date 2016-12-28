@@ -1,54 +1,31 @@
 ---
 fixtures:
   repositories:
-    auditd:
-      repo: git://github.com/simp/pupmod-simp-auditd
-      branch: master
+    auditd: https://github.com/simp/pupmod-simp-auditd
     augeasproviders_core:
-      repo: git://github.com/simp/augeasproviders_core
+      repo: https://github.com/simp/augeasproviders_core
       branch: simp-master
     augeasproviders_grub:
-      repo: git://github.com/simp/augeasproviders_grub
+      repo: https://github.com/simp/augeasproviders_grub
       branch: simp-master
     augeasproviders_sysctl:
-      repo: git://github.com/simp/augeasproviders_sysctl
+      repo: https://github.com/simp/augeasproviders_sysctl
       branch: simp-master
     concat: https://github.com/simp/puppetlabs-concat
     haveged:
       repo: https://github.com/simp/puppet-haveged
       branch: simp-master
-    iptables:
-      repo: git://github.com/simp/pupmod-simp-iptables
-     branch: master
-    krb5:
-      repo: https://github.com/simp/pupmod-simp-krb5
-      branch: master
-    logrotate:
-      repo: https://github.com/simp/pupmod-simp-logrotate
-      branch: master
-    pki:
-      repo: git://github.com/simp/pupmod-simp-pki
-      branch: master
-    rsyslog:
-      repo: git://github.com/simp/pupmod-simp-rsyslog
-      branch: master
-    selinux:
-      repo: git://github.com/simp/pupmod-simp-selinux
-      branch: master
-    simplib:
-      repo: git://github.com/simp/pupmod-simp-simplib
-      branch: master
-    simp_options:
-      repo: https://github.com/simp/pupmod-simp-simp_options
-      branch: master
-    stdlib:
-      repo: git://github.com/simp/puppetlabs-stdlib
-      branch: master
-    stunnel:
-      repo: git://github.com/simp/pupmod-simp-stunnel
-      branch: master
-    tcpwrappers:
-      repo: git://github.com/simp/pupmod-simp-tcpwrappers
-      branch: master
+    iptables: https://github.com/simp/pupmod-simp-iptables
+    krb5: https://github.com/simp/pupmod-simp-krb5
+    logrotate: https://github.com/simp/pupmod-simp-logrotate
+    pki: https://github.com/simp/pupmod-simp-pki
+    rsyslog: https://github.com/simp/pupmod-simp-rsyslog
+    selinux: https://github.com/simp/pupmod-simp-selinux
+    simplib: https://github.com/simp/pupmod-simp-simplib
+    simp_options: https://github.com/simp/pupmod-simp-simp_options
+    stdlib: https://github.com/simp/puppetlabs-stdlib
+    stunnel: https://github.com/simp/pupmod-simp-stunnel
+    svckill: https://github.com/simp/pupmod-simp-svckill
+    tcpwrappers: https://github.com/simp/pupmod-simp-tcpwrappers
   symlinks:
     nfs: "#{source_dir}"

@@ -55,7 +55,13 @@ describe 'nfs' do
           it { is_expected.to_not contain_class('iptables') }
           it { is_expected.to_not create_iptables__listen__tcp_stateful('nfs_client_tcp_ports') }
           it { is_expected.to_not create_iptables__listen__udp('nfs_client_udp_ports') }
-          it { is_expected.to contain_service('sunrpc_tuning').with_require('File[/etc/init.d/sunrpc_tuning]') }
+          if ['RedHat','CentOS'].include?(facts[:operatingsystem])
+            if facts[:operatingsystemmajrelease].to_s < '7'
+              it { is_expected.to contain_service('sunrpc_tuning').with_require('[File[/etc/init.d/sunrpc_tuning]{:path=>"/etc/init.d/sunrpc_tuning"}, Service[nfs]{:name=>"nfs"}]')}
+            else
+              it { is_expected.to contain_service('sunrpc_tuning').with_require('[File[/etc/init.d/sunrpc_tuning]{:path=>"/etc/init.d/sunrpc_tuning"}, Service[nfs-server]{:name=>"nfs-server"}]')}
+            end
+          end
           it { is_expected.to contain_sysctl('sunrpc.tcp_slot_table_entries') }
           it { is_expected.to contain_sysctl('sunrpc.udp_slot_table_entries') }
           it { is_expected.to contain_concat__fragment('nfs_init_server').without_content(%r(RPCSVCGSSDARGS=)) }
