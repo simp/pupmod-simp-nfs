@@ -60,5 +60,5 @@ HOSTS:
 
 CONFIG:
   log_level: verbose
-  type: foss
+  type: aio
   vagrant_memsize: 512

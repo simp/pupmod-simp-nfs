@@ -1,13 +1,12 @@
 # Install the required NFS packages
 #
+# @param ensure
+#
 # @author Trevor Vaughan <tvaughan@onyxpoint.com>
 #
-class nfs::install {
-  package { 'nfs-utils':
-    ensure  => 'latest'
-  }
-
-  package { 'nfs4-acl-tools':
-    ensure => 'latest'
-  }
+class nfs::install (
+  Enum['latest','present','absent'] $ensure = 'latest'
+){
+  package { 'nfs-utils': ensure  => $ensure }
+  package { 'nfs4-acl-tools': ensure => $ensure }
 }

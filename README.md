@@ -36,9 +36,8 @@ it can be used independently:
  * When included within the SIMP ecosystem, security compliance settings will
    be managed from the Puppet server.
  * If used independently, all SIMP-managed security subsystems are disabled by
-   default and must be explicitly opted into by administrators.  Please review
-   the ``$client_nets``, ``$enable_*`` and ``$use_*`` parameters in
-   ``manifests/init.pp`` for details.
+   default and must be explicitly opted into by administrators.  See
+   simp_options for more detail.
 
 ## Setup
 
@@ -55,7 +54,7 @@ To be applied to all nodes, in ``default.yaml``:
 
 ``` yaml
 nfs::server: "your.server.fqdn"
-nfs::server::client_ips: "%{alias('client_nets')}"
+nfs::server::trusted_nets: "%{alias('trusted_nets')}"
 nfs::simp_iptables: true
 ```
 
@@ -86,12 +85,12 @@ path:
 
 ``` puppet
 class site::nfs_server (
-  $usekrb5 = hiera('nfs::simp_krb5',false),
-  $client_nets = defined('$::client_nets') ? { true => $::client_nets, default => hiera('client_nets') }
+  $kerberos = simplib::lookup('simp_options::kerberos', { 'default_value' => false, 'value_type' => Boolean }),
+  $trusted_nets = defined('$::trusted_nets') ? { true => $::trusted_nets, default => hiera('trusted_nets') }
   ){
   include '::nfs'
 
-  if $usekrb5 {
+  if $kerberos {
     $security = 'krb5p'
   } else {
     $security = 'sys'
@@ -99,7 +98,7 @@ class site::nfs_server (
 
   include '::nfs'
 
-  $security = $usekrb5 ? { true => 'krb5p', false => 'sys' }
+  $security = $kerberos ? { true => 'krb5p', false => 'sys' }
 
   file { '/srv/nfs_share':
     ensure => 'directory',
@@ -109,7 +108,7 @@ class site::nfs_server (
   }
 
   nfs::server::export { 'nfs4_root':
-    client      => $client_nets,
+    client      => $trusted_nets,
     export_path => '/srv/nfs_share',
     sec         => [$security],
     require     => File['/srv/nfs_share']
@@ -123,11 +122,11 @@ native Puppet ``mount`` resource:
 
 ``` puppet
 class site::nfs_client (
-    $usekrb5 = hiera('nfs::simp_krb5',false),
+    $kerberos = simplib::lookup('simp_options::kerberos', { 'default_value' => false, 'value_type' => Boolean }),
   ){
   include '::nfs'
 
-  $security = $usekrb5 ? { true => 'krb5p', false =>  'sys' }
+  $security = $kerberos ? { true => 'krb5p', false =>  'sys' }
 
   file { '/mnt/nfs':
     ensure => 'directory',
@@ -167,8 +166,8 @@ Modify the examples provided above to include the following hieradata:
 To be applied on every node in ``default.yaml``:
 
 ``` yaml
-simp_krb5 : true
-nfs::simp_krb5 : true
+simp_options::kerberos : true
+nfs::kerberos : true
 nfs::secure_nfs : true
 
 krb5::config::dns_lookup_kdc : false

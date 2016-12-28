@@ -7,12 +7,12 @@ describe 'nfs::client::stunnel' do
 
       # Nudge us away from the default server test (which is us)
       let(:params) {{
-        :nfs_server => 'some.other.svr'
+        :nfs_servers => ['some.other.svr']
       }}
 
       it { is_expected.to compile.with_all_deps }
       it { is_expected.to create_class('nfs::client::stunnel') }
-      it { is_expected.to create_stunnel__add('nfs_client') }
+      it { is_expected.to create_stunnel__connection('nfs_client') }
     end
   end
 end

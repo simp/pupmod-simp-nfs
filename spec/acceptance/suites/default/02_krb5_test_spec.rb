@@ -4,10 +4,25 @@ test_name 'nfs krb5'
 
 describe 'nfs krb5' do
 
+  before(:context) do
+    hosts.each do |host|
+      interfaces = fact_on(host, 'interfaces').strip.split(',')
+      interfaces.delete_if do |x|
+        x =~ /^lo/
+      end
+
+      interfaces.each do |iface|
+        if fact_on(host, "ipaddress_#{iface}").strip.empty?
+          on(host, "ifup #{iface}", :accept_all_exit_codes => true)
+        end
+      end
+    end
+  end
+
   servers = hosts_with_role( hosts, 'nfs_server' )
   clients = hosts_with_role( hosts, 'nfs_client' )
 
-  def client_nets(target_hosts = hosts)
+  def trusted_nets(target_hosts = hosts)
     host_ipaddresses = []
 
     target_hosts.each do |host|
@@ -42,10 +57,10 @@ describe 'nfs krb5' do
       pattern => 'ALL'
     }
 
-    iptables::add_tcp_stateful_listen { 'i_love_testing':
-      order => '8',
-      client_nets => 'ALL',
-      dports => '22'
+    iptables::listen::tcp_stateful { 'i_love_testing':
+      order        => 8,
+      trusted_nets => ['ALL'],
+      dports       => 22
     }
   EOM
 
@@ -61,10 +76,12 @@ describe 'nfs krb5' do
   let(:hieradata) {
     <<-EOM
 ---
-client_nets :
-#{client_nets.map{|ip| ip = %(  - '#{ip}')}.join("\n")}
+simp_options::trusted_nets :
+#{trusted_nets.map{|ip| ip = %(  - '#{ip}')}.join("\n")}
 
-use_iptables : true
+simp_options::firewall : true
+simp_options::tcpwrappers : true
+simp_options::kerberos : true
 
 pki_dir : '/etc/pki/simp-testing/pki'
 
@@ -73,9 +90,9 @@ pki::public_key_source : "file://%{hiera('pki_dir')}/public/%{::fqdn}.pub"
 pki::cacerts_sources :
   - "file://%{hiera('pki_dir')}/cacerts"
 
-enable_auditing : false
+auditd : false
 
-krb5::kdc::use_ldap : false
+krb5::kdc::ldap : false
 krb5::keytab::keytab_source : 'file:///tmp/keytabs'
 
 # Generate keytabs for everyone
@@ -85,14 +102,13 @@ krb5::kdc::auto_keytabs::hosts :
 krb5::kdc::auto_keytabs::global_services :
   - 'nfs'
 
-nfs::server : '#NFS_SERVERS#'
+nfs::client::nfs_servers :
+  - '#NFS_SERVER#'
 
 # These two need to be paired in our case since we expect to manage the Kerberos
 # infrastructure for our tests.
 nfs::secure_nfs : true
-nfs::simp_krb5 : true
 nfs::is_server : #IS_SERVER#
-nfs::server::client_ips : 'ALL'
     EOM
   }
 
@@ -106,7 +122,7 @@ nfs::server::client_ips : 'ALL'
         # orchestrate this via a profile somewhere.
         keytab_src = %(/var/kerberos/krb5kdc/generated_keytabs/#{fact_on(host,'fqdn')}/krb5.keytab)
 
-        krb5_manifest = "include '::krb5::kdc'"
+        krb5_manifest = "include '::krb5::kdc'\n#{ssh_allow}"
 
         set_hieradata_on(host, hieradata)
         apply_manifest_on(host, krb5_manifest)
@@ -123,7 +139,7 @@ nfs::server::client_ips : 'ALL'
 
       it 'should work with no errors' do
         hdata = hieradata.dup
-        hdata.gsub!(/#NFS_SERVERS#/m, fact_on(host, 'fqdn'))
+        hdata.gsub!(/#NFS_SERVER#/m, fact_on(host, 'fqdn'))
         hdata.gsub!(/#IS_SERVER#/m, 'true')
 
         set_hieradata_on(host, hdata)
@@ -159,7 +175,7 @@ nfs::server::client_ips : 'ALL'
           }
 
           nfs::server::export { 'nfs4_root':
-            client      => ['*'],
+            clients     => ['*'],
             export_path => '/srv/nfs_share',
             sec         => ['krb5p']
           }
@@ -182,7 +198,7 @@ nfs::server::client_ips : 'ALL'
           client_fqdn = fact_on(host, 'fqdn')
 
           hdata = hieradata.dup
-          hdata.gsub!(/#NFS_SERVERS#/m, server_fqdn)
+          hdata.gsub!(/#NFS_SERVER#/m, server_fqdn)
           hdata.gsub!(/#IS_SERVER#/m, 'false')
 
           _manifest = manifest.dup + <<-EOM

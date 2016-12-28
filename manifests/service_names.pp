@@ -1,12 +1,10 @@
-# == Class: nfs::service_names
-#
-# This class provides appropriate service names based on the operating system.
+# This class provides appropriate service names based on the operating system
 #
 class nfs::service_names {
-  if $::operatingsystem in ['RedHat', 'CentOS'] {
+  if $facts['os']['name'] in ['RedHat', 'CentOS'] {
     $rpcbind   = 'rpcbind'
 
-    if (versioncmp($::operatingsystemmajrelease,'7') < 0) {
+    if (versioncmp($facts['os']['release']['major'], '7') < 0) {
       $nfs_lock    = 'nfslock'
       $nfs_server  = 'nfs'
       $rpcgssd     = 'rpcgssd'
@@ -21,7 +19,7 @@ class nfs::service_names {
       $rpcidmapd   = 'nfs-idmapd'
       $rpcgssd     = 'rpc-gssd'
 
-      if (versioncmp($::operatingsystemrelease,'7.1') < 0) {
+      if (versioncmp($facts['os']['release']['full'], '7.1') < 0) {
         $rpcsvcgssd  = 'rpc-svcgssd'
       }
       else {
@@ -30,6 +28,6 @@ class nfs::service_names {
     }
   }
   else {
-    fail("Operating System '${::operatingsystem}' is not supported by ${module_name}")
+    fail("Operating System '${facts['os']['name']}' is not supported by ${module_name}")
   }
 }

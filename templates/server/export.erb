@@ -1,4 +1,4 @@
-<% unless @comment.empty? -%>
+<% if @comment -%>
 # <%= @comment %>
 <% end -%>
 <%
@@ -6,7 +6,7 @@
 
 _options = Array.new
 
-unless @custom.empty?
+if @custom
   # delete parentheses and spaces
   _options = @custom.delete('( )')
   _options = "(#{_options})"
@@ -45,20 +45,24 @@ else
     _options.push('insecure_locks')
   end
 
-  unless @mountpoint.to_s.empty?
-    if @mountpoint.to_s =~ %r(^/)
-      _options.push("mp=#{@mountpoint}")
-    else
+  if @mountpoint
+    if @mountpoint.is_a?(TrueClass)
       _options.push('mp')
+    else
+      _options.push("mp=#{@mountpoint}")
     end
   end
 
-  unless @fsid.empty?
+  if @fsid
     _options.push("fsid=#{@fsid}")
   end
 
-  unless @refer.empty?
-    _options.push("refer=#{@refer}")
+  if @refer
+    _options.push("refer=#{Array(@refer).join(':')}")
+  end
+
+  if @nordirplus
+    _options.push('nordirplus')
   end
 
   _options.push("sec=#{Array(@sec).join(':')}")
@@ -79,7 +83,7 @@ end
 
 _output = Array.new
 # Put it all together
-_client = Array(@client.dup).flatten
+_client = Array(@clients.dup).flatten
 _client.map! { |cl| (['ALL','all','ANY','any'].include? cl) ? '*' : cl }.flatten!
 _client.push("127.0.0.1")
 _client.uniq.sort.each do |cl|

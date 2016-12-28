@@ -1,3 +1,10 @@
+* Thu Dec 08 2016 Nick Markowski <nmarkowski@keywcorp.com> - 6.0.0-0
+- Updated global catalysts and strong typed.
+- Fix bug whereby the STATDARGS parameter in NFS sysconfig server
+  configuration was not set.
+- Fix bug whereby the LOCKD_ARG parameter in NFS sysconfig server
+  configuration was improperly set.
+
 * Thu Dec 01 2016 Nick Markowski <nmarkowski@keywcorp.com> - 5.0.1-0
 - Removed pupmod-simp-sysctl in favor of augeas-sysctl
 

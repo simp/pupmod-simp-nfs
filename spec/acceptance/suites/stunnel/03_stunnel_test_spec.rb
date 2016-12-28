@@ -4,6 +4,21 @@ test_name 'nfs with stunnel'
 
 describe 'nfs stunnel' do
 
+  before(:context) do
+    hosts.each do |host|
+      interfaces = fact_on(host, 'interfaces').strip.split(',')
+      interfaces.delete_if do |x|
+        x =~ /^lo/
+      end
+
+      interfaces.each do |iface|
+        if fact_on(host, "ipaddress_#{iface}").strip.empty?
+          on(host, "ifup #{iface}", :accept_all_exit_codes => true)
+        end
+      end
+    end
+  end
+
   servers = hosts_with_role( hosts, 'nfs_server' )
   clients = hosts_with_role( hosts, 'nfs_client' )
 
@@ -18,10 +33,10 @@ describe 'nfs stunnel' do
       pattern => 'ALL'
     }
 
-    iptables::add_tcp_stateful_listen { 'i_love_testing':
-      order => '8',
-      client_nets => 'ALL',
-      dports => '22'
+    iptables::listen::tcp_stateful { 'i_love_testing':
+      order        => 8,
+      trusted_nets => ['ALL'],
+      dports       => 22
     }
   EOM
 
@@ -37,8 +52,12 @@ describe 'nfs stunnel' do
     <<-EOM
 ---
 # Need to test that our iptables works properly with this stuff
-
-use_iptables : true
+simp_options::firewall : true
+simp_options::tcpwrappers : true
+simp_options::kerberos : false
+simp_options::pki : true
+simp_options::haveged : true
+simp_options::trusted_nets : ['ALL']
 
 pki_dir : '/etc/pki/simp-testing/pki'
 
@@ -47,18 +66,19 @@ pki::public_key_source : "file://%{hiera('pki_dir')}/public/%{::fqdn}.pub"
 pki::cacerts_sources :
   - "file://%{hiera('pki_dir')}/cacerts"
 
-enable_auditing : false
+auditd : false
 
-nfs::use_stunnel : true
-nfs::server : '#NFS_SERVER#'
+nfs::stunnel : true
+nfs::client::nfs_servers :
+  - '#NFS_SERVER#'
+
 # Set us up for a basic server for right now (no Kerberos)
 
 # These two need to be paired in our case since we expect to manage the Kerberos
 # infrastructure for our tests.
-nfs::simp_krb5 : false
+nfs::kerberos : false
 nfs::secure_nfs : false
 nfs::is_server : #IS_SERVER#
-nfs::server::client_ips : 'ALL'
     EOM
   }
 
@@ -113,7 +133,7 @@ nfs::server::client_ips : 'ALL'
           }
 
           nfs::server::export { 'nfs4_root':
-            client      => ['*'],
+            clients     => ['*'],
             export_path => '/srv/nfs_share',
             sec         => ['sys'],
             # Because we're using stunnel and allowing *all* connections
