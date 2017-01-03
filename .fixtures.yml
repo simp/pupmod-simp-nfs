@@ -11,6 +11,7 @@ fixtures:
     augeasproviders_sysctl:
       repo: https://github.com/simp/augeasproviders_sysctl
       branch: simp-master
+    autofs: https://github.com/simp/pupmod-simp-autofs
     concat: https://github.com/simp/puppetlabs-concat
     haveged:
       repo: https://github.com/simp/puppet-haveged

@@ -1,6 +1,6 @@
 # Provides the base segments for NFS server *and* client services.
 #
-# @param stunnel
+# @param use_stunnel
 #   Wrap ``stunnel`` around the NFS server connections
 #
 #   * This is ideally suited for environments without a working Kerberos setup

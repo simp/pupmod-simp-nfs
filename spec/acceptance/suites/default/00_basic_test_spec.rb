@@ -23,17 +23,19 @@ describe 'nfs basic' do
   clients = hosts_with_role( hosts, 'client' )
 
   ssh_allow = <<-EOM
-    include '::tcpwrappers'
-    include '::iptables'
+    if !defined(Iptables::Listen::Tcp_stateful['i_love_testing']) {
+      include '::tcpwrappers'
+      include '::iptables'
 
-    tcpwrappers::allow { 'sshd':
-      pattern => 'ALL'
-    }
+      tcpwrappers::allow { 'sshd':
+        pattern => 'ALL'
+      }
 
-    iptables::listen::tcp_stateful { 'i_love_testing':
-      order        => 8,
-      trusted_nets => ['ALL'],
-      dports       => 22
+      iptables::listen::tcp_stateful { 'i_love_testing':
+        order        => 8,
+        trusted_nets => ['ALL'],
+        dports       => 22
+      }
     }
   EOM
 
@@ -49,12 +51,10 @@ describe 'nfs basic' do
     <<-EOM
 ---
 simp_options::firewall : true
-simp_options::tcpwrappers : true
 simp_options::kerberos : false
+simp_options::stunnel : false
+simp_options::tcpwrappers : true
 simp_options::trusted_nets : ['ALL']
-
-nfs::client::nfs_servers :
-  - '#NFS_SERVER#'
 
 # Set us up for a basic server for right now (no Kerberos)
 
@@ -88,41 +88,39 @@ nfs::is_server : #IS_SERVER#
     end
   end
 
+  server_manifest = <<-EOM
+    #{ssh_allow}
+
+    include '::nfs'
+
+    file { '/srv/nfs_share':
+      ensure => 'directory',
+      owner  => 'root',
+      group  => 'root',
+      mode   => '0644'
+    }
+
+    file { '/srv/nfs_share/test_file':
+      ensure  => 'file',
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0644',
+      content => 'This is a test'
+    }
+
+    nfs::server::export { 'nfs4_root':
+      clients     => ['*'],
+      export_path => '/srv/nfs_share',
+      sec         => ['sys']
+    }
+
+    File['/srv/nfs_share'] -> Nfs::Server::Export['nfs4_root']
+  EOM
+
   context "as a server" do
     servers.each do |host|
-      let(:manifest) {
-        <<-EOM
-          #{ssh_allow}
-
-          include '::nfs'
-
-          file { '/srv/nfs_share':
-            ensure => 'directory',
-            owner  => 'root',
-            group  => 'root',
-            mode   => '0644'
-          }
-
-          file { '/srv/nfs_share/test_file':
-            ensure  => 'file',
-            owner   => 'root',
-            group   => 'root',
-            mode    => '0644',
-            content => 'This is a test'
-          }
-
-          nfs::server::export { 'nfs4_root':
-            clients     => ['*'],
-            export_path => '/srv/nfs_share',
-            sec         => ['sys']
-          }
-
-          File['/srv/nfs_share'] -> Nfs::Server::Export['nfs4_root']
-        EOM
-      }
-
       it 'should export a directory' do
-        apply_manifest_on(host, manifest)
+        apply_manifest_on(host, server_manifest)
       end
     end
   end
@@ -133,10 +131,44 @@ nfs::is_server : #IS_SERVER#
         it "should mount a directory on the #{server} server" do
           server_fqdn = fact_on(server, 'fqdn')
 
+          client_manifest = <<-EOM
+            #{ssh_allow}
+
+            nfs::client::mount { '/mnt/#{server}':
+              nfs_server  => '#{server_fqdn}',
+              remote_path => '/srv/nfs_share',
+              autofs      => false
+            }
+          EOM
+
+          if servers.include?(host)
+            client_manifest = client_manifest + "\n" + server_manifest
+          end
+
           host.mkdir_p("/mnt/#{server}")
-          on(host, %(puppet resource mount /mnt/#{server} ensure=mounted fstype=nfs4 device='#{server_fqdn}:/srv/nfs_share' options='sec=sys'))
+          apply_manifest_on(host, client_manifest)
           on(host, %(grep -q 'This is a test' /mnt/#{server}/test_file))
-          on(host, %{puppet resource mount /mnt/#{server} ensure=unmounted})
+          on(host, %{puppet resource mount /mnt/#{server} ensure=absent})
+        end
+
+        it "should mount a directory on the #{server} server with autofs" do
+          server_fqdn = fact_on(server, 'fqdn')
+
+          autofs_client_manifest = <<-EOM
+            #{ssh_allow}
+
+            nfs::client::mount { '/mnt/#{server}':
+              nfs_server  => '#{server_fqdn}',
+              remote_path => '/srv/nfs_share'
+            }
+          EOM
+
+          if servers.include?(host)
+            autofs_client_manifest = autofs_client_manifest + "\n" + server_manifest
+          end
+
+          apply_manifest_on(host, autofs_client_manifest)
+          on(host, %{puppet resource service autofs ensure=stopped})
         end
       end
     end

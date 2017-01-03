@@ -5,6 +5,11 @@
 # @param version
 #   The version of NFS to use
 #
+# @param verify
+#   The verification level that should be done on the clients
+#
+#   * See ``stunnel::connection::verify`` for details
+#
 # @param trusted_nets
 #   The systems that are allowed to connect to this service
 #
@@ -31,15 +36,16 @@
 # @author Kendall Moore <mailto:kmoore@keywcorp.com>
 #
 class nfs::server::stunnel (
-  Integer[3,4] $version = 4,
-  Simplib::Netlist $trusted_nets = $::nfs::server::trusted_nets,
-  Simplib::IP $nfs_accept_address = '0.0.0.0',
-  Simplib::Port $nfs_accept_port = 20490,
-  Simplib::Port $portmapper_accept_port = 1110,
-  Simplib::Port $rquotad_accept_port = 8750,
-  Simplib::Port $nlockmgr_accept_port = 32804,
-  Simplib::Port $mountd_accept_port = 8920,
-  Simplib::Port $status_accept_port = 6620
+  Integer[3,4]     $version                = 4,
+  Integer          $verify                 = 2,
+  Simplib::Netlist $trusted_nets           = $::nfs::server::trusted_nets,
+  Simplib::IP      $nfs_accept_address     = '0.0.0.0',
+  Simplib::Port    $nfs_accept_port        = 20490,
+  Simplib::Port    $portmapper_accept_port = 1110,
+  Simplib::Port    $rquotad_accept_port    = 8750,
+  Simplib::Port    $nlockmgr_accept_port   = 32804,
+  Simplib::Port    $mountd_accept_port     = 8920,
+  Simplib::Port    $status_accept_port     = 6620
 ) {
   include '::nfs::server'
   include '::stunnel'
@@ -51,7 +57,8 @@ class nfs::server::stunnel (
       client       => false,
       trusted_nets => $trusted_nets,
       connect      => [2049],
-      accept       => "${nfs_accept_address}:${nfs_accept_port}"
+      accept       => "${nfs_accept_address}:${nfs_accept_port}",
+      verify       => $verify
     }
 
     $stunnel_port_override = [ $nfs_accept_port ]
@@ -61,37 +68,43 @@ class nfs::server::stunnel (
       client       => false,
       trusted_nets => $trusted_nets,
       connect      => ['2049'],
-      accept       => "${nfs_accept_address}:${nfs_accept_port}"
+      accept       => "${nfs_accept_address}:${nfs_accept_port}",
+      verify       => $verify
     }
     stunnel::connection { 'portmapper':
       client       => false,
       trusted_nets => $trusted_nets,
       connect      => ['111'],
-      accept       => "${nfs_accept_address}:${portmapper_accept_port}"
+      accept       => "${nfs_accept_address}:${portmapper_accept_port}",
+      verify       => $verify
     }
     stunnel::connection { 'rquotad':
       client       => false,
       trusted_nets => $trusted_nets,
       connect      => [$::nfs::rquotad_port],
-      accept       => "${nfs_accept_address}:${rquotad_accept_port}"
+      accept       => "${nfs_accept_address}:${rquotad_accept_port}",
+      verify       => $verify
     }
     stunnel::connection { 'nlockmgr':
       client       => false,
       trusted_nets => $trusted_nets,
       connect      => [$::nfs::lockd_tcpport],
-      accept       => "${nfs_accept_address}:${nlockmgr_accept_port}"
+      accept       => "${nfs_accept_address}:${nlockmgr_accept_port}",
+      verify       => $verify
     }
     stunnel::connection { 'mountd':
       client       => false,
       trusted_nets => $trusted_nets,
       connect      => [$::nfs::mountd_port],
-      accept       => "${nfs_accept_address}:${mountd_accept_port}"
+      accept       => "${nfs_accept_address}:${mountd_accept_port}",
+      verify       => $verify
     }
     stunnel::connection { 'status':
       client       => false,
       trusted_nets => $trusted_nets,
       connect      => [$::nfs::statd_port],
-      accept       => "${nfs_accept_address}:${status_accept_port}"
+      accept       => "${nfs_accept_address}:${status_accept_port}",
+      verify       => $verify
     }
 
     $stunnel_port_override = [

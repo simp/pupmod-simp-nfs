@@ -1,3 +1,5 @@
+# **NOTE: THIS IS A [PRIVATE](https://github.com/puppetlabs/puppetlabs-stdlib#assert_private) CLASS**
+#
 # Configure a NFS server with a default configuration that nails up the ports
 # so that you can pass them through ``iptables``.
 #
@@ -93,6 +95,8 @@ class nfs::server (
   Boolean                        $stunnel                       = $::nfs::stunnel,
   Boolean                        $tcpwrappers                   = $::nfs::tcpwrappers
 ) inherits ::nfs {
+
+  assert_private()
 
   if $tcpwrappers {
     include '::tcpwrappers'

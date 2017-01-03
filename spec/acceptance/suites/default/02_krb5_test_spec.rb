@@ -50,28 +50,28 @@ describe 'nfs krb5' do
   }
 
   ssh_allow = <<-EOM
-    include '::tcpwrappers'
-    include '::iptables'
+    if !defined(Iptables::Listen::Tcp_stateful['i_love_testing']) {
+      include '::tcpwrappers'
+      include '::iptables'
 
-    tcpwrappers::allow { 'sshd':
-      pattern => 'ALL'
-    }
+      tcpwrappers::allow { 'sshd':
+        pattern => 'ALL'
+      }
 
-    iptables::listen::tcp_stateful { 'i_love_testing':
-      order        => 8,
-      trusted_nets => ['ALL'],
-      dports       => 22
+      iptables::listen::tcp_stateful { 'i_love_testing':
+        order        => 8,
+        trusted_nets => ['ALL'],
+        dports       => 22
+      }
     }
   EOM
 
-  let(:manifest) {
-    <<-EOM
-      include '::nfs'
-      include '::krb5'
+  manifest = <<-EOM
+    include '::nfs'
+    include '::krb5'
 
-      #{ssh_allow}
-    EOM
-  }
+    #{ssh_allow}
+  EOM
 
   let(:hieradata) {
     <<-EOM
@@ -80,6 +80,7 @@ simp_options::trusted_nets :
 #{trusted_nets.map{|ip| ip = %(  - '#{ip}')}.join("\n")}
 
 simp_options::firewall : true
+simp_options::stunnel : false
 simp_options::tcpwrappers : true
 simp_options::kerberos : true
 
@@ -102,15 +103,44 @@ krb5::kdc::auto_keytabs::hosts :
 krb5::kdc::auto_keytabs::global_services :
   - 'nfs'
 
-nfs::client::nfs_servers :
-  - '#NFS_SERVER#'
-
 # These two need to be paired in our case since we expect to manage the Kerberos
 # infrastructure for our tests.
 nfs::secure_nfs : true
 nfs::is_server : #IS_SERVER#
     EOM
   }
+
+  server_manifest = <<-EOM
+    # Keep the SSH ports open
+    #{ssh_allow}
+
+    # Keep the KRB5 ports open
+    include '::krb5::kdc'
+    include '::nfs'
+
+    file { '/srv/nfs_share':
+      ensure => 'directory',
+      owner  => 'root',
+      group  => 'root',
+      mode   => '0644'
+    }
+
+    file { '/srv/nfs_share/test_file':
+      ensure  => 'file',
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0644',
+      content => 'This is a test'
+    }
+
+    nfs::server::export { 'nfs4_root':
+      clients     => ['*'],
+      export_path => '/srv/nfs_share',
+      sec         => ['krb5p']
+    }
+
+    File['/srv/nfs_share'] -> Nfs::Server::Export['nfs4_root']
+  EOM
 
   context "as a server" do
     servers.each do |host|
@@ -151,62 +181,31 @@ nfs::is_server : #IS_SERVER#
       end
 
       it 'should export a directory' do
-        nfs_manifest = <<-EOM
-          # Keep the SSH ports open
-          #{ssh_allow}
-
-          # Keep the KRB5 ports open
-          include '::krb5::kdc'
-          include '::nfs'
-
-          file { '/srv/nfs_share':
-            ensure => 'directory',
-            owner  => 'root',
-            group  => 'root',
-            mode   => '0644'
-          }
-
-          file { '/srv/nfs_share/test_file':
-            ensure  => 'file',
-            owner   => 'root',
-            group   => 'root',
-            mode    => '0644',
-            content => 'This is a test'
-          }
-
-          nfs::server::export { 'nfs4_root':
-            clients     => ['*'],
-            export_path => '/srv/nfs_share',
-            sec         => ['krb5p']
-          }
-
-          File['/srv/nfs_share'] -> Nfs::Server::Export['nfs4_root']
-        EOM
-
-        apply_manifest_on(host, nfs_manifest)
+        apply_manifest_on(host, server_manifest)
       end
     end
   end
 
-  context "as a client" do
-    clients.each do |host|
-      servers.each do |server|
+  clients.each do |host|
+    servers.each do |server|
+      context "as a client" do
+        let(:server_fqdn) { fact_on(server, 'fqdn') }
+
+        let(:krb5_client_manifest) { <<-EOM
+          krb5::setting::realm { $::domain :
+            admin_server => '#{server_fqdn}'
+          }
+          EOM
+        }
+
         # We aren't using DNS here, so we need to make sure that the kerberos
         # client is pointing to the correct location.
         it "should set up the KRB5 client for the appropriate realm" do
-          server_fqdn = fact_on(server, 'fqdn')
-          client_fqdn = fact_on(host, 'fqdn')
-
           hdata = hieradata.dup
           hdata.gsub!(/#NFS_SERVER#/m, server_fqdn)
           hdata.gsub!(/#IS_SERVER#/m, 'false')
 
-          _manifest = manifest.dup + <<-EOM
-
-            krb5::setting::realm { $::domain :
-              admin_server => '#{server_fqdn}'
-            }
-          EOM
+          _manifest = manifest.dup + krb5_client_manifest
 
           keytab_src = %(/var/kerberos/krb5kdc/generated_keytabs/#{fact_on(host,'fqdn')}/krb5.keytab)
 
@@ -231,12 +230,47 @@ nfs::is_server : #IS_SERVER#
         end
 
         it "should mount a directory on the #{server} server" do
-          server_fqdn = fact_on(server, 'fqdn')
+          client_manifest = <<-EOM
+            #{ssh_allow}
+
+            nfs::client::mount { '/mnt/#{server}':
+              nfs_server  => '#{server_fqdn}',
+              remote_path => '/srv/nfs_share',
+              sec         => 'krb5p',
+              autofs      => false
+            }
+          EOM
+
+          if servers.include?(host)
+            client_manifest = client_manifest + "\n" + server_manifest
+          else
+            client_manifest = client_manifest + "\n" + krb5_client_manifest
+          end
 
           host.mkdir_p("/mnt/#{server}")
-          on(host, %(puppet resource mount /mnt/#{server} ensure=mounted fstype=nfs4 device='#{server_fqdn}:/srv/nfs_share' options='sec=krb5p'))
+          apply_manifest_on(host, client_manifest)
           on(host, %(grep -q 'This is a test' /mnt/#{server}/test_file))
           on(host, %{puppet resource mount /mnt/#{server} ensure=unmounted})
+        end
+
+        it "should mount a directory on the #{server} server with autofs" do
+          autofs_client_manifest = <<-EOM
+            #{ssh_allow}
+
+            nfs::client::mount { '/mnt/#{server}':
+              nfs_server  => '#{server_fqdn}',
+              remote_path => '/srv/nfs_share'
+            }
+          EOM
+
+          if servers.include?(host)
+            autofs_client_manifest = autofs_client_manifest + "\n" + server_manifest
+          else
+            autofs_client_manifest = autofs_client_manifest + "\n" + krb5_client_manifest
+          end
+
+          apply_manifest_on(host, autofs_client_manifest)
+          on(host, %{puppet resource service autofs ensure=stopped})
         end
       end
     end
