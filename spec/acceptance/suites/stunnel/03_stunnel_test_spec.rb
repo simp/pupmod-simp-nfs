@@ -26,17 +26,19 @@ describe 'nfs stunnel' do
   let(:el7_nfs_server) { only_host_with_role(hosts, 'el7_nfs_server') }
 
   ssh_allow = <<-EOM
-    include '::tcpwrappers'
-    include '::iptables'
+    if !defined(Iptables::Listen::Tcp_stateful['i_love_testing']) {
+      include '::tcpwrappers'
+      include '::iptables'
 
-    tcpwrappers::allow { 'sshd':
-      pattern => 'ALL'
-    }
+      tcpwrappers::allow { 'sshd':
+        pattern => 'ALL'
+      }
 
-    iptables::listen::tcp_stateful { 'i_love_testing':
-      order        => 8,
-      trusted_nets => ['ALL'],
-      dports       => 22
+      iptables::listen::tcp_stateful { 'i_love_testing':
+        order        => 8,
+        trusted_nets => ['ALL'],
+        dports       => 22
+      }
     }
   EOM
 
@@ -53,10 +55,11 @@ describe 'nfs stunnel' do
 ---
 # Need to test that our iptables works properly with this stuff
 simp_options::firewall : true
-simp_options::tcpwrappers : true
+simp_options::haveged : true
 simp_options::kerberos : false
 simp_options::pki : true
-simp_options::haveged : true
+simp_options::stunnel : true
+simp_options::tcpwrappers : true
 simp_options::trusted_nets : ['ALL']
 
 pki_dir : '/etc/pki/simp-testing/pki'
@@ -67,10 +70,6 @@ pki::cacerts_sources :
   - "file://%{hiera('pki_dir')}/cacerts"
 
 auditd : false
-
-nfs::stunnel : true
-nfs::client::nfs_servers :
-  - '#NFS_SERVER#'
 
 # Set us up for a basic server for right now (no Kerberos)
 
@@ -109,44 +108,42 @@ nfs::is_server : #IS_SERVER#
     end
   end
 
- context "as a server" do
+  server_manifest = <<-EOM
+    #{ssh_allow}
+
+    include '::nfs'
+
+    file { '/srv/nfs_share':
+      ensure => 'directory',
+      owner  => 'root',
+      group  => 'root',
+      mode   => '0644'
+    }
+
+    file { '/srv/nfs_share/test_file':
+      ensure  => 'file',
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0644',
+      content => 'This is a test'
+    }
+
+    nfs::server::export { 'nfs4_root':
+      clients     => ['*'],
+      export_path => '/srv/nfs_share',
+      sec         => ['sys'],
+      # Because we're using stunnel and allowing *all* connections
+      # This overrides the native 127.0.0.1 export
+      insecure    => true
+    }
+
+    File['/srv/nfs_share'] -> Nfs::Server::Export['nfs4_root']
+  EOM
+
+  context "as a server" do
     servers.each do |host|
-      let(:manifest) {
-        <<-EOM
-          #{ssh_allow}
-
-          include '::nfs'
-
-          file { '/srv/nfs_share':
-            ensure => 'directory',
-            owner  => 'root',
-            group  => 'root',
-            mode   => '0644'
-          }
-
-          file { '/srv/nfs_share/test_file':
-            ensure  => 'file',
-            owner   => 'root',
-            group   => 'root',
-            mode    => '0644',
-            content => 'This is a test'
-          }
-
-          nfs::server::export { 'nfs4_root':
-            clients     => ['*'],
-            export_path => '/srv/nfs_share',
-            sec         => ['sys'],
-            # Because we're using stunnel and allowing *all* connections
-            # This overrides the native 127.0.0.1 export
-            insecure    => true
-          }
-
-          File['/srv/nfs_share'] -> Nfs::Server::Export['nfs4_root']
-        EOM
-      }
-
       it 'should export a directory' do
-        apply_manifest_on(host, manifest)
+        apply_manifest_on(host, server_manifest)
       end
     end
   end
@@ -154,6 +151,8 @@ nfs::is_server : #IS_SERVER#
   context "as a client" do
     clients.each do |host|
       servers.each do |server|
+        server_fqdn = fact_on(server,'fqdn')
+
         it 'should prep the stunnel connection' do
           hdata = hieradata.dup
           hdata.gsub!(/#NFS_SERVER#/m, server.to_s)
@@ -164,8 +163,18 @@ nfs::is_server : #IS_SERVER#
         end
 
         it "should mount a directory on #{server}" do
+          client_manifest = <<-EOM
+            #{ssh_allow}
+
+            nfs::client::mount { '/mnt/#{server}':
+              nfs_server  => '#{server_fqdn}',
+              remote_path => '/srv/nfs_share',
+              autofs      => false
+            }
+          EOM
+
           host.mkdir_p("/mnt/#{server}")
-          on(host, %(puppet resource mount /mnt/#{server} ensure=mounted fstype=nfs4 device='127.0.0.1:/srv/nfs_share' options='sec=sys'))
+          apply_manifest_on(host, client_manifest)
           on(host, %(grep -q 'This is a test' /mnt/#{server}/test_file))
           on(host, %{puppet resource mount /mnt/#{server} ensure=unmounted})
         end
