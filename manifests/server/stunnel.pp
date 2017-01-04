@@ -15,9 +15,6 @@
 #
 #   * Set to 'any' or 'ALL' to allow the world
 #
-# @param rquotad_port
-# @param lockd_tcpport
-# @param mountd_port
 # param statd_port
 # @param nfs_accept_address
 #   The address upon which the NFS server will listen

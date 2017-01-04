@@ -1,4 +1,4 @@
-# Define Type to set up the ``/etc/exports`` file
+# Defined Type to set up the ``/etc/exports`` file
 #
 # @see exports(5)
 #
@@ -83,7 +83,7 @@
 #
 # @param anongid
 #   Explicity set the ``GID`` of the ``anonymous`` user
-
+#
 # @param custom
 #   A custom set of options
 #

@@ -70,7 +70,7 @@
 #
 # @param stunnel Use the SIMP ``stunnel`` module to manage stunnel
 #
-# @param tcpwrappersU
+# @param tcpwrappers
 #   Use the SIMP ``tcpwrappers`` module to manage tcpwrappers
 #
 # @author Trevor Vaughan <tvaughan@onyxpoint.com>

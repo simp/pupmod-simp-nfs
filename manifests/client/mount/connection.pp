@@ -10,9 +10,8 @@
 # @param nfs_version
 #   The NFS version that you want to use
 #
-# @param port
+# @param nfs_port
 #   The NFS port to which to connect
-#
 #
 # @param v4_remote_port
 #   If using NFSv4, the remote port to which to connect
