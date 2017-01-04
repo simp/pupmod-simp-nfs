@@ -26,9 +26,9 @@
 # @author Kendall Moore <kendall.moore@onyxpoint.com>
 #
 class nfs::client (
-  Simplib::Port              $callback_port = 876,
-  Boolean                    $stunnel       = $::nfs::stunnel,
-  Boolean                    $firewall      = $::nfs::firewall,
+  Simplib::Port $callback_port = 876,
+  Boolean       $stunnel       = $::nfs::stunnel,
+  Boolean       $firewall      = $::nfs::firewall,
 ) inherits ::nfs {
 
   assert_private()

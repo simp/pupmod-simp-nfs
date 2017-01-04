@@ -33,7 +33,7 @@ class nfs::selinux_hotfix {
       owner   => 'root',
       group   => 'root',
       mode    => '0600',
-      content => file("${module_name}/selinux/gss_hotfix.te.erb")
+      content => file("${module_name}/selinux/gss_hotfix.te")
     }
 
     exec { 'gss_selinux_hotfix_build_module':
