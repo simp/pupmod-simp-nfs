@@ -54,7 +54,7 @@ class nfs::client::stunnel (
   Simplib::Port $statd_connect_port      = 6620,
 ) inherits ::nfs::client {
   # Don't do this if you're running on yourself because, well, it's bad!
-  if !host_is_me($nfs_servers) {
+  if !host_is_me($nfs_server) {
     include '::stunnel'
 
     stunnel::connection { 'nfs_client':

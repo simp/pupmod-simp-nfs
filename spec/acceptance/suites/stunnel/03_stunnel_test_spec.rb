@@ -45,6 +45,13 @@ describe 'nfs stunnel' do
   let(:manifest) {
     <<-EOM
       include '::nfs'
+      file { '/var/stunnel_pki':
+        ensure => 'directory',
+        owner  => 'root',
+        group  => 'root',
+        mode   => '0644'
+      }
+
 
       #{ssh_allow}
     EOM
@@ -62,12 +69,7 @@ simp_options::stunnel : true
 simp_options::tcpwrappers : true
 simp_options::trusted_nets : ['ALL']
 
-pki_dir : '/etc/pki/simp-testing/pki'
-
-pki::private_key_source : "file://%{hiera('pki_dir')}/private/%{::fqdn}.pem"
-pki::public_key_source : "file://%{hiera('pki_dir')}/public/%{::fqdn}.pub"
-pki::cacerts_sources :
-  - "file://%{hiera('pki_dir')}/cacerts"
+stunnel::app_pki_external_source : '/etc/pki/simp-testing/pki'
 
 auditd : false
 
