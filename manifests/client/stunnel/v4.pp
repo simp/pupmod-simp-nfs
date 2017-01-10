@@ -38,7 +38,8 @@ define nfs::client::stunnel::v4 (
 
     stunnel::connection { "nfs4_${name}_client":
       connect => ["${_nfs_server}:${nfs_connect_port}"],
-      accept  => "127.0.0.1:${$_nfs_port}"
+      accept  => "127.0.0.1:${$_nfs_port}",
+      verify  => $::nfs::client::stunnel_verify
     }
   }
 }

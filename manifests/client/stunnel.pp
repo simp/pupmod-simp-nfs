@@ -39,6 +39,11 @@
 # @param statd_connect_port
 #   The ``statd`` remote connection port
 #
+# @param stunnel_verify
+#   What level to verify the TLS connection via stunnel
+#
+#   * See ``stunnel::connection::verify`` for details
+#
 # @author Trevor Vaughan <tvaughan@onyxpoint.com>
 # @author Kendall Moore <kendall.moore@onyxpoint.com>
 #
@@ -52,6 +57,7 @@ class nfs::client::stunnel (
   Simplib::Port $lockd_connect_port      = 32804,
   Simplib::Port $mountd_connect_port     = 8920,
   Simplib::Port $statd_connect_port      = 6620,
+  Integer[0]    $stunnel_verify          = $nfs::client::stunnel_verify
 ) inherits ::nfs::client {
   # Don't do this if you're running on yourself because, well, it's bad!
   if !host_is_me($nfs_server) {
@@ -59,30 +65,36 @@ class nfs::client::stunnel (
 
     stunnel::connection { 'nfs_client':
       connect => ["${nfs_server}:${nfs_connect_port}"],
-      accept  => "127.0.0.1:${nfs_accept_port}"
+      accept  => "127.0.0.1:${nfs_accept_port}",
+      verify  => $verify
     }
 
     stunnel::connection { 'nfs_portmapper':
       connect => ["${nfs_server}:${portmapper_connect_port}"],
       accept  => "127.0.0.1:${portmapper_accept_port}",
+      verify  => $verify,
       require => Service[$::nfs::service_names::rpcbind]
     }
 
     stunnel::connection { 'nfs_rquotad':
       connect => ["${nfs_server}:${rquotad_connect_port}"],
-      accept  => "127.0.0.1:${::nfs::rquotad_port}"
+      accept  => "127.0.0.1:${::nfs::rquotad_port}",
+      verify  => $verify
     }
     stunnel::connection { 'nfs_lockd':
       connect => ["${nfs_server}:${lockd_connect_port}"],
-      accept  => "127.0.0.1:${::nfs::lockd_tcpport}"
+      accept  => "127.0.0.1:${::nfs::lockd_tcpport}",
+      verify  => $verify
     }
     stunnel::connection { 'nfs_mountd':
       connect => ["${nfs_server}:${mountd_connect_port}"],
-      accept  => "127.0.0.1:${::nfs::mountd_port}"
+      accept  => "127.0.0.1:${::nfs::mountd_port}",
+      verify  => $verify
     }
     stunnel::connection { 'nfs_status':
       connect => ["${nfs_server}:${statd_connect_port}"],
-      accept  => "127.0.0.1:${::nfs::statd_port}"
+      accept  => "127.0.0.1:${::nfs::statd_port}",
+      verify  => $verify
     }
   }
 }

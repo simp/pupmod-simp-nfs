@@ -19,6 +19,11 @@
 #   * If you are using host aliases for your NFS server names, this check
 #     may fail and you may need to disable ``$stunnel`` explicitly
 #
+# @param stunnel_verify
+#   The level at which to verify TLS connections
+#
+#   * See ``stunnel::connection::verify`` for details
+#
 # @param firewall
 #   Use the SIMP IPTables module to manipulate the firewall settings
 #
@@ -27,8 +32,9 @@
 #
 class nfs::client (
   Simplib::Port $callback_port = 876,
-  Boolean       $stunnel       = $::nfs::stunnel,
-  Boolean       $firewall      = $::nfs::firewall,
+  Boolean       $stunnel        = $::nfs::stunnel,
+  Integer[0]    $stunnel_verify = 2,
+  Boolean       $firewall       = $::nfs::firewall
 ) inherits ::nfs {
 
   assert_private()

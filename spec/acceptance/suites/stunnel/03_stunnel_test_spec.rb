@@ -73,7 +73,9 @@ stunnel::app_pki_external_source : '/etc/pki/simp-testing/pki'
 
 auditd : false
 
-# Set us up for a basic server for right now (no Kerberos)
+# There is no DNS so we need to eliminate verification
+nfs::client::stunnel_verify: 0
+nfs::server::stunnel::verify: 0
 
 # These two need to be paired in our case since we expect to manage the Kerberos
 # infrastructure for our tests.
