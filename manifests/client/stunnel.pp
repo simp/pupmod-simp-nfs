@@ -66,35 +66,35 @@ class nfs::client::stunnel (
     stunnel::connection { 'nfs_client':
       connect => ["${nfs_server}:${nfs_connect_port}"],
       accept  => "127.0.0.1:${nfs_accept_port}",
-      verify  => $verify
+      verify  => $stunnel_verify
     }
 
     stunnel::connection { 'nfs_portmapper':
       connect => ["${nfs_server}:${portmapper_connect_port}"],
       accept  => "127.0.0.1:${portmapper_accept_port}",
-      verify  => $verify,
+      verify  => $stunnel_verify,
       require => Service[$::nfs::service_names::rpcbind]
     }
 
     stunnel::connection { 'nfs_rquotad':
       connect => ["${nfs_server}:${rquotad_connect_port}"],
       accept  => "127.0.0.1:${::nfs::rquotad_port}",
-      verify  => $verify
+      verify  => $stunnel_verify
     }
     stunnel::connection { 'nfs_lockd':
       connect => ["${nfs_server}:${lockd_connect_port}"],
       accept  => "127.0.0.1:${::nfs::lockd_tcpport}",
-      verify  => $verify
+      verify  => $stunnel_verify
     }
     stunnel::connection { 'nfs_mountd':
       connect => ["${nfs_server}:${mountd_connect_port}"],
       accept  => "127.0.0.1:${::nfs::mountd_port}",
-      verify  => $verify
+      verify  => $stunnel_verify
     }
     stunnel::connection { 'nfs_status':
       connect => ["${nfs_server}:${statd_connect_port}"],
       accept  => "127.0.0.1:${::nfs::statd_port}",
-      verify  => $verify
+      verify  => $stunnel_verify
     }
   }
 }
