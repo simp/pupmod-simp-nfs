@@ -18,6 +18,9 @@
 #   * Further configuration will need to be made via the ```nfs::client``
 #     classes
 #
+# @param nfsv3
+#   Use NFSv3 for connections
+#
 # @param mountd_nfs_v1
 #   Act as an ``NFSv1`` server
 #

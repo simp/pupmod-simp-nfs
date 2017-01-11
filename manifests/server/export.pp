@@ -1,4 +1,4 @@
-# Define Type to set up the ``/etc/exports`` file
+# Defined Type to set up the ``/etc/exports`` file
 #
 # @see exports(5)
 #
@@ -83,7 +83,7 @@
 #
 # @param anongid
 #   Explicity set the ``GID`` of the ``anonymous`` user
-
+#
 # @param custom
 #   A custom set of options
 #
@@ -106,10 +106,7 @@ define nfs::server::export (
   Boolean                                          $crossmnt       = false,
   Boolean                                          $subtree_check  = false,
   Boolean                                          $insecure_locks = false,
-  Optional[Variant[
-    Stdlib::Absolutepath,
-    Boolean
-  ]]                                               $mountpoint     = undef,
+  Optional[Variant[Stdlib::Absolutepath,Boolean]]  $mountpoint     = undef,
   Optional[String]                                 $fsid           = undef,
   Boolean                                          $nordirplus     = false,
   Optional[Array[Pattern['^/.+@.+$']]]             $refer          = undef,
@@ -131,7 +128,7 @@ define nfs::server::export (
 
   # We have to do this if we have a 'sec=sys' situation on EL7+
   if 'sys' in $sec {
-    if $facts['os']['family']== 'RedHat' {
+    if $facts['os']['family'] == 'RedHat' {
       if $facts['os']['name'] in ['RedHat','CentOS'] {
         if $facts['os']['release']['major'] > '6' {
           ensure_resource('selboolean', 'nfsd_anon_write',
