@@ -2,15 +2,9 @@
 fixtures:
   repositories:
     auditd: https://github.com/simp/pupmod-simp-auditd
-    augeasproviders_core:
-      repo: https://github.com/simp/augeasproviders_core
-      branch: simp-master
-    augeasproviders_grub:
-      repo: https://github.com/simp/augeasproviders_grub
-      branch: simp-master
-    augeasproviders_sysctl:
-      repo: https://github.com/simp/augeasproviders_sysctl
-      branch: simp-master
+    augeasproviders_core: https://github.com/simp/augeasproviders_core
+    augeasproviders_grub: https://github.com/simp/augeasproviders_grub
+    augeasproviders_sysctl: https://github.com/simp/augeasproviders_sysctl
     autofs: https://github.com/simp/pupmod-simp-autofs
     concat: https://github.com/simp/puppetlabs-concat
     haveged:
@@ -18,8 +12,8 @@ fixtures:
       branch: simp-master
     iptables: https://github.com/simp/pupmod-simp-iptables
     krb5:
-      repo: https://github.com/trevor-vaughan/pupmod-simp-krb5
-      branch: SIMP-2284
+      repo: https://github.com/simp/pupmod-simp-krb5
+      branch: master
     logrotate: https://github.com/simp/pupmod-simp-logrotate
     pki: https://github.com/simp/pupmod-simp-pki
     rsyslog: https://github.com/simp/pupmod-simp-rsyslog

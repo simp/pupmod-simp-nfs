@@ -31,7 +31,7 @@
 # @author Kendall Moore <kendall.moore@onyxpoint.com>
 #
 class nfs::client (
-  Simplib::Port $callback_port = 876,
+  Simplib::Port $callback_port  = 876,
   Boolean       $stunnel        = $::nfs::stunnel,
   Integer[0]    $stunnel_verify = 2,
   Boolean       $firewall       = $::nfs::firewall
@@ -47,6 +47,10 @@ class nfs::client (
       group   => 'root',
       content => "\n"
     }
+  }
+
+  if $stunnel {
+    include 'nfs::client::stunnel'
   }
 
   exec { 'modprobe_nfs':
