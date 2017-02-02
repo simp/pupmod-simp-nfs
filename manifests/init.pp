@@ -147,21 +147,11 @@ class nfs (
   if $is_client {
     include '::nfs::client'
 
-    if $stunnel {
-      include '::nfs::client::stunnel'
-      Class['nfs::client::stunnel'] ~> Service['stunnel']
-    }
-
     Class['nfs::install'] -> Class['nfs::client']
   }
 
   if $is_server {
     include '::nfs::server'
-
-    if $stunnel {
-      include '::nfs::server::stunnel'
-      Class['nfs::client::stunnel'] ~> Service['stunnel']
-    }
 
     Class['nfs::install'] -> Class['nfs::server']
 

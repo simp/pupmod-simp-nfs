@@ -49,10 +49,6 @@ class nfs::client (
     }
   }
 
-  if $stunnel {
-    include 'nfs::client::stunnel'
-  }
-
   exec { 'modprobe_nfs':
     command => '/sbin/modprobe nfs',
     unless  => '/sbin/lsmod | /bin/grep -qw nfs',
