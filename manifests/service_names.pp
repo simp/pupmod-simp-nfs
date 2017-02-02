@@ -3,7 +3,7 @@
 class nfs::service_names {
   if $facts['os']['name'] in ['RedHat', 'CentOS'] {
 
-    if $facts['os']['release']['major'] <= '7' {
+    if $facts['os']['release']['major'] == '6' {
       $nfs_lock    = 'nfslock'
       $nfs_server  = 'nfs'
       $rpcgssd     = 'rpcgssd'

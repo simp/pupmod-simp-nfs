@@ -35,7 +35,6 @@ class nfs::client (
   Boolean       $stunnel        = $::nfs::stunnel,
   Integer[0]    $stunnel_verify = 2,
   Boolean       $firewall       = $::nfs::firewall,
-  Boolean       $nfsv3          = $::nfs::nfsv3,
 ) inherits ::nfs {
 
   assert_private()
@@ -51,12 +50,7 @@ class nfs::client (
   }
 
   if $stunnel {
-    if $nfsv3 {
-      include 'nfs::client::stunnel'
-    }
-    else {
-      include 'nfs::client::stunnel::v4'
-    }
+    include 'nfs::client::stunnel'
   }
 
   exec { 'modprobe_nfs':

@@ -14,9 +14,10 @@ describe 'nfs::client' do
       context "on #{os}" do
         it { is_expected.to create_class('nfs::client') }
 
-        context 'base' do
+        context 'with default parameters' do
           it { is_expected.to compile.with_all_deps }
           it { is_expected.to contain_class('nfs') }
+          it { is_expected.not_to contain_class('nfs::client::stunnel') }
           it { is_expected.to create_sysctl('fs.nfs.nfs_callback_tcpport') }
           it { is_expected.to create_file('/etc/modprobe.d/nfs.conf').with_content(/options nfs callback_tcpport=876/) }
           it { is_expected.to create_exec('modprobe_nfs').that_requires('File[/etc/modprobe.d/nfs.conf]') }
