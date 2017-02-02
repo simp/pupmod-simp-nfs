@@ -34,7 +34,8 @@ class nfs::client (
   Simplib::Port $callback_port  = 876,
   Boolean       $stunnel        = $::nfs::stunnel,
   Integer[0]    $stunnel_verify = 2,
-  Boolean       $firewall       = $::nfs::firewall
+  Boolean       $firewall       = $::nfs::firewall,
+  Boolean       $nfsv3          = $::nfs::nfsv3,
 ) inherits ::nfs {
 
   assert_private()
@@ -50,7 +51,12 @@ class nfs::client (
   }
 
   if $stunnel {
-    include 'nfs::client::stunnel'
+    if $nfsv3 {
+      include 'nfs::client::stunnel'
+    }
+    else {
+      include 'nfs::client::stunnel::v4'
+    }
   }
 
   exec { 'modprobe_nfs':
