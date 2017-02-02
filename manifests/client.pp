@@ -34,7 +34,7 @@ class nfs::client (
   Simplib::Port $callback_port  = 876,
   Boolean       $stunnel        = $::nfs::stunnel,
   Integer[0]    $stunnel_verify = 2,
-  Boolean       $firewall       = $::nfs::firewall,
+  Boolean       $firewall       = $::nfs::firewall
 ) inherits ::nfs {
 
   assert_private()
