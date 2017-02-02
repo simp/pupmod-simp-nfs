@@ -148,7 +148,7 @@ class nfs (
     include '::nfs::client'
 
     if $stunnel {
-      include '::nfs::client::stunnel'
+      contain '::nfs::client::stunnel'
     }
 
     Class['nfs::install'] -> Class['nfs::client']

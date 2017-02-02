@@ -9,16 +9,16 @@ class nfs::service_names {
       $rpcgssd     = 'rpcgssd'
       $rpcidmapd   = 'rpcidmapd'
       $rpcsvcgssd  = 'rpcsvcgssd'
-      $rpcbind     = 'rpcbind.socket'
+      $rpcbind     = 'rpcbind'
     }
     else {
-      $rpcbind     = 'rpcbind'
       $nfs_lock    = 'rpc-statd'
       $nfs_mountd  = 'nfs-mountd'
       $nfs_rquotad = 'nfs-rquotad'
       $nfs_server  = 'nfs-server'
       $rpcidmapd   = 'nfs-idmapd'
       $rpcgssd     = 'rpc-gssd'
+      $rpcbind     = 'rpcbind.socket'
 
       if (versioncmp($facts['os']['release']['full'], '7.1') < 0) {
         $rpcsvcgssd  = 'rpc-svcgssd'

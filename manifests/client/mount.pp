@@ -43,7 +43,6 @@
 # @param autofs
 #   Enable automounting with Autofs
 #
-#
 # @param autofs_map_to_user
 #   Ensure that autofs maps automatically map to a directory that matches the
 #   username of the logged in user

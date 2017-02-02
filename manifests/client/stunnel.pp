@@ -24,7 +24,7 @@
 # @param portmapper_accept_port
 #   The ``portmapper`` local accept port
 #
-# @param portmapper_connect_port
+# @param portmapper_connect_port`
 #   The ``portmapper`` remote connection port
 #
 # @param rquotad_connect_port
@@ -57,9 +57,12 @@ class nfs::client::stunnel (
   Simplib::Port $lockd_connect_port      = 32804,
   Simplib::Port $mountd_connect_port     = 8920,
   Simplib::Port $statd_connect_port      = 6620,
-  Boolean       $nfsv3                   = $nfs::nfsv3,
-  Integer[0]    $stunnel_verify          = $nfs::client::stunnel_verify
-) inherits ::nfs::client {
+  Boolean       $nfsv3                   = $nfs::nfsv3
+) {
+  assert_private()
+
+  $stunnel_verify = $nfs::client::stunnel_verify
+
   # Don't do this if you're running on yourself because, well, it's bad!
   if !host_is_me($nfs_server) {
     include '::stunnel'

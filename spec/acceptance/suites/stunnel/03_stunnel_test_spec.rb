@@ -82,6 +82,7 @@ nfs::server::stunnel::verify: 0
 nfs::kerberos : false
 nfs::secure_nfs : false
 nfs::is_server : #IS_SERVER#
+nfs::client::stunnel::nfs_server: #NFS_SERVER#
     EOM
   }
 

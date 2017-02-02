@@ -36,7 +36,6 @@ class nfs::client (
   Integer[0]    $stunnel_verify = 2,
   Boolean       $firewall       = $::nfs::firewall
 ) inherits ::nfs {
-
   assert_private()
 
   if !$nfs::is_server {
