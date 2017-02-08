@@ -68,20 +68,16 @@ define nfs::client::mount (
     if ($name !~ Stdlib::Absolutepath) and ($name !~ Pattern['^wildcard-']) {
       fail('"$name" must be of type Stdlib::Absolutepath or Pattern["^wildcard-"]')
     }
-
-    if $name =~ Pattern['^wildcard-'] {
-      $_clean_name = $name
-    }
-    else {
-      $_clean_name = regsubst($name[1,-1], '/', '__', 'G')
-    }
   }
   elsif ($name !~ Stdlib::Absolutepath) {
     fail('"$name" must be of type Stdlib::Absolutepath')
   }
-  else {
-    $_clean_name = regsubst($name[1,-1], '/', '__', 'G')
-  }
+
+  $_clean_name = regsubst(
+    regsubst(
+      regsubst($name,'wildcard-',''),'^/',''
+    ),'/', '__', 'G'
+  )
 
   include '::nfs::client'
 
@@ -107,9 +103,15 @@ define nfs::client::mount (
     # This is a particular quirk about the autofs service ordering
     Class['autofs::service'] ~> Service[$::nfs::service_names::rpcbind]
 
-    autofs::map::master { $_clean_name:
-      mount_point => $name,
-      map_name    => "/etc/autofs/${_clean_name}.map",
+    # Need to handle the wildcard cases
+    $_mount_point = split($name,'wildcard-')[-1]
+
+    # The map name is very particular
+    $_map_name = sprintf("/etc/autofs/%s.map", $_clean_name)
+
+    autofs::map::master { $name:
+      mount_point => $_mount_point,
+      map_name    => $_map_name,
       require     => Nfs::Client::Mount::Connection[$name]
     }
 
@@ -118,7 +120,8 @@ define nfs::client::mount (
       exec { 'refresh_autofs':
         command     => '/usr/bin/pkill -HUP -x automount',
         refreshonly => true,
-        subscribe   => Class['stunnel::service']
+        subscribe   => Class['stunnel::service'],
+        require     => Class['autofs::service']
       }
     }
 
@@ -130,7 +133,7 @@ define nfs::client::mount (
         $_location = "127.0.0.1:${remote_path}"
       }
 
-      autofs::map::entry { $_clean_name:
+      autofs::map::entry { $name:
         options  => "-fstype=${nfs_version},${_nfs_options}",
         location => $_location,
         target   => $_clean_name,
@@ -144,7 +147,7 @@ define nfs::client::mount (
       else {
         $_location = "${nfs_server}:${remote_path}"
       }
-      autofs::map::entry { $_clean_name:
+      autofs::map::entry { $name:
         options  => "-fstype=${nfs_version},${_nfs_options}",
         location => $_location,
         target   => $_clean_name,
