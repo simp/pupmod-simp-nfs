@@ -1,12 +1,12 @@
 # This class provides appropriate service names based on the operating system
 #
 class nfs::service_names {
-  if $facts['os']['name'] in ['RedHat', 'CentOS'] {
-    $rpcbind   = 'rpcbind'
+  if ($facts['os']['name'] in ['RedHat', 'CentOS']) {
 
     if (versioncmp($facts['os']['release']['major'], '7') < 0) {
       $nfs_lock    = 'nfslock'
       $nfs_server  = 'nfs'
+      $rpcbind     = 'rpcbind'
       $rpcgssd     = 'rpcgssd'
       $rpcidmapd   = 'rpcidmapd'
       $rpcsvcgssd  = 'rpcsvcgssd'
@@ -16,6 +16,7 @@ class nfs::service_names {
       $nfs_mountd  = 'nfs-mountd'
       $nfs_rquotad = 'nfs-rquotad'
       $nfs_server  = 'nfs-server'
+      $rpcbind     = 'rpcbind.socket'
       $rpcidmapd   = 'nfs-idmapd'
       $rpcgssd     = 'rpc-gssd'
 

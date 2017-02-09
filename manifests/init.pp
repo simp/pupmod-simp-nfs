@@ -122,7 +122,7 @@ class nfs (
   if $kerberos {
     include '::krb5'
 
-    if $::operatingsystem in ['RedHat', 'CentOS'] {
+    if ($::operatingsystem in ['RedHat', 'CentOS']) {
       if (versioncmp($::operatingsystemmajrelease,'6') > 0) {
         # This is here because the SELinux rules for directory includes in krb5
         # are broken.
