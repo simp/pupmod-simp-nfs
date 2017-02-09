@@ -122,8 +122,8 @@ class nfs (
   if $kerberos {
     include '::krb5'
 
-    if $::operatingsystem in ['RedHat', 'CentOS'] {
-      if (versioncmp($::operatingsystemmajrelease,'6') > 0) {
+    if $facts['os']['name'] in ['RedHat', 'CentOS'] {
+      if $facts['os']['release']['major'] == 7 {
         # This is here because the SELinux rules for directory includes in krb5
         # are broken.
 
@@ -147,11 +147,14 @@ class nfs (
   if $is_client {
     include '::nfs::client'
 
+    if $stunnel {
+      contain '::nfs::client::stunnel'
+    }
+
     Class['nfs::install'] -> Class['nfs::client']
   }
 
   if $is_server {
-
     include '::nfs::server'
 
     Class['nfs::install'] -> Class['nfs::server']

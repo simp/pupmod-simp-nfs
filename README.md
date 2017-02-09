@@ -77,7 +77,7 @@ classes:
 
 ### Basic Usage
 
-In order to export ``/srv/nfs_share`` and mount it as ``/mnt/nfs`` on a client,
+In order to export ``/var/nfs_share`` and mount it as ``/mnt/nfs`` on a client,
 you need to create a couple of profile classes.
 
 One to be added to the node intended to be the server, to define the exported
@@ -85,7 +85,7 @@ path:
 
 ``` puppet
 class site::nfs_server (
-  $kerberos = simplib::lookup('simp_options::kerberos', { 'default_value' => false, 'value_type' => Boolean }),
+  $kerberos = simplib::lookup('simp_options::kerberos', { 'default_value' => false }),
   $trusted_nets = defined('$::trusted_nets') ? { true => $::trusted_nets, default => hiera('trusted_nets') }
   ){
   include '::nfs'
@@ -100,7 +100,7 @@ class site::nfs_server (
 
   $security = $kerberos ? { true => 'krb5p', false => 'sys' }
 
-  file { '/srv/nfs_share':
+  file { '/var/nfs_share':
     ensure => 'directory',
     owner  => 'root',
     group  => 'root',
@@ -109,9 +109,9 @@ class site::nfs_server (
 
   nfs::server::export { 'nfs4_root':
     client      => $trusted_nets,
-    export_path => '/srv/nfs_share',
+    export_path => '/var/nfs_share',
     sec         => [$security],
-    require     => File['/srv/nfs_share']
+    require     => File['/var/nfs_share']
   }
 }
 ```
@@ -138,7 +138,7 @@ class site::nfs_client (
   mount { "/mnt/nfs":
     ensure  => 'mounted',
     fstype  => 'nfs4',
-    device  => '<your_server_fqdn>:/srv/nfs_share',
+    device  => '<your_server_fqdn>:/var/nfs_share',
     options => "sec=${security}",
     require => File['/mnt/nfs']
   }

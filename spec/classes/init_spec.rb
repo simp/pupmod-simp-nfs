@@ -40,7 +40,7 @@ describe 'nfs' do
             })
           }
 
-          if ['RedHat','CentOS'].include?(facts[:operatingsystem]) && facts[:operatingsystemmajrelease].to_s < '7'
+          if ['RedHat','CentOS'].include?(facts[:os][:name]) && facts[:os][:release][:major] == '6'
             it { is_expected.to contain_service('nfs').with({
                 :ensure  => 'running'
               })
@@ -58,14 +58,14 @@ describe 'nfs' do
           it { is_expected.to contain_concat__fragment('nfs_init_server').without_content(%r(RPCSVCGSSDARGS=)) }
         end
 
-        context "as a server with custom args" do
+        context "as a server with many simp_options enabled" do
           let(:hieradata) { 'rpcgssdargs' }
           let(:params) {{
-            :is_server => true,
+            :is_server   => true,
             :tcpwrappers => true,
-            :stunnel => true,
-            :kerberos => true,
-            :firewall => true
+            :stunnel     => true,
+            :kerberos    => true,
+            :firewall    => true
           }}
           it { is_expected.to compile.with_all_deps }
           it { is_expected.to contain_class('nfs') }

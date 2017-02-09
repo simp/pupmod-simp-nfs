@@ -62,6 +62,7 @@ simp_options::trusted_nets : ['ALL']
 # infrastructure for our tests.
 nfs::secure_nfs : false
 nfs::is_server : #IS_SERVER#
+nfs::client::stunnel::nfs_server: #NFS_SERVER#
     EOM
 
   }
@@ -79,6 +80,7 @@ nfs::is_server : #IS_SERVER#
         end
 
         set_hieradata_on(host, hdata)
+        apply_manifest_on(host, manifest, :catch_failures => true)
         apply_manifest_on(host, manifest, :catch_failures => true)
       end
 

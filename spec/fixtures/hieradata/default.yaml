@@ -1,10 +1,11 @@
 ---
 domain: 'example.domain'
-ldap::base_dn : 'dc=example,dc=domain'
-ldap::uri:
+simp_options::ldap::base_dn : 'dc=example,dc=domain'
+simp_options::ldap::uri:
   - 'ldap://testnode.example.domain'
-ldap::bind_dn: 'cn=hostAuth,ou=Hosts,dc=example,dc=domain'
-ldap::bind_pw: 'LKJSDAGFJ891734jk!($+(COKIHASMBNFS'
+simp_options::ldap::bind_dn: 'cn=hostAuth,ou=Hosts,dc=example,dc=domain'
+simp_options::ldap::bind_pw: 'LKJSDAGFJ891734jk!($+(COKIHASMBNFS'
 nfs::server: "%{fqdn}"
 nfs::server::trusted_nets:
   - '1.2.3.4/32'
+nfs::client::stunnel::nfs_server: 'foo.bar.baz'

@@ -2,14 +2,14 @@
 #
 class nfs::service_names {
   if $facts['os']['name'] in ['RedHat', 'CentOS'] {
-    $rpcbind   = 'rpcbind'
 
-    if (versioncmp($facts['os']['release']['major'], '7') < 0) {
+    if $facts['os']['release']['major'] == '6' {
       $nfs_lock    = 'nfslock'
       $nfs_server  = 'nfs'
       $rpcgssd     = 'rpcgssd'
       $rpcidmapd   = 'rpcidmapd'
       $rpcsvcgssd  = 'rpcsvcgssd'
+      $rpcbind     = 'rpcbind'
     }
     else {
       $nfs_lock    = 'rpc-statd'
@@ -18,6 +18,7 @@ class nfs::service_names {
       $nfs_server  = 'nfs-server'
       $rpcidmapd   = 'nfs-idmapd'
       $rpcgssd     = 'rpc-gssd'
+      $rpcbind     = 'rpcbind.socket'
 
       if (versioncmp($facts['os']['release']['full'], '7.1') < 0) {
         $rpcsvcgssd  = 'rpc-svcgssd'

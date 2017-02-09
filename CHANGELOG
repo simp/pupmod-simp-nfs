@@ -1,3 +1,7 @@
+* Wed Feb 01 2017 Nick Miller <nick.miller@onyxpoint.com> - 6.0.0-0
+- Include stunnel logic in the client CLASS
+- Properly diable rpcbind.socket on CentOS 7
+
 * Thu Dec 08 2016 Nick Markowski <nmarkowski@keywcorp.com> - 6.0.0-0
 - Updated global catalysts and strong typed.
 - Fix bug whereby the STATDARGS parameter in NFS sysconfig server
