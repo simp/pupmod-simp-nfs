@@ -24,7 +24,7 @@ describe 'nfs::client::mount' do
       it { is_expected.to contain_class('nfs::client') }
 
       it {
-        is_expected.to contain_autofs__map__entry(clean_title).with_location("#{params[:nfs_server]}:#{params[:remote_path]}")
+        is_expected.to contain_autofs__map__entry(title).with_location("#{params[:nfs_server]}:#{params[:remote_path]}")
       }
 
       context 'without autofs' do
@@ -58,7 +58,7 @@ describe 'nfs::client::mount' do
         it_behaves_like "a fact set"
 
         it {
-          is_expected.to contain_autofs__map__entry(clean_title).with_location("127.0.0.1:#{params[:remote_path]}")
+          is_expected.to contain_autofs__map__entry(title).with_location("127.0.0.1:#{params[:remote_path]}")
         }
       end
 
