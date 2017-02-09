@@ -1,7 +1,7 @@
 # This class provides appropriate service names based on the operating system
 #
 class nfs::service_names {
-  if $facts['os']['name'] in ['RedHat', 'CentOS'] {
+  if ($facts['os']['name'] in ['RedHat', 'CentOS']) {
     $rpcbind   = 'rpcbind'
 
     if (versioncmp($facts['os']['release']['major'], '7') < 0) {

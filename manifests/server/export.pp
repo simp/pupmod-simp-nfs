@@ -127,10 +127,10 @@ define nfs::server::export (
   }
 
   # We have to do this if we have a 'sec=sys' situation on EL7+
-  if 'sys' in $sec {
-    if $facts['os']['family'] == 'RedHat' {
-      if $facts['os']['name'] in ['RedHat','CentOS'] {
-        if $facts['os']['release']['major'] > '6' {
+  if ('sys' in $sec) {
+    if ($facts['os']['family'] == 'RedHat') {
+      if ($facts['os']['name'] in ['RedHat','CentOS']) {
+        if ($facts['os']['release']['major'] > '6') {
           ensure_resource('selboolean', 'nfsd_anon_write',
             {
               persistent => true,
