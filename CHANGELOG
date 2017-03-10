@@ -1,3 +1,6 @@
+* Fri Mar 10 2017 Trevor Vaughan <tvaughan@onyxpoint.com> - 6.0.1-0
+- Fixed the metadata.json dependencies for simp-tcpwrappers
+
 * Thu Dec 08 2016 Nick Markowski <nmarkowski@keywcorp.com> - 6.0.0-0
 - Updated global catalysts and strong typed.
 - Fix bug whereby the STATDARGS parameter in NFS sysconfig server
