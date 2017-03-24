@@ -56,7 +56,7 @@ class nfs::idmapd (
   }
 
   $_startcmd = ('systemd' in $facts['init_systems']) ? {
-    true    => "/usr/sbin/systemctl start ${::nfs::service_names::rpcidmapd}",
+    true    => "/usr/bin/systemctl start ${::nfs::service_names::rpcidmapd}",
     default => "/sbin/service ${::nfs::service_names::rpcidmapd} start"
   }
 
