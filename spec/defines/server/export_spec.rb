@@ -83,6 +83,12 @@ EOM
           end
         end
 
+        context 'with selinux disabled' do
+          let(:params) { base_params }
+          let(:facts) { facts.merge({:selinux => false})}
+          it { is_expected.to compile.with_all_deps }
+          it { is_expected.to_not contain_selboolean('nfsd_anon_write') }
+        end
       end
     end
   end
