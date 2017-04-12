@@ -130,7 +130,7 @@ define nfs::server::export (
   if ('sys' in $sec) {
     if ($facts['os']['family'] == 'RedHat') {
       if ($facts['os']['name'] in ['RedHat','CentOS']) {
-        if ($facts['os']['release']['major'] > '6') {
+        if ($facts['os']['release']['major'] > '6') and $facts['selinux'] {
           ensure_resource('selboolean', 'nfsd_anon_write',
             {
               persistent => true,
