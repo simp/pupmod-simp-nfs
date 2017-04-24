@@ -159,6 +159,10 @@ class nfs (
     if $kerberos {
       Class['krb5'] ~> Class['nfs::server']
 
+      service { 'gssproxy':
+        ensure => 'running'
+      }
+
       if $keytab_on_puppet {
         Class['krb5::keytab'] ~> Class['nfs::server']
       }

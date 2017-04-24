@@ -32,6 +32,7 @@ describe 'nfs' do
           it { is_expected.to_not contain_class('tcpwrappers') }
           it { is_expected.to_not contain_class('stunnel') }
           it { is_expected.to_not contain_class('krb5') }
+          it { is_expected.to_not contain_service('gssproxy').with(:ensure => 'running') }
           it { is_expected.to create_concat('/etc/sysconfig/nfs') }
           it { is_expected.to create_exec('nfs_re-export').with({
               :command     => '/usr/sbin/exportfs -ra',
@@ -80,6 +81,7 @@ describe 'nfs' do
           it { is_expected.to contain_tcpwrappers__allow('lockd') }
           it { is_expected.to contain_tcpwrappers__allow('rpcbind') }
           it { is_expected.to contain_class('krb5') }
+          it { is_expected.to contain_service('gssproxy').with(:ensure => 'running') }
         end
       end
     end
