@@ -17,9 +17,7 @@ fixtures:
       repo: https://github.com/simp/puppet-haveged
       branch: simp-master
     iptables: https://github.com/simp/pupmod-simp-iptables
-    krb5:
-      repo: https://github.com/trevor-vaughan/pupmod-simp-krb5
-      branch: SIMP-2284
+    krb5: https://github.com/simp/pupmod-simp-krb5
     logrotate: https://github.com/simp/pupmod-simp-logrotate
     pki: https://github.com/simp/pupmod-simp-pki
     rsyslog: https://github.com/simp/pupmod-simp-rsyslog
