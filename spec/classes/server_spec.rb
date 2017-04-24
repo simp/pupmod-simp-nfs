@@ -59,6 +59,23 @@ RPCSVCGSSDARGS="some rpcsvcgssd args"
 EOM
           ) }
         end
+
+#	      context 'with secure_nfs => true' do
+#          let(:hieradata) { 'server_secure' }
+#          it { is_expected.to compile.with_all_deps }
+#
+#          if facts[:osfamily] == 'RedHat'
+#            if facts[:operatingsystemmajrelease] >= '7'
+#      #if (versioncmp($facts['os']['release']['full'], '7.1') < 0) {
+#      #  $rpcsvcgssd  = 'rpc-svcgssd'
+#      #}
+#              it { is_expected.to contain_concat__fragment("nfs_init_server").with_content(/SECURE_NFS=yes/) }
+#              it { is_expected.to contain_service('gssproxy').with(:ensure => 'running') }
+#            else
+#              it { is_expected.to contain_service('rpcsvcgssd').with(:ensure => 'running') }
+#            end
+#          end
+#      	end
       end
     end
   end

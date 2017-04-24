@@ -32,7 +32,6 @@ describe 'nfs' do
           it { is_expected.to_not contain_class('tcpwrappers') }
           it { is_expected.to_not contain_class('stunnel') }
           it { is_expected.to_not contain_class('krb5') }
-          it { is_expected.to_not contain_service('gssproxy').with(:ensure => 'running') }
           it { is_expected.to create_concat('/etc/sysconfig/nfs') }
           it { is_expected.to create_exec('nfs_re-export').with({
               :command     => '/usr/sbin/exportfs -ra',
@@ -81,8 +80,24 @@ describe 'nfs' do
           it { is_expected.to contain_tcpwrappers__allow('lockd') }
           it { is_expected.to contain_tcpwrappers__allow('rpcbind') }
           it { is_expected.to contain_class('krb5') }
-          it { is_expected.to contain_service('gssproxy').with(:ensure => 'running') }
         end
+
+        context 'with secure_nfs => true' do
+          let(:hieradata) { 'server_secure' }
+          it { is_expected.to compile.with_all_deps }
+          it { is_expected.to contain_concat__fragment('nfs_init').with_content(/SECURE_NFS=yes/) }
+
+          if facts[:osfamily] == 'RedHat'
+            if facts[:operatingsystemmajrelease] >= '7'
+              it { is_expected.to contain_service('gssproxy').with(:ensure => 'running') }
+              it { is_expected.to contain_service('rpc-gssd').with(:ensure => 'running') }
+            else
+              it { is_expected.to contain_service('rpcgssd').with(:ensure => 'running') }
+              it { is_expected.to contain_service('rpcsvcgssd').with(:ensure => 'running') }
+            end
+          end
+        end
+
       end
     end
   end

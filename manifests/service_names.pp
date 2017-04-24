@@ -24,7 +24,7 @@ class nfs::service_names {
         $rpcsvcgssd  = 'rpc-svcgssd'
       }
       else {
-        $rpcsvcgssd  = ''
+        $rpcsvcgssd  = 'gssproxy'
       }
     }
   }
