@@ -1,5 +1,6 @@
-* Mon Apr 24 2017 Nick Markowski <nmarkowski@keywcorp.com> - 6.0.4-0
+* Mon Apr 24 2017 Nick Markowski <nmarkowski@keywcorp.com> - 6.0.3-0
 - gssproxy ensured running when secure_nfs is true, el > 7.1
+- Confine puppet version in metadata.json
 
 * Tue Apr 11 2017 Nick Markowski <nmarkowski@keywcorp.com> - 6.0.3-0
 - nfs_anon_write selboolean is only applied if selinux is on.
