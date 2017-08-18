@@ -1,6 +1,6 @@
 {
   "name": "simp-nfs",
-  "version": "6.0.3",
+  "version": "6.0.4",
   "author": "SIMP Team",
   "summary": "manages NFS server and client, also PKI and stunnelling",
   "license": "Apache-2.0",
@@ -16,7 +16,7 @@
   "dependencies": [
     {
       "name": "puppetlabs/concat",
-      "version_requirement": ">= 2.2.0 < 3.0.0"
+      "version_requirement": ">= 2.2.0 < 4.0.0"
     },
     {
       "name": "puppetlabs/stdlib",
