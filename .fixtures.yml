@@ -12,7 +12,10 @@ fixtures:
       repo: https://github.com/simp/augeasproviders_sysctl
       branch: simp-master
     autofs: https://github.com/simp/pupmod-simp-autofs
-    concat: https://github.com/simp/puppetlabs-concat
+    concat:
+      # master is at 4.0.1, but we are bound to < 4.0.0 in our metadata.json
+      repo: https://github.com/simp/puppetlabs-concat
+      ref: 3.0.0
     haveged:
       repo: https://github.com/simp/puppet-haveged
       branch: simp-master
