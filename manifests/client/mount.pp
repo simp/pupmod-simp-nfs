@@ -120,9 +120,12 @@ define nfs::client::mount (
       exec { 'refresh_autofs':
         command     => '/usr/bin/pkill -HUP -x automount',
         refreshonly => true,
-        subscribe   => Class['stunnel::service'],
         require     => Class['autofs::service']
       }
+
+      # This is so that the automounter gets refreshed when *any* of the
+      # related stunnel instances are refreshed
+      Stunnel::Instance <| tag == 'nfs' |> ~> Exec['refresh_autofs']
     }
 
     if $::nfs::client::stunnel or $::nfs::client::is_server {

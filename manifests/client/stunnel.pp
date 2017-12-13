@@ -42,7 +42,7 @@
 # @param stunnel_verify
 #   What level to verify the TLS connection via stunnel
 #
-#   * See ``stunnel::connection::verify`` for details
+#   * See ``stunnel::instance::verify`` for details
 #
 # @author Trevor Vaughan <tvaughan@onyxpoint.com>
 # @author Kendall Moore <kendall.moore@onyxpoint.com>
@@ -61,40 +61,50 @@ class nfs::client::stunnel (
 ) inherits ::nfs::client {
   # Don't do this if you're running on yourself because, well, it's bad!
   if !host_is_me($nfs_server) {
-    include '::stunnel'
-
-    stunnel::connection { 'nfs_client':
-      connect => ["${nfs_server}:${nfs_connect_port}"],
-      accept  => "127.0.0.1:${nfs_accept_port}",
-      verify  => $stunnel_verify
+    stunnel::instance { 'nfs_client':
+      connect        => ["${nfs_server}:${nfs_connect_port}"],
+      accept         => "127.0.0.1:${nfs_accept_port}",
+      verify         => $stunnel_verify,
+      socket_options => $::nfs::_stunnel_socket_options,
+      tag            => ['nfs']
     }
 
-    stunnel::connection { 'nfs_portmapper':
-      connect => ["${nfs_server}:${portmapper_connect_port}"],
-      accept  => "127.0.0.1:${portmapper_accept_port}",
-      verify  => $stunnel_verify,
-      require => Service[$::nfs::service_names::rpcbind]
+    stunnel::instance { 'nfs_client_portmapper':
+      connect        => ["${nfs_server}:${portmapper_connect_port}"],
+      accept         => "127.0.0.1:${portmapper_accept_port}",
+      verify         => $stunnel_verify,
+      require        => Service[$::nfs::service_names::rpcbind],
+      socket_options => $::nfs::_stunnel_socket_options,
+      tag            => ['nfs']
     }
 
-    stunnel::connection { 'nfs_rquotad':
-      connect => ["${nfs_server}:${rquotad_connect_port}"],
-      accept  => "127.0.0.1:${::nfs::rquotad_port}",
-      verify  => $stunnel_verify
+    stunnel::instance { 'nfs_client_rquotad':
+      connect        => ["${nfs_server}:${rquotad_connect_port}"],
+      accept         => "127.0.0.1:${::nfs::rquotad_port}",
+      verify         => $stunnel_verify,
+      socket_options => $::nfs::_stunnel_socket_options,
+      tag            => ['nfs']
     }
-    stunnel::connection { 'nfs_lockd':
-      connect => ["${nfs_server}:${lockd_connect_port}"],
-      accept  => "127.0.0.1:${::nfs::lockd_tcpport}",
-      verify  => $stunnel_verify
+    stunnel::instance { 'nfs_client_lockd':
+      connect        => ["${nfs_server}:${lockd_connect_port}"],
+      accept         => "127.0.0.1:${::nfs::lockd_tcpport}",
+      verify         => $stunnel_verify,
+      socket_options => $::nfs::_stunnel_socket_options,
+      tag            => ['nfs']
     }
-    stunnel::connection { 'nfs_mountd':
-      connect => ["${nfs_server}:${mountd_connect_port}"],
-      accept  => "127.0.0.1:${::nfs::mountd_port}",
-      verify  => $stunnel_verify
+    stunnel::instance { 'nfs_client_mountd':
+      connect        => ["${nfs_server}:${mountd_connect_port}"],
+      accept         => "127.0.0.1:${::nfs::mountd_port}",
+      verify         => $stunnel_verify,
+      socket_options => $::nfs::_stunnel_socket_options,
+      tag            => ['nfs']
     }
-    stunnel::connection { 'nfs_status':
-      connect => ["${nfs_server}:${statd_connect_port}"],
-      accept  => "127.0.0.1:${::nfs::statd_port}",
-      verify  => $stunnel_verify
+    stunnel::instance { 'nfs_client_status':
+      connect        => ["${nfs_server}:${statd_connect_port}"],
+      accept         => "127.0.0.1:${::nfs::statd_port}",
+      verify         => $stunnel_verify,
+      socket_options => $::nfs::_stunnel_socket_options,
+      tag            => ['nfs']
     }
   }
 }
