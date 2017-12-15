@@ -30,7 +30,6 @@ describe 'nfs' do
           it { is_expected.to contain_class('nfs::client') }
           it { is_expected.to contain_class('nfs::server') }
           it { is_expected.to_not contain_class('tcpwrappers') }
-          it { is_expected.to_not contain_class('stunnel') }
           it { is_expected.to_not contain_class('krb5') }
           it { is_expected.to contain_concat__fragment('nfs_init').with_content(/SECURE_NFS=no/) }
           it { is_expected.to create_concat('/etc/sysconfig/nfs') }
@@ -73,7 +72,6 @@ describe 'nfs' do
           it { is_expected.to contain_class('nfs::server') }
           it { is_expected.to contain_concat__fragment('nfs_init_server').with_content(%r(\nRPCSVCGSSDARGS="-n -vvvvv -rrrrr -iiiiii")) }
           it { is_expected.to contain_class('tcpwrappers') }
-          it { is_expected.to contain_class('stunnel') }
           it { is_expected.to contain_tcpwrappers__allow('nfs') }
           it { is_expected.to contain_tcpwrappers__allow('mountd') }
           it { is_expected.to contain_tcpwrappers__allow('statd') }

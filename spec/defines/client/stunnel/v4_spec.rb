@@ -9,7 +9,7 @@ describe 'nfs::client::stunnel::v4' do
 
       it { is_expected.to compile.with_all_deps }
       it {
-        is_expected.to create_stunnel__connection("nfs4_#{title}_client").with({
+        is_expected.to create_stunnel__instance("nfs4_#{title}_client").with({
           :connect => ['my.nfs.server:20490'],
           :accept  => '127.0.0.1:1234'
         })

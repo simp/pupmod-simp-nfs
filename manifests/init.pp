@@ -1,11 +1,5 @@
 # Provides the base segments for NFS server *and* client services.
 #
-# @param stunnel
-#   Wrap ``stunnel`` around the NFS server connections
-#
-#   * This is ideally suited for environments without a working Kerberos setup
-#     and may cause issues when used together
-#
 # @param is_server
 #   Explicitly state that this system should be an NFS server
 #
@@ -87,34 +81,58 @@
 # @param tcpwrappers
 #   Use the SIMP ``tcpwrappers`` module to manage tcpwrappers
 #
+# @param stunnel
+#   Wrap ``stunnel`` around the NFS server connections
+#
+#   * This is ideally suited for environments without a working Kerberos setup
+#     and may cause issues when used together
+#
+# @param stunnel_tcp_nodelay
+#   Enable TCP_NODELAY for all stunnel connections
+#
+# @param stunnel_socket_options
+#   Additional socket options to set for stunnel connections
+#
 # @author Trevor Vaughan <tvaughan@onyxpoint.com>
 # @author Kendall Moore <kendall.moore@onyxpoint.com>
 #
 class nfs (
-  Boolean              $stunnel             = simplib::lookup('simp_options::stunnel', { 'default_value' => false }),
-  Boolean              $is_server           = false,
-  Boolean              $is_client           = true,
-  Boolean              $nfsv3               = false,
-  Boolean              $mountd_nfs_v1       = true,
-  Boolean              $mountd_nfs_v2       = false,
-  Boolean              $mountd_nfs_v3       = false,
-  Stdlib::Absolutepath $rquotad             = '/usr/sbin/rpc.rquotad',
-  Simplib::Port        $rquotad_port        = 875,
-  Simplib::Port        $lockd_tcpport       = 32803,
-  Simplib::Port        $lockd_udpport       = 32769,
-  String               $rpcnfsdargs         = '-N 2',
-  Integer[0]           $rpcnfsdcount        = 8,
-  Integer[0]           $nfsd_v4_grace       = 90,
-  Simplib::Port        $mountd_port         = 20048,
-  Simplib::Port        $statd_port          = 662,
-  Simplib::Port        $statd_outgoing_port = 2020,
-  Boolean              $secure_nfs          = false,
-  Boolean              $ensure_latest_lvm2  = true,
-  Boolean              $kerberos            = simplib::lookup('simp_options::kerberos', { 'default_value'    => false }),
-  Boolean              $keytab_on_puppet    = simplib::lookup('simp_options::kerberos', { 'default_value'    => true}),
-  Boolean              $firewall            = simplib::lookup('simp_options::firewall', { 'default_value'    => false}),
-  Boolean              $tcpwrappers         = simplib::lookup('simp_options::tcpwrappers', { 'default_value' => false })
+  Boolean              $is_server              = false,
+  Boolean              $is_client              = true,
+  Boolean              $nfsv3                  = false,
+  Boolean              $mountd_nfs_v1          = true,
+  Boolean              $mountd_nfs_v2          = false,
+  Boolean              $mountd_nfs_v3          = false,
+  Stdlib::Absolutepath $rquotad                = '/usr/sbin/rpc.rquotad',
+  Simplib::Port        $rquotad_port           = 875,
+  Simplib::Port        $lockd_tcpport          = 32803,
+  Simplib::Port        $lockd_udpport          = 32769,
+  String               $rpcnfsdargs            = '-N 2',
+  Integer[0]           $rpcnfsdcount           = 8,
+  Integer[0]           $nfsd_v4_grace          = 90,
+  Simplib::Port        $mountd_port            = 20048,
+  Simplib::Port        $statd_port             = 662,
+  Simplib::Port        $statd_outgoing_port    = 2020,
+  Boolean              $secure_nfs             = false,
+  Boolean              $ensure_latest_lvm2     = true,
+  Boolean              $kerberos               = simplib::lookup('simp_options::kerberos', { 'default_value' => false }),
+  Boolean              $keytab_on_puppet       = simplib::lookup('simp_options::kerberos', { 'default_value' => true}),
+  Boolean              $firewall               = simplib::lookup('simp_options::firewall', { 'default_value' => false}),
+  Boolean              $tcpwrappers            = simplib::lookup('simp_options::tcpwrappers', { 'default_value' => false }),
+  Boolean              $stunnel                = simplib::lookup('simp_options::stunnel', { 'default_value' => false }),
+  Boolean              $stunnel_tcp_nodelay    = true,
+  Array[String]        $stunnel_socket_options = []
 ){
+
+  if $stunnel_tcp_nodelay {
+    $_stunnel_socket_options = $stunnel_socket_options + [
+      'l:TCP_NODELAY=1',
+      'r:TCP_NODELAY=1'
+    ]
+  }
+  else {
+    $_stunnel_socket_options = $stunnel_socket_options
+  }
 
   include '::nfs::service_names'
   include '::nfs::install'

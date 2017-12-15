@@ -8,7 +8,7 @@ describe 'nfs::server::stunnel' do
 
       it { is_expected.to compile.with_all_deps }
       it { is_expected.to contain_class('nfs::server') }
-      it { is_expected.to create_stunnel__connection('nfs') }
+      it { is_expected.to create_stunnel__instance('nfs') }
       it { is_expected.to create_class('nfs::server::stunnel') }
     end
   end

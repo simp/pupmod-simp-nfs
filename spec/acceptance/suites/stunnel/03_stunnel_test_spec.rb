@@ -3,22 +3,6 @@ require 'spec_helper_acceptance'
 test_name 'nfs with stunnel'
 
 describe 'nfs stunnel' do
-
-  before(:context) do
-    hosts.each do |host|
-      interfaces = fact_on(host, 'interfaces').strip.split(',')
-      interfaces.delete_if do |x|
-        x =~ /^lo/
-      end
-
-      interfaces.each do |iface|
-        if fact_on(host, "ipaddress_#{iface}").strip.empty?
-          on(host, "ifup #{iface}", :accept_all_exit_codes => true)
-        end
-      end
-    end
-  end
-
   servers = hosts_with_role( hosts, 'nfs_server' )
   clients = hosts_with_role( hosts, 'nfs_client' )
 
@@ -45,13 +29,6 @@ describe 'nfs stunnel' do
   let(:manifest) {
     <<-EOM
       include '::nfs'
-      file { '/var/stunnel_pki':
-        ensure => 'directory',
-        owner  => 'root',
-        group  => 'root',
-        mode   => '0644'
-      }
-
 
       #{ssh_allow}
     EOM
@@ -65,11 +42,10 @@ simp_options::firewall : true
 simp_options::haveged : true
 simp_options::kerberos : false
 simp_options::pki : true
+simp_options::pki::source : '/etc/pki/simp-testing/pki'
 simp_options::stunnel : true
 simp_options::tcpwrappers : true
 simp_options::trusted_nets : ['ALL']
-
-stunnel::app_pki_external_source : '/etc/pki/simp-testing/pki'
 
 auditd : false
 

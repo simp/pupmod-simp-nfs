@@ -1,3 +1,11 @@
+* Wed Dec 13 2017 Trevor Vaughan <tvaughan@onyxpoint.com> - 6.1.0
+- Changed all stunnel connections to use 'stunnel::instance' methods so that
+  they are not interrupted by an issue with the global stunnel configuration
+  and they can set the TCP_NODELAY option as suggested for small transaction,
+  high bandwidth connections.
+- Added parameters to allow users to tweak the stunnel socket options for all
+  NFS stunnel connections.
+
 * Fri Aug 18 2017 Liz Nemsick <lnemsick.simp@gmail.com> - 6.0.4-0
 - Update concat version in metadata.json
 

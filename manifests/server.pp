@@ -103,7 +103,7 @@ class nfs::server (
   }
 
   if $stunnel {
-    include '::nfs::server::stunnel'
+    contain '::nfs::server::stunnel'
 
     # This is here due to some bug where allowing things through regularly
     # isn't working correctly.

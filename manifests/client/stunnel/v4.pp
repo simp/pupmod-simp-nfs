@@ -34,12 +34,12 @@ define nfs::client::stunnel::v4 (
     warning("You are trying to use stunnel for a local connection to '${name}'. Please use a direct connection.")
   }
   else {
-    include '::stunnel'
-
-    stunnel::connection { "nfs4_${name}_client":
-      connect => ["${_nfs_server}:${nfs_connect_port}"],
-      accept  => "127.0.0.1:${$_nfs_port}",
-      verify  => $::nfs::client::stunnel_verify
+    stunnel::instance { "nfs4_${name}_client":
+      connect        => ["${_nfs_server}:${nfs_connect_port}"],
+      accept         => "127.0.0.1:${$_nfs_port}",
+      verify         => $::nfs::client::stunnel_verify,
+      socket_options => $::nfs::_stunnel_socket_options,
+      tag            => ['nfs']
     }
   }
 }
