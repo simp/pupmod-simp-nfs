@@ -30,13 +30,6 @@ describe 'nfs stunnel' do
     <<-EOM
       include '::nfs'
 
-      #file { '/var/stunnel_pki':
-      #  ensure => 'directory',
-      #  owner  => 'root',
-      #  group  => 'root',
-      #  mode   => '0644'
-      #}
-
       #{ssh_allow}
     EOM
   }
