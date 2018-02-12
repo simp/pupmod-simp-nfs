@@ -1,4 +1,7 @@
-* Wed Dec 13 2017 Trevor Vaughan <tvaughan@onyxpoint.com> - 6.1.0
+* Mon Feb 12 2018 Liz Nemsick <lnemsick.simp@gmail.com> - 6.1.0-0
+- Update upperbound on puppetlabs/concat version to < 5.0.0
+
+* Wed Dec 13 2017 Trevor Vaughan <tvaughan@onyxpoint.com> - 6.1.0-0
 - Changed all stunnel connections to use 'stunnel::instance' methods so that
   they are not interrupted by an issue with the global stunnel configuration
   and they can set the TCP_NODELAY option as suggested for small transaction,
