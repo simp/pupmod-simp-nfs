@@ -8,6 +8,7 @@
   high bandwidth connections.
 - Added parameters to allow users to tweak the stunnel socket options for all
   NFS stunnel connections.
+- Added support for OEL and Puppet 5
 
 * Fri Aug 18 2017 Liz Nemsick <lnemsick.simp@gmail.com> - 6.0.4-0
 - Update concat version in metadata.json

@@ -124,6 +124,8 @@ class nfs (
   Array[String]        $stunnel_socket_options = []
 ){
 
+  simplib::assert_metadata($module_name)
+
   if $stunnel_tcp_nodelay {
     $_stunnel_socket_options = $stunnel_socket_options + [
       'l:TCP_NODELAY=1',
@@ -140,7 +142,7 @@ class nfs (
   if $kerberos {
     include '::krb5'
 
-    if ($::operatingsystem in ['RedHat', 'CentOS']) {
+    if ($::operatingsystem in ['RedHat', 'CentOS', 'OracleLinux']) {
       if (versioncmp($::operatingsystemmajrelease,'6') > 0) {
         # This is here because the SELinux rules for directory includes in krb5
         # are broken.
