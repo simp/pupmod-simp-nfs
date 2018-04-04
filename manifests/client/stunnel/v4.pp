@@ -16,9 +16,28 @@
 # @author Trevor Vaughan <tvaughan@onyxpoint.com>
 #
 define nfs::client::stunnel::v4 (
-  Simplib::Port $nfs_connect_port = 20490
+  Simplib::Port $nfs_connect_port     = 20490,
+  Boolean       $stunnel_systemd_deps = true,
+  Array[String] $stunnel_wantedby     = []
 ) {
-  include '::nfs::client'
+  include 'nfs::client'
+  include 'nfs::service_names'
+
+  if $stunnel_systemd_deps and ($facts['os']['release']['major'] > '6') {
+    $_stunnel_wantedby = [
+      $nfs::service_names::nfs_lock,
+      $nfs::service_names::nfs_mountd,
+      $nfs::service_names::nfs_rquotad,
+      $nfs::service_names::nfs_server,
+      $nfs::service_names::rpcbind,
+      $nfs::service_names::rpcidmapd,
+      $nfs::service_names::rpcgssd,
+      $nfs::service_names::rpcsvcgssd,
+    ]
+  }
+  else {
+    $_stunnel_wantedby = undef
+  }
 
   if $name !~ Simplib::Host::Port {
     fail('$name must be a Simplib::Host::Port => `<host>:<port>`')
@@ -35,11 +54,12 @@ define nfs::client::stunnel::v4 (
   }
   else {
     stunnel::instance { "nfs4_${name}_client":
-      connect        => ["${_nfs_server}:${nfs_connect_port}"],
-      accept         => "127.0.0.1:${$_nfs_port}",
-      verify         => $::nfs::client::stunnel_verify,
-      socket_options => $::nfs::_stunnel_socket_options,
-      tag            => ['nfs']
+      connect          => ["${_nfs_server}:${nfs_connect_port}"],
+      accept           => "127.0.0.1:${$_nfs_port}",
+      verify           => $::nfs::client::stunnel_verify,
+      socket_options   => $::nfs::_stunnel_socket_options,
+      systemd_wantedby => $_stunnel_wantedby,
+      tag              => ['nfs']
     }
   }
 }

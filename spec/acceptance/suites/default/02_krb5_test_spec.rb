@@ -4,21 +4,6 @@ test_name 'nfs krb5'
 
 describe 'nfs krb5' do
 
-  before(:context) do
-    hosts.each do |host|
-      interfaces = fact_on(host, 'interfaces').strip.split(',')
-      interfaces.delete_if do |x|
-        x =~ /^lo/
-      end
-
-      interfaces.each do |iface|
-        if fact_on(host, "ipaddress_#{iface}").strip.empty?
-          on(host, "ifup #{iface}", :accept_all_exit_codes => true)
-        end
-      end
-    end
-  end
-
   servers = hosts_with_role( hosts, 'nfs_server' )
   clients = hosts_with_role( hosts, 'nfs_client' )
 
@@ -181,7 +166,7 @@ nfs::is_server : #IS_SERVER#
       end
 
       it 'should export a directory' do
-        apply_manifest_on(host, server_manifest)
+        apply_manifest_on(host, server_manifest, :catch_failures => true)
       end
     end
   end
@@ -226,7 +211,7 @@ nfs::is_server : #IS_SERVER#
           end
 
           set_hieradata_on(host, hdata)
-          apply_manifest_on(host, _manifest, {:catch_failures => true})
+          apply_manifest_on(host, _manifest, :catch_failures => true)
         end
 
         it "should mount a directory on the #{server} server" do
@@ -248,7 +233,7 @@ nfs::is_server : #IS_SERVER#
           end
 
           host.mkdir_p("/mnt/#{server}")
-          apply_manifest_on(host, client_manifest)
+          apply_manifest_on(host, client_manifest, :catch_failures => true)
           on(host, %(grep -q 'This is a test' /mnt/#{server}/test_file))
           on(host, %{puppet resource mount /mnt/#{server} ensure=unmounted})
         end
@@ -270,6 +255,9 @@ nfs::is_server : #IS_SERVER#
           end
 
           apply_manifest_on(host, autofs_client_manifest)
+          apply_manifest_on(host, autofs_client_manifest, catch_failures: true)
+          apply_manifest_on(host, autofs_client_manifest, catch_changes: true)
+
           on(host, %{puppet resource service autofs ensure=stopped})
         end
       end

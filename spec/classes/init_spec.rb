@@ -61,11 +61,11 @@ describe 'nfs' do
         context "as a server with custom args" do
           let(:hieradata) { 'rpcgssdargs' }
           let(:params) {{
-            :is_server => true,
+            :is_server   => true,
             :tcpwrappers => true,
-            :stunnel => true,
-            :kerberos => true,
-            :firewall => true
+            :stunnel     => true,
+            :kerberos    => true,
+            :firewall    => true
           }}
           it { is_expected.to compile.with_all_deps }
           it { is_expected.to contain_class('nfs') }

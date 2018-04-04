@@ -22,7 +22,9 @@ define nfs::client::mount::connection (
   Simplib::Host           $nfs_server,
   Enum['nfs','nfs4']      $nfs_version,
   Simplib::Port           $nfs_port       = 2049,
-  Optional[Simplib::Port] $v4_remote_port = undef
+  Optional[Simplib::Port] $v4_remote_port = undef,
+  Boolean                 $stunnel_systemd_deps = true,
+  Array[String]           $stunnel_wantedby     = []
 ) {
   assert_private()
 
@@ -47,7 +49,9 @@ define nfs::client::mount::connection (
       ensure_resource('nfs::client::stunnel::v4',
         "${nfs_server}:${nfs_port}",
         {
-          nfs_connect_port => $v4_remote_port
+          nfs_connect_port     => $v4_remote_port,
+          stunnel_systemd_deps => $stunnel_systemd_deps,
+          stunnel_wantedby     => $stunnel_wantedby,
         }
       )
     }
@@ -61,8 +65,8 @@ define nfs::client::mount::connection (
     ensure_resource('iptables::listen::tcp_stateful',
       "nfs_callback_${nfs_server}",
       {
-        trusted_nets => [$nfs_server],
-        dports       => $nfs::client::callback_port
+        'trusted_nets' => [$nfs_server],
+        'dports'       => $nfs::client::callback_port
       }
     )
   }

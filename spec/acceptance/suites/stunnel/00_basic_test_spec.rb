@@ -63,11 +63,11 @@ nfs::is_server : #IS_SERVER#
         end
 
         set_hieradata_on(host, hdata)
-        apply_manifest_on(host, manifest, :catch_failures => true)
+        apply_manifest_on(host, manifest, catch_failures: true)
       end
 
       it 'should be idempotent' do
-        apply_manifest_on(host, manifest, :catch_changes => true)
+        apply_manifest_on(host, manifest, catch_changes: true)
       end
     end
   end
@@ -104,13 +104,13 @@ nfs::is_server : #IS_SERVER#
   context "as a server" do
     servers.each do |host|
       it 'should export a directory' do
-        apply_manifest_on(host, server_manifest)
+        apply_manifest_on(host, server_manifest, catch_failures: true)
       end
     end
   end
 
   context "as a client" do
-    clients.each do |host|
+    clients.each do |client|
       servers.each do |server|
         it "should mount a directory on the #{server} server" do
           server_fqdn = fact_on(server, 'fqdn')
@@ -125,14 +125,16 @@ nfs::is_server : #IS_SERVER#
             }
           EOM
 
-          if servers.include?(host)
+          if servers.include?(client)
             client_manifest = client_manifest + "\n" + server_manifest
           end
 
-          host.mkdir_p("/mnt/#{server}")
-          apply_manifest_on(host, client_manifest)
-          on(host, %(grep -q 'This is a test' /mnt/#{server}/test_file))
-          on(host, %{puppet resource mount /mnt/#{server} ensure=absent})
+          client.mkdir_p("/mnt/#{server}")
+
+          apply_manifest_on(client, client_manifest, catch_failures: true)
+
+          on(client, %(grep -q 'This is a test' /mnt/#{server}/test_file))
+          on(client, %{puppet resource mount /mnt/#{server} ensure=absent})
         end
 
         it "should mount a directory on the #{server} server with autofs" do
@@ -147,12 +149,23 @@ nfs::is_server : #IS_SERVER#
             }
           EOM
 
-          if servers.include?(host)
+          if servers.include?(client)
             autofs_client_manifest = autofs_client_manifest + "\n" + server_manifest
           end
+          if client.host_hash['platform'] =~ /el-7/
+            on(client, 'systemctl stop rpcbind.socket')
+          end
 
-          apply_manifest_on(host, autofs_client_manifest)
-          on(host, %{puppet resource service autofs ensure=stopped})
+          apply_manifest_on(client, autofs_client_manifest)
+          if client.host_hash['platform'] =~ /el-7/
+            retry_on(client, 'systemctl is-active remote-fs-pre.target')
+          else
+            sleep 15
+          end
+          apply_manifest_on(client, autofs_client_manifest, catch_failures: true)
+          apply_manifest_on(client, autofs_client_manifest, catch_changes: true)
+
+          on(client, %{puppet resource service autofs ensure=stopped})
         end
       end
     end

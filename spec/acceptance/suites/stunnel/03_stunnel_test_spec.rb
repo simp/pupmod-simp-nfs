@@ -79,11 +79,16 @@ nfs::is_server : #IS_SERVER#
         end
 
         set_hieradata_on(host, hdata)
-        apply_manifest_on(host, manifest, :catch_failures => true)
+        apply_manifest_on(host, manifest)
+        if host.host_hash['platform'] =~ /el-7/
+          retry_on(host, 'systemctl is-active remote-fs-pre.target')
+        else
+          sleep 15
+        end
       end
 
       it 'should be idempotent' do
-        apply_manifest_on(host, manifest, :catch_changes => true)
+        apply_manifest_on(host, manifest, catch_changes: true)
       end
     end
   end
@@ -105,7 +110,7 @@ nfs::is_server : #IS_SERVER#
       owner   => 'root',
       group   => 'root',
       mode    => '0644',
-      content => 'This is a test'
+      content => "This is a test\\n"
     }
 
     nfs::server::export { 'nfs4_root':
@@ -129,7 +134,7 @@ nfs::is_server : #IS_SERVER#
   end
 
   context "as a client" do
-    clients.each do |host|
+    clients.each do |client|
       servers.each do |server|
         server_fqdn = fact_on(server,'fqdn')
 
@@ -138,8 +143,8 @@ nfs::is_server : #IS_SERVER#
           hdata.gsub!(/#NFS_SERVER#/m, server.to_s)
           hdata.gsub!(/#IS_SERVER#/m, 'false')
 
-          set_hieradata_on(host, hdata)
-          apply_manifest_on(host, manifest, :catch_failures => true)
+          set_hieradata_on(client, hdata)
+          apply_manifest_on(client, manifest, catch_failures: true)
         end
 
         it "should mount a directory on #{server}" do
@@ -153,10 +158,19 @@ nfs::is_server : #IS_SERVER#
             }
           EOM
 
-          host.mkdir_p("/mnt/#{server}")
-          apply_manifest_on(host, client_manifest)
-          on(host, %(grep -q 'This is a test' /mnt/#{server}/test_file))
-          on(host, %{puppet resource mount /mnt/#{server} ensure=unmounted})
+          client.mkdir_p("/mnt/#{server}")
+
+          apply_manifest_on(client, client_manifest)
+          if client.host_hash['platform'] =~ /el-7/
+            retry_on(client, 'systemctl is-active remote-fs-pre.target')
+          else
+            sleep 15
+          end
+          apply_manifest_on(client, client_manifest, catch_failures: true)
+          apply_manifest_on(client, client_manifest, catch_changes: true)
+
+          on(client, %(grep -q 'This is a test' /mnt/#{server}/test_file))
+          on(client, %{puppet resource mount /mnt/#{server} ensure=unmounted})
         end
       end
     end
