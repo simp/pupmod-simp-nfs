@@ -169,6 +169,9 @@ nfs::is_server : #IS_SERVER#
 
         it 'should run cleanly after reboot' do
           client.reboot
+          # wait for it to come back up, then a little more
+          on(client, 'uptime')
+          sleep 15
           apply_manifest_on(client, client_manifest, catch_changes: true)
         end
       end

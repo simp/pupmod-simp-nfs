@@ -188,7 +188,7 @@ pup5_latest-unit:
 
 # Acceptance tests
 # ==============================================================================
-acceptance-default:
+default:
   stage: acceptance
   tags:
     - beaker
@@ -199,7 +199,7 @@ acceptance-default:
   script:
     - bundle exec rake beaker:suites[default]
 
-acceptance-fips-default:
+default-fips:
   stage: acceptance
   tags:
     - beaker
@@ -211,7 +211,7 @@ acceptance-fips-default:
   script:
     - bundle exec rake beaker:suites[default]
 
-acceptance-stunnel:
+stunnel:
   stage: acceptance
   tags:
     - beaker
@@ -222,7 +222,7 @@ acceptance-stunnel:
   script:
     - bundle exec rake beaker:suites[stunnel]
 
-acceptance-fips-stunnel:
+stunnel-fips:
   stage: acceptance
   tags:
     - beaker
