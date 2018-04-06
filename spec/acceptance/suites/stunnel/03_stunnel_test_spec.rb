@@ -172,6 +172,7 @@ nfs::is_server : #IS_SERVER#
           # wait for it to come back up, then a little more
           on(client, 'uptime')
           sleep 15
+          apply_manifest_on(client, client_manifest, catch_failures: true)
           apply_manifest_on(client, client_manifest, catch_changes: true)
         end
       end
