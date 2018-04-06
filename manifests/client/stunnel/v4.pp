@@ -24,16 +24,7 @@ define nfs::client::stunnel::v4 (
   include 'nfs::service_names'
 
   if $stunnel_systemd_deps and ($facts['os']['release']['major'] > '6') {
-    $_stunnel_wantedby = [
-      $nfs::service_names::nfs_lock,
-      $nfs::service_names::nfs_mountd,
-      $nfs::service_names::nfs_rquotad,
-      $nfs::service_names::nfs_server,
-      $nfs::service_names::rpcbind,
-      $nfs::service_names::rpcidmapd,
-      $nfs::service_names::rpcgssd,
-      $nfs::service_names::rpcsvcgssd,
-    ]
+    $_stunnel_wantedby = ['remote-fs-pre.target']
   }
   else {
     $_stunnel_wantedby = undef

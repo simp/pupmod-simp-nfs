@@ -118,7 +118,7 @@ define nfs::client::mount (
     $_mount_point = split($name,'wildcard-')[-1]
 
     # The map name is very particular
-    $_map_name = sprintf("/etc/autofs/%s.map", $_clean_name)
+    $_map_name = sprintf('/etc/autofs/%s.map', $_clean_name)
 
     autofs::map::master { $name:
       mount_point => $_mount_point,

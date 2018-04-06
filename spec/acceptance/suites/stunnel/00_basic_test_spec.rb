@@ -156,12 +156,7 @@ nfs::is_server : #IS_SERVER#
             on(client, 'systemctl stop rpcbind.socket')
           end
 
-          apply_manifest_on(client, autofs_client_manifest)
-          if client.host_hash['platform'] =~ /el-7/
-            retry_on(client, 'systemctl is-active remote-fs-pre.target')
-          else
-            sleep 15
-          end
+          # apply_manifest_on(client, autofs_client_manifest)
           apply_manifest_on(client, autofs_client_manifest, catch_failures: true)
           apply_manifest_on(client, autofs_client_manifest, catch_changes: true)
 

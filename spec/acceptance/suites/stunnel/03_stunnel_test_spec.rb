@@ -137,6 +137,15 @@ nfs::is_server : #IS_SERVER#
     clients.each do |client|
       servers.each do |server|
         server_fqdn = fact_on(server,'fqdn')
+        client_manifest = <<-EOM
+          #{ssh_allow}
+
+          nfs::client::mount { '/mnt/#{server}':
+            nfs_server  => '#{server_fqdn}',
+            remote_path => '/srv/nfs_share',
+            autofs      => false
+          }
+        EOM
 
         it 'should prep the stunnel connection' do
           hdata = hieradata.dup
@@ -148,29 +157,19 @@ nfs::is_server : #IS_SERVER#
         end
 
         it "should mount a directory on #{server}" do
-          client_manifest = <<-EOM
-            #{ssh_allow}
-
-            nfs::client::mount { '/mnt/#{server}':
-              nfs_server  => '#{server_fqdn}',
-              remote_path => '/srv/nfs_share',
-              autofs      => false
-            }
-          EOM
-
           client.mkdir_p("/mnt/#{server}")
 
-          apply_manifest_on(client, client_manifest)
-          if client.host_hash['platform'] =~ /el-7/
-            retry_on(client, 'systemctl is-active remote-fs-pre.target')
-          else
-            sleep 15
-          end
+          # apply_manifest_on(client, client_manifest)
           apply_manifest_on(client, client_manifest, catch_failures: true)
           apply_manifest_on(client, client_manifest, catch_changes: true)
 
           on(client, %(grep -q 'This is a test' /mnt/#{server}/test_file))
           on(client, %{puppet resource mount /mnt/#{server} ensure=unmounted})
+        end
+
+        it 'should run cleanly after reboot' do
+          client.reboot
+          apply_manifest_on(client, client_manifest, catch_changes: true)
         end
       end
     end
