@@ -156,12 +156,26 @@ nfs::is_server : #IS_SERVER#
             on(client, 'systemctl stop rpcbind.socket')
           end
 
-          # apply_manifest_on(client, autofs_client_manifest)
           apply_manifest_on(client, autofs_client_manifest, catch_failures: true)
           apply_manifest_on(client, autofs_client_manifest, catch_changes: true)
-
-          on(client, %{puppet resource service autofs ensure=stopped})
         end
+      end
+    end
+  end
+
+  context 'should cleanup client mounts' do
+    clients.each do |client|
+      servers.each do |server|
+        it 'should unmount test mounts' do
+          on(client, %{puppet resource mount /mnt/#{server} ensure=absent})
+        end
+      end
+      it 'should stop autofs' do
+        on(client, %{puppet resource service autofs ensure=stopped})
+      end
+      it 'should delete configuration from this test' do
+        on(client, 'rm -f /etc/autofs.conf')
+        on(client, 'rm -f /etc/autofs/*')
       end
     end
   end

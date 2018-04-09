@@ -21,9 +21,7 @@ fixtures:
     simplib: https://github.com/simp/pupmod-simp-simplib
     simp_options: https://github.com/simp/pupmod-simp-simp_options
     stdlib: https://github.com/simp/puppetlabs-stdlib
-    stunnel:
-      repo: https://github.com/jeefberkey/pupmod-simp-stunnel
-      branch: SIMP-4598-systemd-deps
+    stunnel: https://github.com/simp/pupmod-simp-stunnel
     svckill: https://github.com/simp/pupmod-simp-svckill
     tcpwrappers: https://github.com/simp/pupmod-simp-tcpwrappers
   symlinks:

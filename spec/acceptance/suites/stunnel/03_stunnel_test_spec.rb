@@ -159,7 +159,6 @@ nfs::is_server : #IS_SERVER#
         it "should mount a directory on #{server}" do
           client.mkdir_p("/mnt/#{server}")
 
-          # apply_manifest_on(client, client_manifest)
           apply_manifest_on(client, client_manifest, catch_failures: true)
           apply_manifest_on(client, client_manifest, catch_changes: true)
 
