@@ -23,15 +23,15 @@ define nfs::client::stunnel::v4 (
   include 'nfs::client'
   include 'nfs::service_names'
 
+  if $name !~ Simplib::Host::Port {
+    fail('$name must be a Simplib::Host::Port => `<host>:<port>`')
+  }
+
   if $stunnel_systemd_deps and ($facts['os']['release']['major'] > '6') {
     $_stunnel_wantedby = ['remote-fs-pre.target']
   }
   else {
     $_stunnel_wantedby = undef
-  }
-
-  if $name !~ Simplib::Host::Port {
-    fail('$name must be a Simplib::Host::Port => `<host>:<port>`')
   }
 
   $_target_parts = split($name, ':')

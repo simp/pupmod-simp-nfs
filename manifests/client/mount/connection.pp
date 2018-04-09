@@ -65,8 +65,8 @@ define nfs::client::mount::connection (
     ensure_resource('iptables::listen::tcp_stateful',
       "nfs_callback_${nfs_server}",
       {
-        'trusted_nets' => [$nfs_server],
-        'dports'       => $nfs::client::callback_port
+        trusted_nets => [$nfs_server],
+        dports       => $nfs::client::callback_port
       }
     )
   }
