@@ -1,23 +1,22 @@
 require 'spec_helper'
 
 describe 'nfs::idmapd' do
-  before(:each) do
-    Puppet::Parser::Functions.newfunction('assert_private') do |f|
-      f.stubs(:call).returns(true)
+  on_supported_os.each do |os, facts|
+    before(:each) do
+      Puppet::Parser::Functions.newfunction('assert_private') do |f|
+        f.stubs(:call).returns(true)
+      end
     end
-  end
 
-  context 'supported operating systems' do
-    on_supported_os.each do |os, facts|
-      context "on #{os}" do
-        let(:facts){ facts }
+    context "on #{os}" do
+      let(:facts){ facts }
 
-        let(:pre_condition) { 'class { "nfs": is_server => true }' }
+      let(:pre_condition) { 'class { "nfs": is_server => true }' }
 
-        context 'with default parameters' do
-          it { is_expected.to compile.with_all_deps }
-          it { is_expected.to create_class('nfs::idmapd') }
-          it { is_expected.to create_file('/etc/idmapd.conf').with_content( <<EOM
+      context 'with default parameters' do
+        it { is_expected.to compile.with_all_deps }
+        it { is_expected.to create_class('nfs::idmapd') }
+        it { is_expected.to create_file('/etc/idmapd.conf').with_content( <<EOM
 # This file is managed by Puppet. Any changes made to the file will be
 # overwritten at the next Puppet run.
 [General]
@@ -38,19 +37,19 @@ Method = nsswitch
 
 # This is not yet supported by the SIMP configuration.
 EOM
-          )}
-        end
+        )}
+      end
 
-        context 'with optional parameters set' do
-          let(:params) {{
-            :verbosity          => 2,
-            :local_realms       => ['realm1', 'realm2'],
-            :gss_methods        => ['nsswitch'],
-            :static_translation => { 'key1' => 'value1', 'key2' => 'value2' }
-          }}
-          it { is_expected.to compile.with_all_deps }
-          it { is_expected.to create_class('nfs::idmapd') }
-          it { is_expected.to create_file('/etc/idmapd.conf').with_content( <<EOM
+      context 'with optional parameters set' do
+        let(:params) {{
+          :verbosity          => 2,
+          :local_realms       => ['realm1', 'realm2'],
+          :gss_methods        => ['nsswitch'],
+          :static_translation => { 'key1' => 'value1', 'key2' => 'value2' }
+        }}
+        it { is_expected.to compile.with_all_deps }
+        it { is_expected.to create_class('nfs::idmapd') }
+        it { is_expected.to create_file('/etc/idmapd.conf').with_content( <<EOM
 # This file is managed by Puppet. Any changes made to the file will be
 # overwritten at the next Puppet run.
 [General]
@@ -76,8 +75,7 @@ key2 = value2
 
 # This is not yet supported by the SIMP configuration.
 EOM
-          )}
-        end
+        )}
       end
     end
   end
