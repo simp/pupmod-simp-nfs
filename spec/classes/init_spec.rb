@@ -39,13 +39,13 @@ describe 'nfs' do
           })
         }
 
-        if ['RedHat','CentOS'].include?(facts[:operatingsystem]) && facts[:operatingsystemmajrelease].to_s < '7'
+        if facts[:operatingsystemmajrelease].to_s < '7'
           it { is_expected.to contain_service('nfs').with({
               :ensure  => 'running'
             })
           }
         else
-          it { is_expected.to contain_service('nfs-server').with({
+          it { is_expected.to contain_service('nfs-server.service').with({
               :ensure  => 'running'
             })
           }
@@ -86,18 +86,16 @@ describe 'nfs' do
         it { is_expected.to compile.with_all_deps }
         it { is_expected.to contain_concat__fragment('nfs_init').with_content(/SECURE_NFS=yes/) }
 
-        if facts[:osfamily] == 'RedHat'
-          if facts[:operatingsystemmajrelease] >= '7'
-            it { is_expected.to contain_service('rpc-gssd').with(:ensure => 'running') }
-            if facts[:os][:release][:full] >= '7.1.0'
-              it { is_expected.to contain_service('gssproxy').with(:ensure => 'running') }
-            else
-              it { is_expected.to contain_service('rpc-svcgssd').with(:ensure => 'running') }
-            end
+        if facts[:operatingsystemmajrelease] >= '7'
+          it { is_expected.to contain_service('rpc-gssd.service').with(:ensure => 'running') }
+          if facts[:os][:release][:full] >= '7.1.0'
+            it { is_expected.to contain_service('gssproxy.service').with(:ensure => 'running') }
           else
-            it { is_expected.to contain_service('rpcgssd').with(:ensure => 'running') }
-            it { is_expected.to contain_service('rpcsvcgssd').with(:ensure => 'running') }
+            it { is_expected.to contain_service('rpc-svcgssd.service').with(:ensure => 'running') }
           end
+        else
+          it { is_expected.to contain_service('rpcgssd').with(:ensure => 'running') }
+          it { is_expected.to contain_service('rpcsvcgssd').with(:ensure => 'running') }
         end
       end
 

@@ -12,19 +12,19 @@ class nfs::service_names {
       $rpcsvcgssd  = 'rpcsvcgssd'
     }
     else {
-      $nfs_lock    = 'rpc-statd'
-      $nfs_mountd  = 'nfs-mountd'
-      $nfs_rquotad = 'nfs-rquotad'
-      $nfs_server  = 'nfs-server'
+      $nfs_lock    = 'rpc-statd.service'
+      $nfs_mountd  = 'nfs-mountd.service'
+      $nfs_rquotad = 'nfs-rquotad.service'
+      $nfs_server  = 'nfs-server.service'
       $rpcbind     = 'rpcbind.socket'
-      $rpcidmapd   = 'nfs-idmapd'
-      $rpcgssd     = 'rpc-gssd'
+      $rpcidmapd   = 'nfs-idmapd.service'
+      $rpcgssd     = 'rpc-gssd.service'
 
       if (versioncmp($facts['os']['release']['full'], '7.1') < 0) {
-        $rpcsvcgssd  = 'rpc-svcgssd'
+        $rpcsvcgssd  = 'rpc-svcgssd.service'
       }
       else {
-        $rpcsvcgssd  = 'gssproxy'
+        $rpcsvcgssd  = 'gssproxy.service'
       }
     }
   }

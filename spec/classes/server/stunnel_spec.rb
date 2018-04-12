@@ -11,14 +11,14 @@ describe 'nfs::server::stunnel' do
       it { is_expected.to create_class('nfs::server::stunnel') }
       if facts[:os][:release][:major] == '7'
         it { is_expected.to create_stunnel__instance('nfs').with_systemd_wantedby([
-          'rpc-statd',
-          'nfs-mountd',
-          'nfs-rquotad',
-          'nfs-server',
+          'rpc-statd.service',
+          'nfs-mountd.service',
+          'nfs-rquotad.service',
+          'nfs-server.service',
           'rpcbind.socket',
-          'nfs-idmapd',
-          'rpc-gssd',
-          'gssproxy',
+          'nfs-idmapd.service',
+          'rpc-gssd.service',
+          'gssproxy.service',
         ] ) }
       end
     end
