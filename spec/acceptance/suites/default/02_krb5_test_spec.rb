@@ -254,8 +254,8 @@ nfs::is_server : #IS_SERVER#
             autofs_client_manifest = autofs_client_manifest + "\n" + krb5_client_manifest
           end
 
-          apply_manifest_on(host, autofs_client_manifest)
-          # apply_manifest_on(host, autofs_client_manifest, catch_failures: true)
+          # apply_manifest_on(host, autofs_client_manifest)
+          apply_manifest_on(host, autofs_client_manifest, catch_failures: true)
           apply_manifest_on(host, autofs_client_manifest, catch_changes: true)
 
           on(host, %{puppet resource service autofs ensure=stopped})
