@@ -12,6 +12,10 @@ class nfs::service_names {
       $rpcsvcgssd  = 'rpcsvcgssd'
     }
     else {
+      # Services here should use the fully qualified service name
+      # When Puppet runs `systemctl is-enabled <service>` without `.service`,
+      # it doesn't know what to check the enabled status of, and returns
+      # unknown
       $nfs_lock    = 'rpc-statd.service'
       $nfs_mountd  = 'nfs-mountd.service'
       $nfs_rquotad = 'nfs-rquotad.service'
