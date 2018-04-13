@@ -55,14 +55,16 @@
 define nfs::client::mount (
   Simplib::Host                             $nfs_server,
   Stdlib::Absolutepath                      $remote_path,
-  Simplib::Port                             $port               = 2049,
-  Enum['nfs','nfs4']                        $nfs_version        = 'nfs4',
-  Optional[Simplib::Port]                   $v4_remote_port     = undef,
-  Enum['none','sys','krb5','krb5i','krb5p'] $sec                = 'sys',
-  String                                    $options            = 'hard,intr',
-  Boolean                                   $at_boot            = true,
-  Boolean                                   $autofs             = true,
-  Boolean                                   $autofs_map_to_user = false
+  Simplib::Port                             $port                 = 2049,
+  Enum['nfs','nfs4']                        $nfs_version          = 'nfs4',
+  Optional[Simplib::Port]                   $v4_remote_port       = undef,
+  Enum['none','sys','krb5','krb5i','krb5p'] $sec                  = 'sys',
+  String                                    $options              = 'hard,intr',
+  Boolean                                   $at_boot              = true,
+  Boolean                                   $autofs               = true,
+  Boolean                                   $autofs_map_to_user   = false,
+  Boolean                                   $stunnel_systemd_deps = true,
+  Optional[Array[String]]                   $stunnel_wantedby     = undef
 ) {
   if $autofs {
     if ($name !~ Stdlib::Absolutepath) and ($name !~ Pattern['^wildcard-']) {
@@ -81,11 +83,20 @@ define nfs::client::mount (
 
   include '::nfs::client'
 
+  if $stunnel_wantedby =~ Undef {
+    $_stunnel_wantedby = $stunnel_wantedby
+  }
+  else {
+    $_stunnel_wantedby = ['remote-fs-pre.target']
+  }
+
   nfs::client::mount::connection { $name:
-    nfs_server     => $nfs_server,
-    nfs_version    => $nfs_version,
-    nfs_port       => $port,
-    v4_remote_port => $v4_remote_port
+    nfs_server           => $nfs_server,
+    nfs_version          => $nfs_version,
+    nfs_port             => $port,
+    v4_remote_port       => $v4_remote_port,
+    stunnel_systemd_deps => $stunnel_systemd_deps,
+    stunnel_wantedby     => $_stunnel_wantedby
   }
 
   if $nfs_version == 'nfs4' {
@@ -107,7 +118,7 @@ define nfs::client::mount (
     $_mount_point = split($name,'wildcard-')[-1]
 
     # The map name is very particular
-    $_map_name = sprintf("/etc/autofs/%s.map", $_clean_name)
+    $_map_name = sprintf('/etc/autofs/%s.map', $_clean_name)
 
     autofs::map::master { $name:
       mount_point => $_mount_point,

@@ -79,11 +79,16 @@ nfs::is_server : #IS_SERVER#
         end
 
         set_hieradata_on(host, hdata)
-        apply_manifest_on(host, manifest, :catch_failures => true)
+        apply_manifest_on(host, manifest)
+        if host.host_hash['platform'] =~ /el-7/
+          retry_on(host, 'systemctl is-active remote-fs-pre.target')
+        else
+          sleep 15
+        end
       end
 
       it 'should be idempotent' do
-        apply_manifest_on(host, manifest, :catch_changes => true)
+        apply_manifest_on(host, manifest, catch_changes: true)
       end
     end
   end
@@ -105,7 +110,7 @@ nfs::is_server : #IS_SERVER#
       owner   => 'root',
       group   => 'root',
       mode    => '0644',
-      content => 'This is a test'
+      content => "This is a test\\n"
     }
 
     nfs::server::export { 'nfs4_root':
@@ -129,34 +134,45 @@ nfs::is_server : #IS_SERVER#
   end
 
   context "as a client" do
-    clients.each do |host|
+    clients.each do |client|
       servers.each do |server|
         server_fqdn = fact_on(server,'fqdn')
+        client_manifest = <<-EOM
+          #{ssh_allow}
+
+          nfs::client::mount { '/mnt/#{server}':
+            nfs_server  => '#{server_fqdn}',
+            remote_path => '/srv/nfs_share',
+            autofs      => false
+          }
+        EOM
 
         it 'should prep the stunnel connection' do
           hdata = hieradata.dup
           hdata.gsub!(/#NFS_SERVER#/m, server.to_s)
           hdata.gsub!(/#IS_SERVER#/m, 'false')
 
-          set_hieradata_on(host, hdata)
-          apply_manifest_on(host, manifest, :catch_failures => true)
+          set_hieradata_on(client, hdata)
+          apply_manifest_on(client, manifest, catch_failures: true)
         end
 
         it "should mount a directory on #{server}" do
-          client_manifest = <<-EOM
-            #{ssh_allow}
+          client.mkdir_p("/mnt/#{server}")
 
-            nfs::client::mount { '/mnt/#{server}':
-              nfs_server  => '#{server_fqdn}',
-              remote_path => '/srv/nfs_share',
-              autofs      => false
-            }
-          EOM
+          apply_manifest_on(client, client_manifest, catch_failures: true)
+          apply_manifest_on(client, client_manifest, catch_changes: true)
 
-          host.mkdir_p("/mnt/#{server}")
-          apply_manifest_on(host, client_manifest)
-          on(host, %(grep -q 'This is a test' /mnt/#{server}/test_file))
-          on(host, %{puppet resource mount /mnt/#{server} ensure=unmounted})
+          on(client, %(grep -q 'This is a test' /mnt/#{server}/test_file))
+          on(client, %{puppet resource mount /mnt/#{server} ensure=unmounted})
+        end
+
+        it 'should run cleanly after reboot' do
+          client.reboot
+          # wait for it to come back up, then a little more
+          on(client, 'uptime')
+          sleep 15
+          apply_manifest_on(client, client_manifest, catch_failures: true)
+          apply_manifest_on(client, client_manifest, catch_changes: true)
         end
       end
     end

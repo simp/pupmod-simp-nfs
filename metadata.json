@@ -1,6 +1,6 @@
 {
   "name": "simp-nfs",
-  "version": "6.1.0",
+  "version": "6.1.1",
   "author": "SIMP Team",
   "summary": "manages NFS server and client, also PKI and stunnelling",
   "license": "Apache-2.0",
@@ -44,7 +44,7 @@
     },
     {
       "name": "simp/stunnel",
-      "version_requirement": ">= 6.3.0 < 7.0.0"
+      "version_requirement": ">= 6.3.1 < 7.0.0"
     },
     {
       "name": "simp/tcpwrappers",
