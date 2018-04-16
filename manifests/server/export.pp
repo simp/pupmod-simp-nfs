@@ -95,27 +95,27 @@
 # @author Trevor Vaughan <mailto:tvaughan@onyxpoint.com>
 #
 define nfs::server::export (
-  Stdlib::Absolutepath                             $export_path,
-  Array[String]                                    $clients,
-  Optional[String]                                 $comment        = undef,
-  Boolean                                          $insecure       = false,
-  Boolean                                          $rw             = false,
-  Boolean                                          $async          = false,
-  Boolean                                          $no_wdelay      = false,
-  Boolean                                          $nohide         = false,
-  Boolean                                          $crossmnt       = false,
-  Boolean                                          $subtree_check  = false,
-  Boolean                                          $insecure_locks = false,
-  Optional[Variant[Stdlib::Absolutepath,Boolean]]  $mountpoint     = undef,
-  Optional[String]                                 $fsid           = undef,
-  Boolean                                          $nordirplus     = false,
-  Optional[Array[Pattern['^/.+@.+$']]]             $refer          = undef,
-  Array[Enum['none','sys','krb5','krb5i','krb5p']] $sec            = ['sys'],
-  Boolean                                          $no_root_squash = false,
-  Boolean                                          $all_squash     = false,
-  Simplib::Port                                    $anonuid        = 65534,
-  Simplib::Port                                    $anongid        = 65534,
-  Optional[String]                                 $custom         = undef
+  Stdlib::Absolutepath                            $export_path,
+  Array[String]                                   $clients,
+  Optional[String]                                $comment        = undef,
+  Boolean                                         $insecure       = false,
+  Boolean                                         $rw             = false,
+  Boolean                                         $async          = false,
+  Boolean                                         $no_wdelay      = false,
+  Boolean                                         $nohide         = false,
+  Boolean                                         $crossmnt       = false,
+  Boolean                                         $subtree_check  = false,
+  Boolean                                         $insecure_locks = false,
+  Optional[Variant[Stdlib::Absolutepath,Boolean]] $mountpoint     = undef,
+  Optional[String]                                $fsid           = undef,
+  Boolean                                         $nordirplus     = false,
+  Optional[Array[Pattern['^/.+@.+$']]]            $refer          = undef,
+  Array[Nfs::SecurityFlavor]                      $sec            = ['sys'],
+  Boolean                                         $no_root_squash = false,
+  Boolean                                         $all_squash     = false,
+  Simplib::Port                                   $anonuid        = 65534,
+  Simplib::Port                                   $anongid        = 65534,
+  Optional[String]                                $custom         = undef
 ) {
   include '::nfs::server'
 

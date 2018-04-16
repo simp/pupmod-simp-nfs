@@ -7,28 +7,9 @@ describe 'nfs basic' do
   servers = hosts_with_role( hosts, 'nfs_server' )
   clients = hosts_with_role( hosts, 'client' )
 
-  ssh_allow = <<-EOM
-    if !defined(Iptables::Listen::Tcp_stateful['i_love_testing']) {
-      include '::tcpwrappers'
-      include '::iptables'
-
-      tcpwrappers::allow { 'sshd':
-        pattern => 'ALL'
-      }
-
-      iptables::listen::tcp_stateful { 'i_love_testing':
-        order        => 8,
-        trusted_nets => ['ALL'],
-        dports       => 22
-      }
-    }
-  EOM
-
   let(:manifest) {
     <<-EOM
       include '::nfs'
-
-      #{ssh_allow}
     EOM
   }
 
@@ -74,8 +55,6 @@ nfs::is_server : #IS_SERVER#
   end
 
   server_manifest = <<-EOM
-    #{ssh_allow}
-
     include '::nfs'
 
     file { '/srv/nfs_share':
@@ -117,12 +96,11 @@ nfs::is_server : #IS_SERVER#
           server_fqdn = fact_on(server, 'fqdn')
 
           client_manifest = <<-EOM
-            #{ssh_allow}
-
             nfs::client::mount { '/mnt/#{server}':
-              nfs_server  => '#{server_fqdn}',
-              remote_path => '/srv/nfs_share',
-              autofs      => false
+              nfs_server        => '#{server_fqdn}',
+              remote_path       => '/srv/nfs_share',
+              autodetect_remote => #{!servers.include?(host)},
+              autofs            => false
             }
           EOM
 
@@ -140,11 +118,11 @@ nfs::is_server : #IS_SERVER#
           server_fqdn = fact_on(server, 'fqdn')
 
           autofs_client_manifest = <<-EOM
-            #{ssh_allow}
-
             nfs::client::mount { '/mnt/#{server}':
-              nfs_server  => '#{server_fqdn}',
-              remote_path => '/srv/nfs_share'
+              nfs_server        => '#{server_fqdn}',
+              remote_path       => '/srv/nfs_share',
+              autodetect_remote => #{!servers.include?(host)},
+              autofs            => true
             }
           EOM
 
