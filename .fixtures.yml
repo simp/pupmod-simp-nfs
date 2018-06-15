@@ -1,7 +1,6 @@
 ---
 fixtures:
   repositories:
-    auditd: https://github.com/simp/pupmod-simp-auditd
     augeasproviders_core: https://github.com/simp/augeasproviders_core
     augeasproviders_grub: https://github.com/simp/augeasproviders_grub
     augeasproviders_sysctl: https://github.com/simp/augeasproviders_sysctl
@@ -14,15 +13,18 @@ fixtures:
     haveged: https://github.com/simp/pupmod-simp-haveged
     iptables: https://github.com/simp/pupmod-simp-iptables
     krb5: https://github.com/simp/pupmod-simp-krb5
-    logrotate: https://github.com/simp/pupmod-simp-logrotate
     pki: https://github.com/simp/pupmod-simp-pki
-    rsyslog: https://github.com/simp/pupmod-simp-rsyslog
-    selinux: https://github.com/simp/pupmod-simp-selinux
     simplib: https://github.com/simp/pupmod-simp-simplib
-    simp_options: https://github.com/simp/pupmod-simp-simp_options
     stdlib: https://github.com/simp/puppetlabs-stdlib
     stunnel: https://github.com/simp/pupmod-simp-stunnel
     svckill: https://github.com/simp/pupmod-simp-svckill
     tcpwrappers: https://github.com/simp/pupmod-simp-tcpwrappers
+
+    # Fixtures required for the acceptance tests
+    # auditd: https://github.com/simp/pupmod-simp-auditd
+    # logrotate: https://github.com/simp/pupmod-simp-logrotate
+    # rsyslog: https://github.com/simp/pupmod-simp-rsyslog
+    # selinux: https://github.com/simp/pupmod-simp-selinux
+    # simp_options: https://github.com/simp/pupmod-simp-simp_options
   symlinks:
     nfs: "#{source_dir}"
