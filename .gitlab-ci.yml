@@ -197,6 +197,7 @@ default:
   variables:
     PUPPET_VERSION: '4.10'
   script:
+    - bundle exec rake spec_clean
     - bundle exec rake beaker:suites[default]
 
 default-fips:
@@ -209,6 +210,7 @@ default-fips:
     PUPPET_VERSION: '4.10'
     BEAKER_fips: 'yes'
   script:
+    - bundle exec rake spec_clean
     - bundle exec rake beaker:suites[default]
 
 stunnel:
@@ -220,6 +222,7 @@ stunnel:
   variables:
     PUPPET_VERSION: '4.10'
   script:
+    - bundle exec rake spec_clean
     - bundle exec rake beaker:suites[stunnel]
 
 stunnel-fips:
@@ -232,4 +235,5 @@ stunnel-fips:
     PUPPET_VERSION: '4.10'
     BEAKER_fips: 'yes'
   script:
+    - bundle exec rake spec_clean
     - bundle exec rake beaker:suites[stunnel]

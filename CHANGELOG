@@ -1,4 +1,9 @@
-* Mon Apr 16 2018 Trevor Vaughan <tvaughan@onyxpoint.com> - 6.1.2-0
+* Thu Jun 14 2018 Nick Miller <nick.miller@onyxpoint.com> - 6.1.1-0
+- Update systemd fixtures and CI assets
+- Add logging for exportfs failures
+- Ensure that reexports happen after the NFS service has been started
+
+* Mon Apr 16 2018 Trevor Vaughan <tvaughan@onyxpoint.com> - 6.1.1-0
 - Added `nfs::client::mount::autodetect_remote` to override all autodetection
   of whether or not the remote host was the current NFS server so an NFS
   server can mount NFS directories from other servers.

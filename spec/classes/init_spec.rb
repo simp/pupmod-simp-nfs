@@ -34,8 +34,7 @@ describe 'nfs' do
         it { is_expected.to create_concat('/etc/sysconfig/nfs') }
         it { is_expected.to create_exec('nfs_re-export').with({
             :command     => '/usr/sbin/exportfs -ra',
-            :refreshonly => true,
-            :require     => 'Package[nfs-utils]'
+            :refreshonly => true
           })
         }
 
