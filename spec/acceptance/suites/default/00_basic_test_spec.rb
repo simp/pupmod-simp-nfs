@@ -4,46 +4,12 @@ test_name 'nfs basic'
 
 describe 'nfs basic' do
 
-  before(:context) do
-    hosts.each do |host|
-      interfaces = fact_on(host, 'interfaces').strip.split(',')
-      interfaces.delete_if do |x|
-        x =~ /^lo/
-      end
-
-      interfaces.each do |iface|
-        if fact_on(host, "ipaddress_#{iface}").strip.empty?
-          on(host, "ifup #{iface}", :accept_all_exit_codes => true)
-        end
-      end
-    end
-  end
-
   servers = hosts_with_role( hosts, 'nfs_server' )
   clients = hosts_with_role( hosts, 'client' )
-
-  ssh_allow = <<-EOM
-    if !defined(Iptables::Listen::Tcp_stateful['i_love_testing']) {
-      include '::tcpwrappers'
-      include '::iptables'
-
-      tcpwrappers::allow { 'sshd':
-        pattern => 'ALL'
-      }
-
-      iptables::listen::tcp_stateful { 'i_love_testing':
-        order        => 8,
-        trusted_nets => ['ALL'],
-        dports       => 22
-      }
-    }
-  EOM
 
   let(:manifest) {
     <<-EOM
       include '::nfs'
-
-      #{ssh_allow}
     EOM
   }
 
@@ -89,8 +55,6 @@ nfs::is_server : #IS_SERVER#
   end
 
   server_manifest = <<-EOM
-    #{ssh_allow}
-
     include '::nfs'
 
     file { '/srv/nfs_share':
@@ -120,7 +84,7 @@ nfs::is_server : #IS_SERVER#
   context "as a server" do
     servers.each do |host|
       it 'should export a directory' do
-        apply_manifest_on(host, server_manifest)
+        apply_manifest_on(host, server_manifest, :catch_failures => true)
       end
     end
   end
@@ -132,12 +96,11 @@ nfs::is_server : #IS_SERVER#
           server_fqdn = fact_on(server, 'fqdn')
 
           client_manifest = <<-EOM
-            #{ssh_allow}
-
             nfs::client::mount { '/mnt/#{server}':
-              nfs_server  => '#{server_fqdn}',
-              remote_path => '/srv/nfs_share',
-              autofs      => false
+              nfs_server        => '#{server_fqdn}',
+              remote_path       => '/srv/nfs_share',
+              autodetect_remote => #{!servers.include?(host)},
+              autofs            => false
             }
           EOM
 
@@ -146,7 +109,7 @@ nfs::is_server : #IS_SERVER#
           end
 
           host.mkdir_p("/mnt/#{server}")
-          apply_manifest_on(host, client_manifest)
+          apply_manifest_on(host, client_manifest, :catch_failures => true)
           on(host, %(grep -q 'This is a test' /mnt/#{server}/test_file))
           on(host, %{puppet resource mount /mnt/#{server} ensure=absent})
         end
@@ -155,11 +118,11 @@ nfs::is_server : #IS_SERVER#
           server_fqdn = fact_on(server, 'fqdn')
 
           autofs_client_manifest = <<-EOM
-            #{ssh_allow}
-
             nfs::client::mount { '/mnt/#{server}':
-              nfs_server  => '#{server_fqdn}',
-              remote_path => '/srv/nfs_share'
+              nfs_server        => '#{server_fqdn}',
+              remote_path       => '/srv/nfs_share',
+              autodetect_remote => #{!servers.include?(host)},
+              autofs            => true
             }
           EOM
 
@@ -168,6 +131,8 @@ nfs::is_server : #IS_SERVER#
           end
 
           apply_manifest_on(host, autofs_client_manifest)
+          # apply_manifest_on(host, autofs_client_manifest, catch_failures: true)
+          apply_manifest_on(host, autofs_client_manifest, catch_changes: true)
           on(host, %{puppet resource service autofs ensure=stopped})
         end
       end

@@ -16,6 +16,15 @@
 # @param remote_path
 #   The NFS share that you want to mount
 #
+# @param autodetect_remote
+#   This should be set to ``false`` if you want to ignore any 'intelligent'
+#   guessing as to whether or not your system is the NFS server.
+#
+#   For instance, if you are an NFS server, but want to mount an NFS share on a
+#   remote system, then you will need to set this to ``false`` to ensure that
+#   your mount is not set to ``127.0.0.1`` based on the detection that you are
+#   also an NFS server.
+#
 # @param port
 #   The NFS port to which to connect
 #
@@ -50,19 +59,38 @@
 #
 #   * If you are appending your own special maps, make sure this is not set
 #
+# @param stunnel
+#   Controls enabling ``stunnel`` for this connection
+#
+#   * If left unset, the value will be taken from ``nfs::client::stunnel``
+#   * May be set to ``false`` to ensure that ``stunnel`` will not be used for
+#     this connection
+#   * May be set to ``true`` to force the use of ``stunnel`` on this connection
+#
+# @param stunnel_systemd_deps
+#   Add the appropriate ``systemd`` dependencies on systems that use ``systemd``
+#
+# @param stunnel_wantedby
+#   The ``systemd`` targets that need ``stunnel`` to be active prior to being
+#   activated
+#
 # @author Trevor Vaughan <mailto:tvaughan@onyxpoint.com>
 #
 define nfs::client::mount (
-  Simplib::Host                             $nfs_server,
-  Stdlib::Absolutepath                      $remote_path,
-  Simplib::Port                             $port               = 2049,
-  Enum['nfs','nfs4']                        $nfs_version        = 'nfs4',
-  Optional[Simplib::Port]                   $v4_remote_port     = undef,
-  Enum['none','sys','krb5','krb5i','krb5p'] $sec                = 'sys',
-  String                                    $options            = 'hard,intr',
-  Boolean                                   $at_boot            = true,
-  Boolean                                   $autofs             = true,
-  Boolean                                   $autofs_map_to_user = false
+  Simplib::Host           $nfs_server,
+  Stdlib::Absolutepath    $remote_path,
+  Boolean                 $autodetect_remote    = true,
+  Simplib::Port           $port                 = 2049,
+  Enum['nfs','nfs4']      $nfs_version          = 'nfs4',
+  Optional[Simplib::Port] $v4_remote_port       = undef,
+  Nfs::SecurityFlavor     $sec                  = 'sys',
+  String                  $options              = 'hard,intr',
+  Boolean                 $at_boot              = true,
+  Boolean                 $autofs               = true,
+  Boolean                 $autofs_map_to_user   = false,
+  Optional[Boolean]       $stunnel              = undef,
+  Boolean                 $stunnel_systemd_deps = true,
+  Array[String]           $stunnel_wantedby     = ['remote-fs-pre.target']
 ) {
   if $autofs {
     if ($name !~ Stdlib::Absolutepath) and ($name !~ Pattern['^wildcard-']) {
@@ -81,18 +109,28 @@ define nfs::client::mount (
 
   include '::nfs::client'
 
-  nfs::client::mount::connection { $name:
-    nfs_server     => $nfs_server,
-    nfs_version    => $nfs_version,
-    nfs_port       => $port,
-    v4_remote_port => $v4_remote_port
-  }
-
   if $nfs_version == 'nfs4' {
     $_nfs_options = "port=${port},${options},sec=${sec}"
   }
   else {
     $_nfs_options = "port=${port},${options}"
+  }
+
+  if $stunnel !~ Undef {
+    $_stunnel = $stunnel
+  }
+  else {
+    $_stunnel = $nfs::client::stunnel
+  }
+
+  nfs::client::mount::connection { $name:
+    nfs_server           => $nfs_server,
+    nfs_version          => $nfs_version,
+    nfs_port             => $port,
+    v4_remote_port       => $v4_remote_port,
+    stunnel              => $_stunnel,
+    stunnel_systemd_deps => $stunnel_systemd_deps,
+    stunnel_wantedby     => $stunnel_wantedby
   }
 
   if $autofs {
@@ -107,7 +145,7 @@ define nfs::client::mount (
     $_mount_point = split($name,'wildcard-')[-1]
 
     # The map name is very particular
-    $_map_name = sprintf("/etc/autofs/%s.map", $_clean_name)
+    $_map_name = sprintf('/etc/autofs/%s.map', $_clean_name)
 
     autofs::map::master { $name:
       mount_point => $_mount_point,
@@ -115,7 +153,7 @@ define nfs::client::mount (
       require     => Nfs::Client::Mount::Connection[$name]
     }
 
-    if $::nfs::client::stunnel {
+    if $_stunnel {
       # This is a workaround for issues with hooking into stunnel
       exec { 'refresh_autofs':
         command     => '/usr/bin/pkill -HUP -x automount',
@@ -128,7 +166,7 @@ define nfs::client::mount (
       Stunnel::Instance <| tag == 'nfs' |> ~> Exec['refresh_autofs']
     }
 
-    if $::nfs::client::stunnel or $::nfs::client::is_server {
+    if $_stunnel or ($autodetect_remote and $::nfs::client::is_server) {
       if $autofs_map_to_user {
         $_location = "127.0.0.1:${remote_path}/&"
       }
@@ -159,7 +197,7 @@ define nfs::client::mount (
     }
   }
   else {
-    if $::nfs::client::stunnel or $::nfs::client::is_server {
+    if $_stunnel or ($autodetect_remote and $::nfs::client::is_server) {
       mount { $name:
         ensure   => 'mounted',
         atboot   => $at_boot,

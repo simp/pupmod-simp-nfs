@@ -1,14 +1,8 @@
 require 'spec_helper'
 
 describe 'nfs::client' do
-  before(:each) do
-    Puppet::Parser::Functions.newfunction('assert_private') do |f|
-      f.stubs(:call).returns(true)
-    end
-  end
-
-  context 'supported operating systems' do
-    on_supported_os.each do |os, facts|
+  on_supported_os.each do |os, facts|
+    context "on #{os}" do
       let(:facts) { facts }
 
       context "on #{os}" do

@@ -3,14 +3,8 @@ require 'spec_helper'
 # most of server class is tested in init_spec.rb.  Here we are focusing on the
 # content of the concat fragment
 describe 'nfs::server' do
-  before(:each) do
-    Puppet::Parser::Functions.newfunction('assert_private') do |f|
-      f.stubs(:call).returns(true)
-    end
-  end
-
-  context 'supported operating systems' do
-    on_supported_os.each do |os, facts|
+  on_supported_os.each do |os, facts|
+    context "on #{os}" do
       let(:facts) { facts }
 
       context "on #{os}" do

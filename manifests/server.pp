@@ -131,7 +131,11 @@ class nfs::server (
   exec { 'nfs_re-export':
     command     => '/usr/sbin/exportfs -ra',
     refreshonly => true,
-    require     => Package['nfs-utils']
+    logoutput   => true,
+    require     => [
+      Package['nfs-utils'],
+      Service[$::nfs::service_names::nfs_server]
+    ]
   }
 
   service { $::nfs::service_names::nfs_server :

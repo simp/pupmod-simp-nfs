@@ -121,8 +121,10 @@ class nfs (
   Boolean              $tcpwrappers            = simplib::lookup('simp_options::tcpwrappers', { 'default_value' => false }),
   Boolean              $stunnel                = simplib::lookup('simp_options::stunnel', { 'default_value' => false }),
   Boolean              $stunnel_tcp_nodelay    = true,
-  Array[String]        $stunnel_socket_options = []
-){
+  Array[String]        $stunnel_socket_options = [],
+  Boolean              $stunnel_systemd_deps   = true,
+  Array[String]        $stunnel_wantedby       = []
+) {
 
   simplib::assert_metadata($module_name)
 
