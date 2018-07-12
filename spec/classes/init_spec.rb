@@ -15,10 +15,8 @@ describe 'nfs' do
         it { is_expected.to contain_package('nfs4-acl-tools').with_ensure('latest') }
       end
 
-      if os =~ /(?:redhat|centos|oraclelinux)-(\d+)/
-        it_behaves_like "a fact set"
-        it { is_expected.to contain_concat__fragment('nfs_init').with_content(%r(MOUNTD_PORT=20048)) }
-      end
+      it_behaves_like "a fact set"
+      it { is_expected.to contain_concat__fragment('nfs_init').with_content(%r(MOUNTD_PORT=20048)) }
 
       context "as a server with default params" do
         let(:params){{
@@ -44,7 +42,7 @@ describe 'nfs' do
             })
           }
 
-          if ['RedHat','CentOS','OracleLinux'].include?(facts[:operatingsystem]) && facts[:operatingsystemmajrelease].to_s < '7'
+          if facts[:operatingsystemmajrelease].to_s < '7'
             it { is_expected.to contain_service('nfs').with({
                 :ensure  => 'running'
               })
