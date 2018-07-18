@@ -22,7 +22,7 @@ class nfs::service_names {
       $nfs_mountd  = 'nfs-mountd.service'
       $nfs_rquotad = 'nfs-rquotad.service'
       $nfs_server  = 'nfs-server.service'
-      $rpcbind     = 'rpcbind.socket'
+      $rpcbind     = 'rpcbind.service'
       $rpcidmapd   = 'nfs-idmapd.service'
       $rpcgssd     = 'rpc-gssd.service'
 

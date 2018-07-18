@@ -15,7 +15,7 @@ describe 'nfs::server::stunnel' do
           'nfs-mountd.service',
           'nfs-rquotad.service',
           'nfs-server.service',
-          'rpcbind.socket',
+          'rpcbind.service',
           'nfs-idmapd.service',
           'rpc-gssd.service',
           'gssproxy.service',

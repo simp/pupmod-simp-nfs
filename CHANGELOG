@@ -1,5 +1,6 @@
 * Thu Jul 12 2018 Nick Miller <nick.miller@onyxpoint.com> - 6.1.2-0
 - Added OEL and Puppet 5 support
+- Change rpcbind service name on EL7 from `rpcbind.socket` to `rpcbind.service`
 
 * Thu Jun 14 2018 Nick Miller <nick.miller@onyxpoint.com> - 6.1.1-0
 - Update systemd fixtures and CI assets
