@@ -22,7 +22,6 @@ class nfs::service_names {
       $nfs_mountd  = 'nfs-mountd.service'
       $nfs_rquotad = 'nfs-rquotad.service'
       $nfs_server  = 'nfs-server.service'
-      $rpcbind     = 'rpcbind.service'
       $rpcidmapd   = 'nfs-idmapd.service'
       $rpcgssd     = 'rpc-gssd.service'
 
@@ -31,6 +30,12 @@ class nfs::service_names {
       }
       else {
         $rpcsvcgssd  = 'gssproxy.service'
+      }
+      if (versioncmp($facts['os']['release']['full'], '7.4') < 0) {
+        $rpcbind     = 'rpcbind.socket'
+      }
+      else {
+        $rpcbind     = 'rpcbind.service'
       }
     }
   }
