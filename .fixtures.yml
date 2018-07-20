@@ -19,12 +19,5 @@ fixtures:
     stunnel: https://github.com/simp/pupmod-simp-stunnel
     svckill: https://github.com/simp/pupmod-simp-svckill
     tcpwrappers: https://github.com/simp/pupmod-simp-tcpwrappers
-
-    # Fixtures required for the acceptance tests
-    # auditd: https://github.com/simp/pupmod-simp-auditd
-    # logrotate: https://github.com/simp/pupmod-simp-logrotate
-    # rsyslog: https://github.com/simp/pupmod-simp-rsyslog
-    # selinux: https://github.com/simp/pupmod-simp-selinux
-    # simp_options: https://github.com/simp/pupmod-simp-simp_options
   symlinks:
     nfs: "#{source_dir}"

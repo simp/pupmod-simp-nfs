@@ -76,7 +76,7 @@ EOM
 EOM
           ) }
 
-          if ['RedHat','CentOS'].include?(facts[:operatingsystem]) && facts[:operatingsystemmajrelease].to_s > '6'
+          if facts[:operatingsystemmajrelease].to_s > '6'
             it { is_expected.to contain_selboolean('nfsd_anon_write') }
           else
             it { is_expected.to_not contain_selboolean('nfsd_anon_write') }

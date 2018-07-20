@@ -117,6 +117,8 @@ define nfs::server::export (
   Simplib::Port                                   $anongid        = 65534,
   Optional[String]                                $custom         = undef
 ) {
+  simplib::assert_metadata($module_name)
+
   include '::nfs::server'
 
   $_name = inline_template('<%= @name.gsub("/","|") -%>')
@@ -128,23 +130,15 @@ define nfs::server::export (
 
   # We have to do this if we have a 'sec=sys' situation on EL7+
   if ('sys' in $sec) {
-    if ($facts['os']['family'] == 'RedHat') {
-      if ($facts['os']['name'] in ['RedHat','CentOS']) {
-        if ($facts['os']['release']['major'] > '6') and $facts['selinux'] {
-          ensure_resource('selboolean', 'nfsd_anon_write',
-            {
-              persistent => true,
-              value      => 'on'
-            }
-          )
-        }
+    if ($facts['os']['name'] in ['RedHat','CentOS','OracleLinux']) {
+      if ($facts['os']['release']['major'] > '6') and $facts['selinux'] {
+        ensure_resource('selboolean', 'nfsd_anon_write',
+          {
+            persistent => true,
+            value      => 'on'
+          }
+        )
       }
-      else {
-        fail("OS '${facts['os']['name']}' not supported by '${module_name}'")
-      }
-    }
-    else {
-      fail("OS Family '${facts['os']['family']}' not supported by ${module_name}")
     }
   }
 }

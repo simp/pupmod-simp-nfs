@@ -1,3 +1,8 @@
+* Thu Jul 12 2018 Nick Miller <nick.miller@onyxpoint.com> - 6.1.2-0
+- Added OEL and Puppet 5 support
+- Change rpcbind service name on EL7 from `rpcbind.socket` to,
+  `rpcbind.service`, but only on EL7.4+
+
 * Thu Jun 14 2018 Nick Miller <nick.miller@onyxpoint.com> - 6.1.1-0
 - Update systemd fixtures and CI assets
 - Add logging for exportfs failures
@@ -24,6 +29,7 @@
   high bandwidth connections.
 - Added parameters to allow users to tweak the stunnel socket options for all
   NFS stunnel connections.
+- Added support for OEL and Puppet 5
 
 * Fri Aug 18 2017 Liz Nemsick <lnemsick.simp@gmail.com> - 6.0.4-0
 - Update concat version in metadata.json

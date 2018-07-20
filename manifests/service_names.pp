@@ -1,7 +1,9 @@
 # This class provides appropriate service names based on the operating system
 #
 class nfs::service_names {
-  if ($facts['os']['name'] in ['RedHat', 'CentOS']) {
+  simplib::assert_metadata($module_name)
+
+  if ($facts['os']['name'] in ['RedHat', 'CentOS', 'OracleLinux']) {
 
     if (versioncmp($facts['os']['release']['major'], '7') < 0) {
       $nfs_lock    = 'nfslock'
@@ -20,7 +22,6 @@ class nfs::service_names {
       $nfs_mountd  = 'nfs-mountd.service'
       $nfs_rquotad = 'nfs-rquotad.service'
       $nfs_server  = 'nfs-server.service'
-      $rpcbind     = 'rpcbind.socket'
       $rpcidmapd   = 'nfs-idmapd.service'
       $rpcgssd     = 'rpc-gssd.service'
 
@@ -30,9 +31,12 @@ class nfs::service_names {
       else {
         $rpcsvcgssd  = 'gssproxy.service'
       }
+      if (versioncmp($facts['os']['release']['full'], '7.4') < 0) {
+        $rpcbind     = 'rpcbind.socket'
+      }
+      else {
+        $rpcbind     = 'rpcbind.service'
+      }
     }
-  }
-  else {
-    fail("Operating System '${facts['os']['name']}' is not supported by ${module_name}")
   }
 }

@@ -15,10 +15,8 @@ describe 'nfs' do
         it { is_expected.to contain_package('nfs4-acl-tools').with_ensure('latest') }
       end
 
-      if os =~ /(?:redhat|centos)-(\d+)/
-        it_behaves_like "a fact set"
-        it { is_expected.to contain_concat__fragment('nfs_init').with_content(%r(MOUNTD_PORT=20048)) }
-      end
+      it_behaves_like "a fact set"
+      it { is_expected.to contain_concat__fragment('nfs_init').with_content(%r(MOUNTD_PORT=20048)) }
 
       context "as a server with default params" do
         let(:params){{
@@ -43,11 +41,23 @@ describe 'nfs' do
               :ensure  => 'running'
             })
           }
-        else
-          it { is_expected.to contain_service('nfs-server.service').with({
-              :ensure  => 'running'
-            })
-          }
+
+          if facts[:operatingsystemmajrelease].to_s < '7'
+            it { is_expected.to contain_service('nfs').with({
+                :ensure  => 'running'
+              })
+            }
+          else
+            it { is_expected.to contain_service('nfs-server').with({
+                :ensure  => 'running'
+              })
+            }
+          end
+          it { is_expected.to create_file('/etc/init.d/sunrpc_tuning').with_content(/128/) }
+          it { is_expected.to contain_service('sunrpc_tuning') }
+          it { is_expected.to contain_sysctl('sunrpc.tcp_slot_table_entries') }
+          it { is_expected.to contain_sysctl('sunrpc.udp_slot_table_entries') }
+          it { is_expected.to contain_concat__fragment('nfs_init_server').without_content(%r(RPCSVCGSSDARGS=)) }
         end
         it { is_expected.to create_file('/etc/init.d/sunrpc_tuning').with_content(/128/) }
         it { is_expected.to contain_service('sunrpc_tuning') }
@@ -97,7 +107,6 @@ describe 'nfs' do
           it { is_expected.to contain_service('rpcsvcgssd').with(:ensure => 'running') }
         end
       end
-
     end
   end
 end
