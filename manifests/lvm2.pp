@@ -6,8 +6,10 @@
 #
 # @param ensure
 #
-class nfs::lvm2(
-  String $ensure = 'latest'
+class nfs::lvm2 (
+  String $ensure = simplib::lookup('simp_options::package_ensure', { 'default_value' => 'installed' }),
 ) {
-  package { 'lvm2': ensure => $ensure }
+  package { 'lvm2':
+    ensure => $ensure
+  }
 }

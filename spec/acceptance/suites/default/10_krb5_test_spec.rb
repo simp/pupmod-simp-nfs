@@ -8,11 +8,10 @@ describe 'nfs krb5' do
   clients = hosts_with_role( hosts, 'nfs_client' )
 
   def trusted_nets(target_hosts = hosts)
-    host_ipaddresses = []
+    host_ipaddresses = ['10.0.2.0/24','10.0.0.0/16']
 
     target_hosts.each do |host|
       host_ifaces = fact_on(host, 'interfaces').split(',')
-
       host_ifaces.each do |iface|
         unless iface == 'lo'
           host_ipaddresses << fact_on(host, "ipaddress_#{iface}")
@@ -27,7 +26,7 @@ describe 'nfs krb5' do
       host_ipaddresses.delete_if{|x| x =~ /^\s*$/}
     end
 
-    host_ipaddresses
+    host_ipaddresses.uniq
   end
 
   let(:puppet_confdir) {
@@ -35,14 +34,14 @@ describe 'nfs krb5' do
   }
 
   ssh_allow = <<-EOM
+    include '::tcpwrappers'
+    include '::iptables'
+
+    tcpwrappers::allow { 'sshd':
+      pattern => 'ALL'
+    }
+
     if !defined(Iptables::Listen::Tcp_stateful['i_love_testing']) {
-      include '::tcpwrappers'
-      include '::iptables'
-
-      tcpwrappers::allow { 'sshd':
-        pattern => 'ALL'
-      }
-
       iptables::listen::tcp_stateful { 'i_love_testing':
         order        => 8,
         trusted_nets => ['ALL'],
@@ -61,37 +60,33 @@ describe 'nfs krb5' do
   let(:hieradata) {
     <<-EOM
 ---
-simp_options::trusted_nets :
+simp_options::trusted_nets:
 #{trusted_nets.map{|ip| ip = %(  - '#{ip}')}.join("\n")}
 
-simp_options::firewall : true
-simp_options::stunnel : false
-simp_options::tcpwrappers : true
-simp_options::kerberos : true
+simp_options::firewall: true
+simp_options::stunnel: false
+simp_options::tcpwrappers: true
+simp_options::kerberos: true
+simp_options::audit: false
 
-pki_dir : '/etc/pki/simp-testing/pki'
+simp_options::pki: true
+simp_options::pki::source: /etc/pki/simp-testing/pki
 
-pki::private_key_source : "file://%{hiera('pki_dir')}/private/%{::fqdn}.pem"
-pki::public_key_source : "file://%{hiera('pki_dir')}/public/%{::fqdn}.pub"
-pki::cacerts_sources :
-  - "file://%{hiera('pki_dir')}/cacerts"
 
-auditd : false
-
-krb5::kdc::ldap : false
-krb5::keytab::keytab_source : 'file:///tmp/keytabs'
+krb5::kdc::ldap: false
+krb5::keytab::keytab_source: 'file:///tmp/keytabs'
 
 # Generate keytabs for everyone
-krb5::kdc::auto_keytabs::hosts :
-#{hosts.map{|host| host = %(  '#{fact_on(host,'fqdn')}' :\n    'ensure' : 'present')}.join("\n")}
+krb5::kdc::auto_keytabs::hosts:
+#{hosts.map{|host| host = %(  '#{fact_on(host,'fqdn')}' :\n    'ensure': 'present')}.join("\n")}
 
 krb5::kdc::auto_keytabs::global_services :
   - 'nfs'
 
 # These two need to be paired in our case since we expect to manage the Kerberos
 # infrastructure for our tests.
-nfs::secure_nfs : true
-nfs::is_server : #IS_SERVER#
+nfs::secure_nfs: true
+nfs::is_server: #IS_SERVER#
     EOM
   }
 
@@ -177,7 +172,7 @@ nfs::is_server : #IS_SERVER#
         let(:server_fqdn) { fact_on(server, 'fqdn') }
 
         let(:krb5_client_manifest) { <<-EOM
-          krb5::setting::realm { $::domain :
+          krb5::setting::realm { $facts['domain'] :
             admin_server => '#{server_fqdn}'
           }
           EOM

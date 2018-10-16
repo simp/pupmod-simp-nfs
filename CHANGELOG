@@ -1,7 +1,10 @@
-* Thu Jul 12 2018 Nick Miller <nick.miller@onyxpoint.com> - 6.1.2-0
+* Thu Jul 12 2018 Nick Miller <nick.miller@onyxpoint.com> - 6.2.0-0
 - Added OEL and Puppet 5 support
 - Change rpcbind service name on EL7 from `rpcbind.socket` to,
   `rpcbind.service`, but only on EL7.4+
+- Changed all packages ensure parameter from 'latest' to 'installed'
+  - They also respect `simp_options::package_ensure`
+  - Added $nfs::install::tools_ensure and $nfs::lvm2::ensure
 
 * Thu Jun 14 2018 Nick Miller <nick.miller@onyxpoint.com> - 6.1.1-0
 - Update systemd fixtures and CI assets

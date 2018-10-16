@@ -9,27 +9,26 @@ describe 'nfs basic' do
 
   let(:manifest) {
     <<-EOM
-      include '::nfs'
+    include '::nfs'
     EOM
   }
 
   let(:hieradata) {
     <<-EOM
 ---
-simp_options::firewall : true
-simp_options::kerberos : false
-simp_options::stunnel : false
-simp_options::tcpwrappers : true
-simp_options::trusted_nets : ['ALL']
+simp_options::firewall: true
+simp_options::kerberos: false
+simp_options::stunnel: false
+simp_options::tcpwrappers: false
+simp_options::trusted_nets: ['ALL','0.0.0.0/0']
 
 # Set us up for a basic server for right now (no Kerberos)
 
 # These two need to be paired in our case since we expect to manage the Kerberos
 # infrastructure for our tests.
-nfs::secure_nfs : false
-nfs::is_server : #IS_SERVER#
+nfs::secure_nfs: false
+nfs::is_server: #IS_SERVER#
     EOM
-
   }
 
   context 'setup' do

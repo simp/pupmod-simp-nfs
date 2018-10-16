@@ -14,8 +14,8 @@ HOSTS:
       - server
       - nfs_server
       - el6_nfs_server
-    platform:   el-6-x86_64
-    box:        centos/6
+    platform: el-6-x86_64
+    box: centos/6
     hypervisor: <%= hypervisor %>
     yum_repos:
       epel:
@@ -28,8 +28,8 @@ HOSTS:
       - client
       - nfs_client
       - el6_nfs_client
-    platform:   el-6-x86_64
-    box:        centos/6
+    platform: el-6-x86_64
+    box: centos/6
     hypervisor: <%= hypervisor %>
     yum_repos:
       epel:
@@ -69,6 +69,6 @@ CONFIG:
   log_level: verbose
   type: aio
   vagrant_memsize: 256
-<% if ENV['BEAKER_PUPPET_ENVIRONMENT'] -%>
-  puppet_environment: <%= ENV['BEAKER_PUPPET_ENVIRONMENT'] %>
+<% if ENV['BEAKER_PUPPET_COLLECTION'] -%>
+  puppet_collection: <%= ENV['BEAKER_PUPPET_COLLECTION'] %>
 <% end -%>
