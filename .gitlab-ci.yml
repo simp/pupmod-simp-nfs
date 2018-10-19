@@ -61,55 +61,6 @@ stages:
   - acceptance
   - deploy
 
-# Puppet 4.7 for PE 2016.4 LTS Support (EOL: 2018-10-21)
-# See: https://puppet.com/misc/puppet-enterprise-lifecycle
-# --------------------------------------
-pup4_7-validation:
-  stage: validation
-  tags:
-    - docker
-  image: ruby:2.1
-  variables:
-    PUPPET_VERSION: '~> 4.7.0'
-  <<: *cache_bundler
-  <<: *setup_bundler_env
-  <<: *validation_checks
-
-pup4_7-unit:
-  stage: unit
-  tags:
-    - docker
-  image: ruby:2.1
-  variables:
-    PUPPET_VERSION: '~> 4.7.0'
-  <<: *cache_bundler
-  <<: *setup_bundler_env
-  <<: *spec_tests
-
-
-# Puppet 4.8 for SIMP 6.0 + 6.1 support
-# --------------------------------------
-pup4_8-validation:
-  stage: validation
-  tags:
-    - docker
-  image: ruby:2.1
-  variables:
-    PUPPET_VERSION: '~> 4.8.0'
-  <<: *cache_bundler
-  <<: *setup_bundler_env
-  <<: *validation_checks
-
-pup4_8-unit:
-  stage: unit
-  tags:
-    - docker
-  image: ruby:2.1
-  variables:
-    PUPPET_VERSION: '~> 4.8.0'
-  <<: *cache_bundler
-  <<: *setup_bundler_env
-  <<: *spec_tests
 
 
 # Puppet 4.10 for PE 2017.2 support (EOL:2018-02-21)
@@ -222,9 +173,10 @@ default-fips:
   tags:
     - beaker
   <<: *cache_bundler
-  <<: *setup_bundler_env
+  <<: *setup_bundler_env   
   variables:
-    PUPPET_VERSION: '~> 4.10.10'
+    PUPPET_VERSION: '~> 5.3'
+    BEAKER_PUPPET_COLLECTION: 'puppet5'
     BEAKER_fips: 'yes'
   script:
     - bundle exec rake spec_clean
@@ -289,7 +241,8 @@ stunnel-fips:
   <<: *cache_bundler
   <<: *setup_bundler_env
   variables:
-    PUPPET_VERSION: '~> 4.10.10'
+    PUPPET_VERSION: '~> 5.3'
+    BEAKER_PUPPET_COLLECTION: 'puppet5'
     BEAKER_fips: 'yes'
   script:
     - bundle exec rake spec_clean
@@ -303,6 +256,7 @@ stunnel-puppet5:
   <<: *setup_bundler_env
   variables:
     PUPPET_VERSION: '~> 5.3'
+    BEAKER_PUPPET_COLLECTION: 'puppet5'
   script:
     - bundle exec rake spec_clean
     - bundle exec rake beaker:suites[stunnel]
