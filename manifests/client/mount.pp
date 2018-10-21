@@ -44,6 +44,15 @@
 #
 #   * fstype and port will already be set for you
 #
+# @param ensure
+#   The mount state of the specified mount point
+#
+#   * ``mounted``   => Ensure that the mount point is actually mounted
+#   * ``present``   => Just add the entry to the fstab and do not mount it
+#   * ``unmounted`` => Add the entry to the fstab and ensure that it is not
+#                      mounted
+#   * Has no effect if ``$autofs`` is set
+#
 # @param at_boot
 #   Ensure that this mount is mounted at boot time
 #
@@ -77,20 +86,21 @@
 # @author Trevor Vaughan <mailto:tvaughan@onyxpoint.com>
 #
 define nfs::client::mount (
-  Simplib::Host           $nfs_server,
-  Stdlib::Absolutepath    $remote_path,
-  Boolean                 $autodetect_remote    = true,
-  Simplib::Port           $port                 = 2049,
-  Enum['nfs','nfs4']      $nfs_version          = 'nfs4',
-  Optional[Simplib::Port] $v4_remote_port       = undef,
-  Nfs::SecurityFlavor     $sec                  = 'sys',
-  String                  $options              = 'hard,intr',
-  Boolean                 $at_boot              = true,
-  Boolean                 $autofs               = true,
-  Boolean                 $autofs_map_to_user   = false,
-  Optional[Boolean]       $stunnel              = undef,
-  Boolean                 $stunnel_systemd_deps = true,
-  Array[String]           $stunnel_wantedby     = ['remote-fs-pre.target']
+  Simplib::Host                         $nfs_server,
+  Stdlib::Absolutepath                  $remote_path,
+  Boolean                               $autodetect_remote    = true,
+  Simplib::Port                         $port                 = 2049,
+  Enum['nfs','nfs4']                    $nfs_version          = 'nfs4',
+  Optional[Simplib::Port]               $v4_remote_port       = undef,
+  Nfs::SecurityFlavor                   $sec                  = 'sys',
+  String                                $options              = 'hard,intr',
+  Enum['mounted','present','unmounted'] $ensure               = 'mounted',
+  Boolean                               $at_boot              = true,
+  Boolean                               $autofs               = true,
+  Boolean                               $autofs_map_to_user   = false,
+  Optional[Boolean]                     $stunnel              = undef,
+  Boolean                               $stunnel_systemd_deps = true,
+  Array[String]                         $stunnel_wantedby     = ['remote-fs-pre.target']
 ) {
   if $autofs {
     if ($name !~ Stdlib::Absolutepath) and ($name !~ Pattern['^wildcard-']) {
@@ -199,7 +209,7 @@ define nfs::client::mount (
   else {
     if $_stunnel or ($autodetect_remote and $::nfs::client::is_server) {
       mount { $name:
-        ensure   => 'mounted',
+        ensure   => $ensure,
         atboot   => $at_boot,
         device   => "127.0.0.1:${remote_path}",
         fstype   => $nfs_version,
@@ -210,7 +220,7 @@ define nfs::client::mount (
     }
     else {
       mount { $name:
-        ensure   => 'mounted',
+        ensure   => $ensure,
         atboot   => $at_boot,
         device   => "${nfs_server}:${remote_path}",
         fstype   => $nfs_version,

@@ -34,28 +34,10 @@ describe 'nfs krb5' do
     on(host, %(puppet config print confdir)).stdout.strip
   }
 
-  ssh_allow = <<-EOM
-    if !defined(Iptables::Listen::Tcp_stateful['i_love_testing']) {
-      include '::tcpwrappers'
-      include '::iptables'
-
-      tcpwrappers::allow { 'sshd':
-        pattern => 'ALL'
-      }
-
-      iptables::listen::tcp_stateful { 'i_love_testing':
-        order        => 8,
-        trusted_nets => ['ALL'],
-        dports       => 22
-      }
-    }
-  EOM
-
   manifest = <<-EOM
-    include '::nfs'
-    include '::krb5'
-
-    #{ssh_allow}
+    include 'nfs'
+    include 'krb5'
+    include 'ssh'
   EOM
 
   let(:hieradata) {
@@ -68,6 +50,9 @@ simp_options::firewall : true
 simp_options::stunnel : false
 simp_options::tcpwrappers : true
 simp_options::kerberos : true
+
+ssh::server::conf::permitrootlogin : true
+ssh::server::conf::authorizedkeysfile : '.ssh/authorized_keys'
 
 pki_dir : '/etc/pki/simp-testing/pki'
 
@@ -96,12 +81,10 @@ nfs::is_server : #IS_SERVER#
   }
 
   server_manifest = <<-EOM
-    # Keep the SSH ports open
-    #{ssh_allow}
-
     # Keep the KRB5 ports open
-    include '::krb5::kdc'
-    include '::nfs'
+    include 'krb5::kdc'
+    include 'nfs'
+    include 'ssh'
 
     file { '/srv/nfs_share':
       ensure => 'directory',
@@ -137,7 +120,10 @@ nfs::is_server : #IS_SERVER#
         # orchestrate this via a profile somewhere.
         keytab_src = %(/var/kerberos/krb5kdc/generated_keytabs/#{fact_on(host,'fqdn')}/krb5.keytab)
 
-        krb5_manifest = "include '::krb5::kdc'\n#{ssh_allow}"
+        krb5_manifest = <<-EOM
+          include 'krb5::kdc'
+          include 'ssh'
+        EOM
 
         set_hieradata_on(host, hieradata)
         apply_manifest_on(host, krb5_manifest)
@@ -177,6 +163,7 @@ nfs::is_server : #IS_SERVER#
         let(:server_fqdn) { fact_on(server, 'fqdn') }
 
         let(:krb5_client_manifest) { <<-EOM
+          include 'ssh'
           krb5::setting::realm { $::domain :
             admin_server => '#{server_fqdn}'
           }
@@ -216,8 +203,7 @@ nfs::is_server : #IS_SERVER#
 
         it "should mount a directory on the #{server} server" do
           client_manifest = <<-EOM
-            #{ssh_allow}
-
+            include 'ssh'
             nfs::client::mount { '/mnt/#{server}':
               nfs_server  => '#{server_fqdn}',
               remote_path => '/srv/nfs_share',
@@ -240,8 +226,7 @@ nfs::is_server : #IS_SERVER#
 
         it "should mount a directory on the #{server} server with autofs" do
           autofs_client_manifest = <<-EOM
-            #{ssh_allow}
-
+            include 'ssh'
             nfs::client::mount { '/mnt/#{server}':
               nfs_server  => '#{server_fqdn}',
               remote_path => '/srv/nfs_share'
