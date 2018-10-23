@@ -4,6 +4,7 @@ fixtures:
     augeasproviders_core: https://github.com/simp/augeasproviders_core
     augeasproviders_grub: https://github.com/simp/augeasproviders_grub
     augeasproviders_sysctl: https://github.com/simp/augeasproviders_sysctl
+    augeasproviders_ssh: https://github.com/simp/augeasproviders_ssh
     autofs: https://github.com/simp/pupmod-simp-autofs
     concat:
       # master is beyond 4.1.1, but has breaking changes to
@@ -15,6 +16,7 @@ fixtures:
     krb5: https://github.com/simp/pupmod-simp-krb5
     pki: https://github.com/simp/pupmod-simp-pki
     simplib: https://github.com/simp/pupmod-simp-simplib
+    ssh: https://github.com/simp/pupmod-simp-ssh
     stdlib: https://github.com/simp/puppetlabs-stdlib
     stunnel: https://github.com/simp/pupmod-simp-stunnel
     svckill: https://github.com/simp/pupmod-simp-svckill

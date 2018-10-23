@@ -1,4 +1,8 @@
-* Thu Jul 12 2018 Nick Miller <nick.miller@onyxpoint.com> - 6.1.2-0
+* Sun Oct 21 2018 Trevor Vaughan <tvaughan@onyxpoint.com> - 6.2.0-0
+- Added a nfs::client::mount::ensure parameter to allow users to set the state
+  of the mountpoints
+
+* Thu Jul 12 2018 Nick Miller <nick.miller@onyxpoint.com> - 6.2.0-0
 - Added OEL and Puppet 5 support
 - Change rpcbind service name on EL7 from `rpcbind.socket` to,
   `rpcbind.service`, but only on EL7.4+
