@@ -9,18 +9,22 @@ describe 'nfs basic' do
 
   let(:manifest) {
     <<-EOM
-    include '::nfs'
+      include 'nfs'
+      include 'ssh'
     EOM
   }
 
   let(:hieradata) {
     <<-EOM
 ---
-simp_options::firewall: true
-simp_options::kerberos: false
-simp_options::stunnel: false
-simp_options::tcpwrappers: false
-simp_options::trusted_nets: ['ALL','0.0.0.0/0']
+simp_options::firewall : true
+simp_options::kerberos : false
+simp_options::stunnel : false
+simp_options::tcpwrappers : false
+simp_options::trusted_nets : ['ALL','0.0.0.0/0']
+
+ssh::server::conf::permitrootlogin : true
+ssh::server::conf::authorizedkeysfile : '.ssh/authorized_keys'
 
 # Set us up for a basic server for right now (no Kerberos)
 
@@ -54,7 +58,8 @@ nfs::is_server: #IS_SERVER#
   end
 
   server_manifest = <<-EOM
-    include '::nfs'
+    include 'nfs'
+    include 'ssh'
 
     file { '/srv/nfs_share':
       ensure => 'directory',
@@ -95,6 +100,8 @@ nfs::is_server: #IS_SERVER#
           server_fqdn = fact_on(server, 'fqdn')
 
           client_manifest = <<-EOM
+            include 'ssh'
+
             nfs::client::mount { '/mnt/#{server}':
               nfs_server        => '#{server_fqdn}',
               remote_path       => '/srv/nfs_share',
@@ -117,6 +124,8 @@ nfs::is_server: #IS_SERVER#
           server_fqdn = fact_on(server, 'fqdn')
 
           autofs_client_manifest = <<-EOM
+            include 'ssh'
+
             nfs::client::mount { '/mnt/#{server}':
               nfs_server        => '#{server_fqdn}',
               remote_path       => '/srv/nfs_share',
