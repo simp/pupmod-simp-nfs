@@ -8,11 +8,8 @@ describe 'nfs' do
       shared_examples_for "a fact set" do
         it { is_expected.to compile.with_all_deps }
         it { is_expected.to create_class('nfs') }
-        it { is_expected.to contain_package('nfs-utils').with({
-            :ensure  => 'latest'
-          })
-        }
-        it { is_expected.to contain_package('nfs4-acl-tools').with_ensure('latest') }
+        it { is_expected.to contain_package('nfs-utils').with_ensure('installed') }
+        it { is_expected.to contain_package('nfs4-acl-tools').with_ensure('installed') }
       end
 
       it_behaves_like "a fact set"
