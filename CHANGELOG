@@ -1,3 +1,6 @@
+* Thu Nov 01 2018 Jeanne Greulich <jeanne,greulich@onyxpoint.com> - 6.2.0-0
+- static asset updates for puppet 5
+
 * Sun Oct 21 2018 Trevor Vaughan <tvaughan@onyxpoint.com> - 6.2.0-0
 - Added a nfs::client::mount::ensure parameter to allow users to set the state
   of the mountpoints
