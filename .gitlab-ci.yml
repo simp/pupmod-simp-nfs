@@ -234,39 +234,39 @@ pup5.5.7-oel:
 
 pup4.10-stunnel:
   <<: *pup_4_10
-  <<: *acceptance_base
+  <<: *acceptance_tests
   <<: *only_with_SIMP_FULL_MATRIX
   script:
     - 'bundle exec rake beaker:suites[stunnel]'
 
 pup4.10-fips-stunnel:
   <<: *pup_4_10
-  <<: *acceptance_base
+  <<: *acceptance_tests
   <<: *only_with_SIMP_FULL_MATRIX
   script:
     - 'BEAKER_fips=yes bundle exec rake beaker:suites[stunnel]'
 
 pup5.5.7-stunnel:
   <<: *pup_5_5_7
-  <<: *acceptance_base
+  <<: *acceptance_tests
   script:
     - 'bundle exec rake beaker:suites[stunnel]'
 
 pup5.5.7-fips-stunnel:
   <<: *pup_5_5_7
-  <<: *acceptance_base
+  <<: *acceptance_tests
   script:
     - 'BEAKER_fips=yes bundle exec rake beaker:suites[stunnel]'
 
 pup5.5.7-oel-stunnel:
   <<: *pup_5_5_7
-  <<: *acceptance_base
+  <<: *acceptance_tests
   script:
     - 'bundle exec rake beaker:suites[stunnel,oel]'
 
 pup5.5.7-oel-fips-stunnel:
   <<: *pup_5_5_7
-  <<: *acceptance_base
+  <<: *acceptance_tests
   <<: *only_with_SIMP_FULL_MATRIX
   script:
     - 'BEAKER_fips=yes bundle exec rake beaker:suites[stunnel,oel]'
