@@ -15,7 +15,7 @@ HOSTS:
       - nfs_server
       - el6_nfs_server
     platform: el-6-x86_64
-    box: elastic/oel-6-x86_64
+    box: onyxpoint/oel-6-x86_64
     hypervisor: <%= hypervisor %>
     yum_repos:
       epel:
@@ -29,7 +29,7 @@ HOSTS:
       - nfs_client
       - el6_nfs_client
     platform: el-6-x86_64
-    box: elastic/oel-6-x86_64
+    box: onyxpoint/oel-6-x86_64
     hypervisor: <%= hypervisor %>
     yum_repos:
       epel:
@@ -43,7 +43,7 @@ HOSTS:
       - nfs_server
       - el7_nfs_server
     platform: el-7-x86_64
-    box: elastic/oel-7-x86_64
+    box: onyxpoint/oel-7-x86_64
     hypervisor: <%= hypervisor %>
     yum_repos:
       epel:
@@ -57,7 +57,7 @@ HOSTS:
       - nfs_client
       - el7_nfs_client_
     platform: el-7-x86_64
-    box: elastic/oel-7-x86_64
+    box: onyxpoint/oel-7-x86_64
     hypervisor: <%= hypervisor %>
     yum_repos:
       epel:
