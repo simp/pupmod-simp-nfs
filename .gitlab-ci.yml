@@ -204,26 +204,26 @@ pup4.10:
   <<: *pup_4_10
   <<: *acceptance_tests
   script:
-    - 'bundle exec rake beaker:suites'
+    - 'bundle exec rake beaker:suites[default]'
 
 pup4.10-fips:
   <<: *pup_4_10
   <<: *acceptance_tests
   <<: *only_with_SIMP_FULL_MATRIX
   script:
-    - 'BEAKER_fips=yes bundle exec rake beaker:suites'
+    - 'BEAKER_fips=yes bundle exec rake beaker:suites[default]'
 
 pup5.5.7:
   <<: *pup_5_5_7
   <<: *acceptance_tests
   script:
-    - 'bundle exec rake beaker:suites'
+    - 'bundle exec rake beaker:suites[default]'
 
 pup5.5.7-fips:
   <<: *pup_5_5_7
   <<: *acceptance_tests
   script:
-    - 'BEAKER_fips=yes bundle exec rake beaker:suites'
+    - 'BEAKER_fips=yes bundle exec rake beaker:suites[default]'
 
 pup5.5.7-oel:
   <<: *pup_5_5_7
@@ -269,33 +269,3 @@ pup5.5.7-oel-fips-stunnel:
   <<: *only_with_SIMP_FULL_MATRIX
   script:
     - 'BEAKER_fips=yes bundle exec rake beaker:suites[stunnel,oel]'
-
-# FUTURE
-#pup-current-fips-compliance:
-#  <<: *pup_current
-# FUTURE
-#pup-current-fips-compliance:
-#  <<: *pup_current
-#  <<: *compliance_base
-#  script:
-#    - 'BEAKER_fips=yes bundle exec rake beaker:suites[compliance]'
-#
-## Deployment jobs
-##=======================================================================
-#
-#module_build:
-#  only:
-#    - 'tags'
-#  stage: 'deployment'
-#  tags:
-#    - 'docker'
-#  script:
-#    - 'bundle exec rake clean'
-#    - 'rm -rf pkg/'
-#    - 'bundle exec puppet module build'
-#  artifacts:
-#    name: 'forge_release-${CI_COMMIT_TAG}'
-#    when: 'on_success'
-#    paths:
-#      - 'pkg/${MODULE_NAME}-${MODULE_VERSION}.tar.gz'
-
