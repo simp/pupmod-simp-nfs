@@ -249,7 +249,7 @@ able to access any shares from that realm.
 
 ### Automatic mounting of home directories
 
-Please reference the [SIMP documentation](http://simp.readthedocs.io/en/master/user_guide/HOWTO/NFS.html#exporting-home-directories) for details on how to implement this feature.
+Please reference the [SIMP documentation](https://simp.readthedocs.io/en/stable/user_guide/HOWTO/NFS.html#exporting-home-directories) for details on how to implement this feature.
 
 ## Reference
 
@@ -262,7 +262,7 @@ and module dependencies.
 
 ## Development
 
-Please read our [Contribution Guide](http://simp-doc.readthedocs.io/en/stable/contributors_guide/index.html).
+Please read our [Contribution Guide](https://simp.readthedocs.io/en/stable/contributors_guide/index.html).
 
 ### Acceptance tests
 

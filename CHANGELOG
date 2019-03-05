@@ -1,3 +1,7 @@
+* Mon Mar 04 2019 Liz Nemsick <lnemsick.simp@gmail.com> - 6.2.1-0
+- Expanded the upper limit of the concat and stdlib Puppet module versions
+- Updated URLs in the README.md
+
 * Thu Nov 01 2018 Jeanne Greulich <jeanne,greulich@onyxpoint.com> - 6.2.0-0
 - Update static assets for puppet 5
 - Update to onyxpoint OEL boxes in acceptance tests
