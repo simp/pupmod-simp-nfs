@@ -40,7 +40,7 @@ define nfs::client::stunnel::v4 (
   $_nfs_port = $_target_parts[-1]
 
   # Don't do this if you're running on yourself because, well, it's bad!
-  if host_is_me($_nfs_server) {
+  if simplib::host_is_me($_nfs_server) {
     warning("You are trying to use stunnel for a local connection to '${name}'. Please use a direct connection.")
   }
   else {

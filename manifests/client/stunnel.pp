@@ -72,7 +72,7 @@ class nfs::client::stunnel (
   }
 
   # Don't do this if you're running on yourself because, well, it's bad!
-  if !host_is_me($nfs_server) {
+  if !simplib::host_is_me($nfs_server) {
     stunnel::instance { 'nfs_client':
       connect          => ["${nfs_server}:${nfs_connect_port}"],
       accept           => "127.0.0.1:${nfs_accept_port}",
