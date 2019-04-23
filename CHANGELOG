@@ -1,3 +1,6 @@
+* Tue Apr 23 2019 Joseph Sharkey <shark.bruhaha@gmail.com> - 6.2.3-0
+- Updated .travis.yml, .gitlab-ci.yml, .ruby-version
+
 * Fri Mar 22 2019 Liz Nemsick <lnemsick.simp@gmail.com> - 6.2.2-0
 - Use simplib::host_is_me in lieu of simplib's Puppet 3 host_is_me
 
