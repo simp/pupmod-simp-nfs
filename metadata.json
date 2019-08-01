@@ -1,6 +1,6 @@
 {
   "name": "simp-nfs",
-  "version": "6.2.2",
+  "version": "6.2.3",
   "author": "SIMP Team",
   "summary": "manages NFS server and client, also PKI and stunnelling",
   "license": "Apache-2.0",
@@ -16,11 +16,11 @@
   "dependencies": [
     {
       "name": "puppetlabs/concat",
-      "version_requirement": ">= 2.2.0 < 6.0.0"
+      "version_requirement": ">= 2.2.0 < 7.0.0"
     },
     {
       "name": "puppetlabs/stdlib",
-      "version_requirement": ">= 4.9.0 < 6.0.0"
+      "version_requirement": ">= 4.9.0 < 7.0.0"
     },
     {
       "name": "herculesteam/augeasproviders_sysctl",
@@ -77,7 +77,7 @@
   "requirements": [
     {
       "name": "puppet",
-      "version_requirement": ">= 4.7.0 < 6.0.0"
+      "version_requirement": ">= 4.7.0 < 7.0.0"
     }
   ]
 }
