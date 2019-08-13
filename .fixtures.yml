@@ -10,7 +10,13 @@ fixtures:
     haveged: https://github.com/simp/pupmod-simp-haveged
     iptables: https://github.com/simp/pupmod-simp-iptables
     krb5: https://github.com/simp/pupmod-simp-krb5
+    mount_core:
+      repo: https://github.com/simp/pupmod-puppetlabs-mount_core.git
+      puppet_version: ">= 6.0.0"
     pki: https://github.com/simp/pupmod-simp-pki
+    selinux_core:
+      repo: https://github.com/simp/pupmod-puppetlabs-selinux_core.git
+      puppet_version: ">= 6.0.0"
     simplib: https://github.com/simp/pupmod-simp-simplib
     ssh: https://github.com/simp/pupmod-simp-ssh
     stdlib: https://github.com/simp/puppetlabs-stdlib
