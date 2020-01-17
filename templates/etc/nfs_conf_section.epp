@@ -1,0 +1,13 @@
+<%-|
+  String $section,
+  Hash   $opts
+|-%>
+
+[<%= $section -%>]
+<%
+  # Sort keys in order to have deterministic content when
+  # $opts is the output of a deep_merge
+  $opts.keys.sort.each |String $param| {
+-%>
+  <%= $param %> = <%= $opts[$param] %>
+<% } -%>

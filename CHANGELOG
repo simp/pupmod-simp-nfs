@@ -1,4 +1,119 @@
-* Fri Aug 02 2019 Robert Vincent <pillarsdotnet@gmail.com> - 6.3.0-0
+* Fri Jan 10 2020 Liz Nemsick <lnemsick.simp@gmail.com> - 7.0.0-0
+- Added EL8 support
+- Dropped EL6 support
+- Refactored the module.  Notable feature/API changes:
+  - Overall changes
+    - Dropped stunnel support for NFSv3.  This tunneling did not work because:
+      - The NFS client sends the NFS server Network Status Manager (NSM)
+        notifications via UDP, exclusively.
+      - At multi-NFS-server sites, a unique `rpcbind` port per server is
+        required in order for a NFS client to be able tunnel its
+        server-specific RPC requests to the appropriate server.
+    - nfs class
+      - Reworked parameters to reflect configuration of /etc/nfs.conf and,
+        for limited EL7-only configuration, /etc/sysconfig/nfs.  See the class
+        documentation for full details.
+    - Remove $stunnel_systemd_deps and $sunnel_tcp_nodelay parameters throughout
+      the module.
+      - These parameters were not consistently used in the manifest
+        code (i.e., declared but not used) and were confusing.
+      - The corresponding $stunnel_socket_options and $stunnel_wantedby
+        parameters in classes/defines now use defaults that were intended to be
+        set by those parameters.
+    - Now masks NFS services that are not needed, so they are not unnecessarily
+      started when the nfs-server.service or nfs-client.target are restarted.
+    - Move simp-autofs, simp-krb5, simp-iptables, simp-stunnel, and
+      simp-tcpwrappers to simp/optional_dependencies in the metadata.json.
+  - nfs::client
+    - Added support for pNFS:  Set $blkmap to true to enable the pNFS service,
+      nfs-blkmap.service.
+    - Added $nfs::stunnel_socket_options and $stunnel_wantedby parameters which
+      provide the defaults for all nfs::client::mount instances.
+  - nfs::client::mount define
+    - $nfs_server must now be specified as an IP address.  This change was
+      necessary for firewalld.
+    - In $options, changed the default mount type to 'soft' instead of 'hard'
+      Also removed deprecated 'intr' option, as it has no effect.
+    - Reworked the remote autodetect logic to detect a local mount based
+      on IP address instead of simply whether the node is also configured
+      to be an NFS server.
+    - Added support for direct autofs mounts and simplified specification of
+      indirect mounts.  When $autofs_indirect_map_key is not specified, a
+      direct mount is specified by $name.  When $autofs_indirect_map_key is
+      specified, an indirect mount is specified with $name as the mount point
+      and $autofs_indirect_map_key as the mount key.
+    - Renamed $autofs_map_to_user to $autofs_add_key_subst to better reflect
+      automount terminology. This parameter simply adds key substitution
+      to the remote location, which although can be used for user home
+      directories, is not restricted to that use case.
+    - Renamed $port to $nfsd_port to be consistent with the name of that
+      parameter throughout the entire module.
+    - Renamed $v4_remote_port to $stunnel_nfsd_port for clarity and to be
+      consistent with the name of that parameter throught the entire module.
+    - Exposed client stunnel configuration that was scattered throughout the
+      module to this API.  User can now specify $stunnel_socket_options and
+      $stunnel_verify for each mount.  When unspecified, the defaults from
+      the nfs class are used.
+  - nfs::server
+    - Exposed server stunnel configuration that was scattered throughout the
+      module to this API.  User can now specify $stunnel_accept_address,
+      $stunnel_nfsd_acccept_port, $stunnel_socket_options, $stunnel_verify,
+      and $stunnel_wantedby in this class.  When unspecified, the defaults
+      for all but $stunnel_accept_address and $stunnel_wantedby are pulled
+      from the nfs class.
+    - Added the following parameters: $nfsd_vers4, $nfsd_vers4_0,
+      $nfsd_vers4_1, $nfsd_vers4_2, and $custom_rpcrquotad_opts.
+    - Renamed $nfsv3 to $nfsd_vers3 to reflect its use in /etc/nfs.conf.
+    - Moved nfs::rpcquotad_port to this class and renamed $rpcrquotadopts
+      to $custom_rpcrquotad_opts for clarity.
+    - Moved nfs::mountd_port to this class and removed $rpcmountdopts.
+      Custom configuration for that daemon should now be made via
+      $nfs::custom_nfs_conf_opts or $nfs::custom_daemon_args as appropriate.
+    - Removed the obsolete $nfsd_module parameter.
+  - nfs::server::export define
+    - Added $replicas, $pnfs, and $security_label parameters to support
+      additional export configuration parameters.
+  - nfs::idmapd was refactored into 3 classes to support distinct NFS server
+    and client configuration:  nfs::idmapd::config, nfs::idmapd::server,
+    nfs::idmapd::server, and nfs::idmapd::client
+    - Added $no_strip and $reformat_group to nfs::idmapd::config to support
+      support additional /etc/idmapd.conf configuration parameters.
+- Fixed bugs:
+  - rpc.rquotad service configuration was erroneously written to
+    /etc/sysconfig/nfs for EL7. It is now written to the correct file,
+    /etc/sysconfig/rpc-rquotad.
+  - idmapd
+    - idmapd was erroneously only enabled when NFSv3 was allowed. idmapd is
+      a NFSv4 service.
+    - The idmapd client was not configured to use nfsidmap.  An nfsidmap entry
+      has now been added to /etc/request-key.conf.
+  - Fixed bugs in which bidirectional communication for NFSv3 was not properly
+    configured.
+    - NFSv3 lockd ports on the NFS client were not explicitly configured and thus
+      not allowed through the firewall.  This would have affected file locking
+      using NLM.
+    - rpcbind, statd, and lockd service names were not allowed by TCP wrappers
+      for the NFS client. This would have affected server to client NFSv3 NSM
+      and NLM protocol messages over TCP.
+  - Fixed bugs in mount options
+    - Previously used the deprecated 'nfs4' fstype.  This has been replaced with
+      the 'nfs' fstype and use of the 'nfsvers' option to specify the version of
+      NFS to use.
+    - The 'proto' previously was not set to 'tcp' when stunnel is being used.
+  - Fixed bug with a duplicate exec reource in nfs::client::mount
+  - Fixed erronously server/client-only configuration that appeared to be able
+    to be set independently for the NFS client and NFS server on the same node,
+    but because of shared services applied to the node as a whole.
+    - Removed $nfs::client::firewall and $nfs::server::firewall. Use
+      $nfs::firewall instead.
+    - Removed $nfs::server::tcpwrappers. Use $nfs::tcpwrappers instead.
+    - Removed $nfs::server::nfsv3, $nfs::server::lockd_arg,
+      $nfs::server::statdarg, $nfs::server::statd_ha_callout,
+      $nfs::server::rpcgssdargs, and $nfs:;server::rpcsvcgssdargs. Use
+      appropriate parameters in the nfs class instead.
+- Updated the upper bound of simp-simplib to < 5.0.0
+
+* Fri Aug 02 2019 Robert Vincent <pillarsdotnet@gmail.com> - 7.0.0-0
 - Remove Puppet 4 support
 - Add Puppet 6 support
 - Add puppetlabs-stdlib 6 support

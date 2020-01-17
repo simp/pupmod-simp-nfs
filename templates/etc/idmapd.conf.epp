@@ -1,0 +1,50 @@
+# This file is managed by Puppet (simp-nfs module). Changes will be overwritten
+# at the next Puppet run.
+<% if $nfs::idmapd::config::content {-%>
+<%= $nfs::idmapd::config::content -%>
+<% } else { -%>
+[General]
+
+<%  unless $nfs::idmapd::config::verbosity == undef { -%>
+Verbosity = <%= $nfs::idmapd::config::verbosity %>
+<%  } -%>
+<%  if $nfs::idmapd::config::domain { -%>
+Domain = <%= $nfs::idmapd::config::domain %>
+<%  } -%>
+<%  if $nfs::idmapd::config::no_strip { -%>
+No-Strip = <%= $nfs::idmapd::config::no_strip %>
+<%  } -%>
+<%  unless $nfs::idmapd::config::reformat_group == undef { -%>
+Reformat-Group = <%= $nfs::idmapd::config::reformat_group %>
+<%  } -%>
+<%  if $nfs::idmapd::config::local_realms { -%>
+Local-Realms = <%= join($nfs::idmapd::config::local_realms, ',') %>
+<%  } -%>
+
+[Mapping]
+
+Nobody-User = <%= $nfs::idmapd::config::nobody_user %>
+Nobody-Group = <%= $nfs::idmapd::config::nobody_group %>
+
+[Translation]
+
+Method = <%= join($nfs::idmapd::config::trans_method, ',') %>
+<%  if $nfs::idmapd::config::gss_methods { -%>
+GSS-Methods = <%= join($nfs::idmapd::config::gss_methods, ',') %>
+<%  } -%>
+
+[Static]
+<%
+  if $nfs::idmapd::config::static_translation {
+    $nfs::idmapd::config::static_translation.each |String $k, String $v| {
+-%>
+<%= $k %> = <%= $v %>
+<%
+    }
+  }
+-%>
+
+[UMICH_SCHEMA]
+
+# This is not yet supported by the SIMP configuration.
+<% } -%>

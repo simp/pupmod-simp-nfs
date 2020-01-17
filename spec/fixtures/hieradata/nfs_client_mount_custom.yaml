@@ -1,0 +1,15 @@
+---
+nfs::nfsd_port: 2050
+nfs::stunnel_nfsd_port: 20500
+nfs::firewall: true
+nfs::stunnel: false
+nfs::tcpwrappers: true
+
+nfs::client::stunnel: true
+nfs::client::stunnel_socket_options:
+ - 'l:TCP_NODELAY=2'
+ - 'r:TCP_NODELAY=2'
+nfs::client::stunnel_verify: 1
+nfs::client::stunnel_wantedby:
+ - 'remote-fs-pre.target'
+ - 'some-other.service'

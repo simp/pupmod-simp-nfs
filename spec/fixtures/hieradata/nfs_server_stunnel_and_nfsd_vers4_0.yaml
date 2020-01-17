@@ -1,0 +1,4 @@
+---
+nfs::is_server : true
+nfs::stunnel: true
+nfs::server::nfsd_vers4_0 : true

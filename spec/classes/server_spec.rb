@@ -1,57 +1,83 @@
 require 'spec_helper'
 
-# most of server class is tested in init_spec.rb.  Here we are focusing on the
-# content of the concat fragment
-describe 'nfs::server' do
-  on_supported_os.each do |os, facts|
-    context "on #{os}" do
-      let(:facts) { facts }
-
+# Testing private nfs::server class via nfs class
+describe 'nfs' do
+  describe 'private nfs::server' do
+    on_supported_os.each do |os, os_facts|
       context "on #{os}" do
+        let(:facts) { os_facts}
 
-        context 'with default parameters' do
-          let(:hieradata) { 'server' }
+        context 'with default nfs and nfs::server parameters' do
+          let(:params) {{ :is_server => true }}
+
           it { is_expected.to compile.with_all_deps }
-          it { is_expected.to contain_concat__fragment('nfs_init_server').with_content(<<EOM
-RQUOTAD=no
-RQUOTAD_PORT=875
-LOCKD_TCPPORT=32803
-LOCKD_UDPPORT=32769
-EOM
-          ) }
+          it { is_expected.to create_class('nfs::server') }
+          it { is_expected.to create_class('nfs::base::config') }
+          it { is_expected.to create_class('nfs::base::service') }
+          it { is_expected.to create_class('nfs::server::config') }
+          it { is_expected.to create_class('nfs::server::service') }
+          it { is_expected.to create_class('nfs::idmapd::server') }
+          it { is_expected.to_not create_class('nfs::server::stunnel') }
+          it { is_expected.to_not create_class('nfs::server::firewall') }
+          it { is_expected.to_not create_class('krb5') }
+          it { is_expected.to_not create_class('krb5::keytab') }
         end
 
-        context 'with optional parameters set and nfsv3 true' do
-          let(:hieradata) { 'server' }
+        context 'with nfs::stunnel = true' do
+          context 'with nfs::server::nfsd_vers_4_0 = false' do
+            let(:params) {{
+              :is_server => true,
+              :stunnel   => true
+            }}
+
+            it { is_expected.to compile.with_all_deps }
+            it { is_expected.to create_class('nfs::server') }
+            it { is_expected.to create_class('nfs::server::stunnel') }
+          end
+
+          context 'with nfs::server::nfsd_vers4_0 = true' do
+            let(:hieradata) { 'nfs_server_stunnel_and_nfsd_vers4_0' }
+            it { is_expected.to_not compile.with_all_deps }
+          end
+        end
+
+        context 'with nfs::firewall = true' do
           let(:params) {{
-            :nfsv3            => true,
-            :rpcrquotadopts   => 'some rpcrquotad opts',
-            :lockd_arg        => 'some lockd args',
-            :nfsd_module      => 'force noload',
-            :rpcmountdopts    => 'some rpcmountd opts',
-            :statdarg         => 'some statd args',
-            :statd_ha_callout => '/the/statd/ha/callout/program',
-            :rpcidmapdargs    => 'some rpcidmapd args',
-            :rpcgssdargs      => 'some rpcgssd args',
-            :rpcsvcgssdargs   => 'some rpcsvcgssd args'
+            :is_server => true,
+            :firewall  => true
           }}
+
           it { is_expected.to compile.with_all_deps }
-          it { is_expected.to contain_concat__fragment('nfs_init_server').with_content(<<EOM
-RQUOTAD="/usr/sbin/rpc.rquotad"
-RQUOTAD_PORT=875
-RPCRQUOTADOPTS="some rpcrquotad opts"
-LOCKD_ARG="some lockd args"
-LOCKD_TCPPORT=32803
-LOCKD_UDPPORT=32769
-NFSD_MODULE="noload"
-RPCMOUNTDOPTS="some rpcmountd opts"
-STATDARG="some statd args"
-STATD_HA_CALLOUT="/the/statd/ha/callout/program"
-RPCIDMAPDARGS="some rpcidmapd args"
-RPCGSSDARGS="some rpcgssd args"
-RPCSVCGSSDARGS="some rpcsvcgssd args"
-EOM
-          ) }
+          it { is_expected.to create_class('nfs::server') }
+          it { is_expected.to create_class('nfs::server::firewall') }
+        end
+
+        context 'with nfs::kerberos = true' do
+          context 'with nfs::keytab_on_puppet = false' do
+            let(:params) {{
+              :is_server        => true,
+              :kerberos         => true,
+              :keytab_on_puppet => false
+            }}
+
+            it { is_expected.to compile.with_all_deps }
+            it { is_expected.to create_class('nfs::server') }
+            it { is_expected.to create_class('krb5') }
+            it { is_expected.to_not create_class('krb5::keytab') }
+          end
+
+          context 'with nfs::keytab_on_puppet = true' do
+            let(:params) {{
+              :is_server        => true,
+              :kerberos         => true,
+              :keytab_on_puppet => true
+            }}
+
+            it { is_expected.to compile.with_all_deps }
+            it { is_expected.to create_class('nfs::server') }
+            it { is_expected.to create_class('krb5') }
+            it { is_expected.to create_class('krb5::keytab') }
+          end
         end
       end
     end
