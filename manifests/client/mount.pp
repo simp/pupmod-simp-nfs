@@ -297,7 +297,11 @@ define nfs::client::mount (
 
     if $autofs_indirect_map_key {
       $_mount_point = $name
-      $_map_key = $autofs_indirect_map_key
+      if $autofs_indirect_map_key == '*' {
+        $_map_key = "wildcard-${name}"
+      } else {
+        $_map_key = $autofs_indirect_map_key
+      }
     } else {
       $_mount_point = '/-'
       $_map_key = $name

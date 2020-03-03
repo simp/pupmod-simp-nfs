@@ -22,7 +22,7 @@
         set by those parameters.
     - Now masks NFS services that are not needed, so they are not unnecessarily
       started when the nfs-server.service or nfs-client.target are restarted.
-    - Move simp-autofs, simp-krb5, simp-iptables, simp-stunnel, and
+    - Moved simp-autofs, simp-krb5, simp-iptables, simp-stunnel, and
       simp-tcpwrappers to simp/optional_dependencies in the metadata.json.
   - nfs::client
     - Added support for pNFS:  Set $blkmap to true to enable the pNFS service,
@@ -73,9 +73,9 @@
   - nfs::server::export define
     - Added $replicas, $pnfs, and $security_label parameters to support
       additional export configuration parameters.
-  - nfs::idmapd was refactored into 3 classes to support distinct NFS server
-    and client configuration:  nfs::idmapd::config, nfs::idmapd::server,
-    nfs::idmapd::server, and nfs::idmapd::client
+  - nf::idmapd
+    - Refactored into 3 classes to support distinct NFS server and client
+      configuration
     - Added $no_strip and $reformat_group to nfs::idmapd::config to support
       support additional /etc/idmapd.conf configuration parameters.
 - Fixed bugs:
@@ -89,9 +89,9 @@
       has now been added to /etc/request-key.conf.
   - Fixed bugs in which bidirectional communication for NFSv3 was not properly
     configured.
-    - NFSv3 lockd ports on the NFS client were not explicitly configured and thus
-      not allowed through the firewall.  This would have affected file locking
-      using NLM.
+    - NFSv3 lockd ports on the NFS client were not explicitly configured and
+      thus not allowed through the firewall.  This would have affected file
+      locking using NLM.
     - rpcbind, statd, and lockd service names were not allowed by TCP wrappers
       for the NFS client. This would have affected server to client NFSv3 NSM
       and NLM protocol messages over TCP.
@@ -100,16 +100,18 @@
       the 'nfs' fstype and use of the 'nfsvers' option to specify the version of
       NFS to use.
     - The 'proto' previously was not set to 'tcp' when stunnel is being used.
-  - Fixed bug with a duplicate exec reource in nfs::client::mount
-  - Fixed erronously server/client-only configuration that appeared to be able
-    to be set independently for the NFS client and NFS server on the same node,
-    but because of shared services applied to the node as a whole.
+  - Fixed bug with a duplicate exec resource in nfs::client::mount when stunnel
+    was enabled.
+  - Fixed erronously server-only/client-only configuration that appeared to be
+    able to be set independently for the NFS client and NFS server on the same
+    node, but because of shared services, actually applied to the node as a
+    whole.
     - Removed $nfs::client::firewall and $nfs::server::firewall. Use
       $nfs::firewall instead.
     - Removed $nfs::server::tcpwrappers. Use $nfs::tcpwrappers instead.
     - Removed $nfs::server::nfsv3, $nfs::server::lockd_arg,
       $nfs::server::statdarg, $nfs::server::statd_ha_callout,
-      $nfs::server::rpcgssdargs, and $nfs:;server::rpcsvcgssdargs. Use
+      $nfs::server::rpcgssdargs, and $nfs::server::rpcsvcgssdargs. Use
       appropriate parameters in the nfs class instead.
 - Updated the upper bound of simp-simplib to < 5.0.0
 

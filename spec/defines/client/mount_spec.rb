@@ -263,7 +263,6 @@ describe 'nfs::client::mount' do
           context 'with key substitution' do
             let(:params) {
               base_params.merge( {
-                :autofs_indirect_map_key => 'some_dir',
                 :autofs_indirect_map_key => '*',
                 :autofs_add_key_subst    => true
               } )
@@ -276,7 +275,7 @@ describe 'nfs::client::mount' do
                 :map_name    => '/etc/autofs/net__apps.map'
               } )
 
-              is_expected.to contain_autofs__map__entry(params[:autofs_indirect_map_key]).with( {
+              is_expected.to contain_autofs__map__entry("wildcard-#{title}").with( {
                :options  => '-nfsvers=4,port=2049,soft,sec=sys',
                :location => "#{params[:nfs_server]}:#{params[:remote_path]}/&",
                :target   => 'net__apps'
