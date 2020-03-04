@@ -12,7 +12,7 @@ HOSTS:
       - nfs_server
       - nfs_server_and_client
     platform: el-7-x86_64
-    box: onyxpoint/oel-7-x86_64
+    box: generic/oracle7
     hypervisor: <%= hypervisor %>
     yum_repos:
       epel:
@@ -24,7 +24,7 @@ HOSTS:
     roles:
       - nfs_client
     platform: el-7-x86_64
-    box: onyxpoint/oel-7-x86_64
+    box: generic/oracle7
     hypervisor: <%= hypervisor %>
     yum_repos:
       epel:
