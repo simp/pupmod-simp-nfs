@@ -91,19 +91,6 @@ describe 'nfs' do
               ExecStart=/usr/sbin/exportfs -ra
               EOM
           } ) }
-
-          it { is_expected.to create_sysctl('sunrpc.tcp_slot_table_entries').with( {
-            :ensure  => 'present',
-            :val     => 128,
-            :silent  => true
-          } ) }
-
-          it { is_expected.to create_sysctl('sunrpc.udp_slot_table_entries').with( {
-            :ensure  => 'present',
-            :val     => 128,
-            :silent  => true
-          } ) }
-
         end
 
         context 'when nfsv3 only enabled for the NFS client' do

@@ -15,12 +15,6 @@ describe 'nfs' do
             :unless  => '/sbin/lsmod | /usr/bin/grep -qw nfsv4'
           } ) }
 
-          it { is_expected.to create_sysctl('fs.nfs.nfs_callback_tcpport').with( {
-            :ensure  => 'present',
-            :val     => 876,
-            :silent  => true
-          } ) }
-
           it { is_expected.to create_file('/etc/modprobe.d/nfs.conf').with( {
             :owner   => 'root',
             :group   => 'root',

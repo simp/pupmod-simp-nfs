@@ -258,6 +258,28 @@ Whether to enable secure NFS mounts
 
 Default value: `false`
 
+##### `sunrpc_udp_slot_table_entries`
+
+Data type: `Integer[1]`
+
+Set the default UDP slot table entries in the kernel
+
+* Most NFS performance guides seem to recommend this setting
+* If you have a low memory system, you may want to reduce this
+
+Default value: 128
+
+##### `sunrpc_tcp_slot_table_entries`
+
+Data type: `Integer[1]`
+
+Set the default TCP slot table entries in the kernel
+
+* Most NFS performance guides seem to recommend this setting
+* If you have a low memory system, you may want to reduce this
+
+Default value: 128
+
 ##### `ensure_latest_lvm2`
 
 Data type: `Boolean`

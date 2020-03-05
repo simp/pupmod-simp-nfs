@@ -13,7 +13,8 @@ class nfs::client::config {
   # the mount requiring it is executed.  This dynamic loading doesn't play
   # well with sysctl.  So, we are going to ensure the kernel module is
   # configured properly with a static configuration file, load the module if
-  # necessary, and, in case it was already loaded, set the value by sysctl.
+  # necessary, and, in case it was already loaded, set the value by sysctl
+  # in nfs::client::service.
   #
   # NOTE: The parameter has to be configured via the nfs kernel module (a
   # dependency of the nfsv4 kernel module), but won't be activated until the
@@ -24,17 +25,6 @@ class nfs::client::config {
     unless  => '/sbin/lsmod | /usr/bin/grep -qw nfsv4',
     require =>  File['/etc/modprobe.d/nfs.conf'],
     notify  => Sysctl['fs.nfs.nfs_callback_tcpport']
-  }
-
-  sysctl { 'fs.nfs.nfs_callback_tcpport':
-    ensure  => 'present',
-    val     => $nfs::client::callback_port,
-    # Ignore 'invalid' kernel parameter, because the sysctl custom type caches
-    # all kernel param info the first time any sysctl resource is created. So,
-    # the parameter may appear to not be activated, even when it has just been
-    # activated by the module we loaded in Exec['modprobe_nfsv4'].
-    silent  => true,
-    comment => 'Managed by simp-nfs Puppet module'
   }
 
   $_modprobe_d_nfs_conf = @("NFSCONF")

@@ -178,26 +178,6 @@ class nfs::server::config
     content => $_simp_etc_exports_service
   }
 
-  # Tune with the proper number of slot entries.
-  # TODO Is this still applicable?  Also, should we persist to file
-  # in /etc/modprobe.d so that it is available at boot time, just
-  # like the kernel module settings for nfs(v4)?
-  sysctl { 'sunrpc.tcp_slot_table_entries':
-    ensure  => 'present',
-    val     => $nfs::server::sunrpc_tcp_slot_table_entries,
-    # Ignore failure if var-lib-nfs-rpc_pipefs.mount is not up yet.
-    silent  => true,
-    comment => 'Managed by simp-nfs Puppet module'
-  }
-
-  sysctl { 'sunrpc.udp_slot_table_entries':
-    ensure  => 'present',
-    val     => $nfs::server::sunrpc_udp_slot_table_entries,
-    # Ignore failure if var-lib-nfs-rpc_pipefs.mount is not up yet.
-    silent  => true,
-    comment => 'Managed by simp-nfs Puppet module'
-  }
-
   if $nfs::tcpwrappers {
     include 'nfs::server::tcpwrappers'
   }

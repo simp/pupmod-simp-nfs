@@ -38,6 +38,18 @@ describe 'nfs' do
           end
 
           it { is_expected.to_not create_systemd__dropin_file('simp_unit.conf') }
+          it { is_expected.to create_file('/etc/modprobe.d/sunrpc.conf').with( {
+            :owner   => 'root',
+            :group   => 'root',
+            :mode    => '0640',
+            :content => <<~EOM
+              # This file is managed by Puppet (simp-nfs module).  Changes will be overwritten
+              # at the next puppet run.
+              #
+              options sunrpc tcp_slot_table_entries=128 udp_slot_table_entries=128
+            EOM
+          } ) }
+
           it { is_expected.to_not create_class('nfs::idmapd::config') }
           it { is_expected.to_not create_file('/etc/modprobe.d/lockd.conf') }
         end

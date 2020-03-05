@@ -17,6 +17,24 @@ describe 'nfs' do
             :restart    => '/usr/bin/systemctl restart nfs-utils.service nfs-client.target'
           } ) }
 
+          it { is_expected.to create_sysctl('sunrpc.tcp_slot_table_entries').with( {
+            :ensure  => 'present',
+            :val     => 128,
+            :silent  => true
+          } ) }
+
+          it { is_expected.to create_sysctl('sunrpc.udp_slot_table_entries').with( {
+            :ensure  => 'present',
+            :val     => 128,
+            :silent  => true
+          } ) }
+
+          it { is_expected.to create_sysctl('fs.nfs.nfs_callback_tcpport').with( {
+            :ensure  => 'present',
+            :val     => 876,
+            :silent  => true
+          } ) }
+
           it { is_expected.to_not create_service('nfs-blkmap.service') }
         end
 

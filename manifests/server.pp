@@ -61,18 +61,6 @@
 # @param custom_rpcrquotad_opts
 #   * Additional arguments to pass to the `rpc.rquotad` daemon
 #
-# @param sunrpc_udp_slot_table_entries
-#   Set the default UDP slot table entries in the kernel
-#
-#   * Most NFS server performance guides seem to recommend this setting
-#   * If you have a low memory system, you may want to reduce this
-#
-# @param sunrpc_tcp_slot_table_entries
-#   Set the default TCP slot table entries in the kernel
-#
-#   * Most NFS server performance guides seem to recommend this setting
-#   * If you have a low memory system, you may want to reduce this
-#
 # @param stunnel
 #   Controls enabling `stunnel` to encrypt critical NFSv4 connections
 #
@@ -136,8 +124,6 @@ class nfs::server (
   Simplib::Port    $nfsd_port                     = $nfs::nfsd_port,
   Simplib::Port    $rquotad_port                  = 875,
   Optional[String] $custom_rpcrquotad_opts        = undef,
-  Integer[1]       $sunrpc_udp_slot_table_entries = 128,
-  Integer[1]       $sunrpc_tcp_slot_table_entries = 128,
   Boolean          $stunnel                       = $nfs::stunnel,
   Simplib::IP      $stunnel_accept_address        = '0.0.0.0',
   Simplib::Port    $stunnel_nfsd_accept_port      = $nfs::stunnel_nfsd_port,

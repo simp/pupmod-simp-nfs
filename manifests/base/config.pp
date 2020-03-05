@@ -179,6 +179,20 @@ class nfs::base::config
     }
   }
 
+  $_modprobe_d_sunrpc_conf = @("SUNRPC")
+    # This file is managed by Puppet (simp-nfs module).  Changes will be overwritten
+    # at the next puppet run.
+    #
+    options sunrpc tcp_slot_table_entries=${nfs::sunrpc_tcp_slot_table_entries} udp_slot_table_entries=${nfs::sunrpc_udp_slot_table_entries}
+    | SUNRPC
+
+  file { '/etc/modprobe.d/sunrpc.conf':
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0640',
+    content => $_modprobe_d_sunrpc_conf
+  }
+
   if $nfs::idmapd {
     include 'nfs::idmapd::config'
   }

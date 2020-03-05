@@ -117,6 +117,18 @@
 # @param secure_nfs
 #   Whether to enable secure NFS mounts
 #
+# @param sunrpc_udp_slot_table_entries
+#   Set the default UDP slot table entries in the kernel
+#
+#   * Most NFS performance guides seem to recommend this setting
+#   * If you have a low memory system, you may want to reduce this
+#
+# @param sunrpc_tcp_slot_table_entries
+#   Set the default TCP slot table entries in the kernel
+#
+#   * Most NFS performance guides seem to recommend this setting
+#   * If you have a low memory system, you may want to reduce this
+#
 # @param ensure_latest_lvm2
 #   See `nfs::lvm2` for further description
 #
@@ -220,6 +232,8 @@ class nfs (
   Nfs::LegacyDaemonArgs $custom_daemon_args            = {},
   Boolean               $idmapd                        = false,
   Boolean               $secure_nfs                    = false,
+  Integer[1]            $sunrpc_udp_slot_table_entries = 128,
+  Integer[1]            $sunrpc_tcp_slot_table_entries = 128,
   Boolean               $ensure_latest_lvm2            = true,
   Boolean               $kerberos                      = simplib::lookup('simp_options::kerberos', { 'default_value' => false }),
   Boolean               $keytab_on_puppet              = simplib::lookup('simp_options::kerberos', { 'default_value' => true}),
