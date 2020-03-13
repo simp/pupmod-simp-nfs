@@ -64,12 +64,6 @@ describe 'nfs stunnel' do
     'firewalld::firewall_backend'           => 'iptables'
   }
 
-  # FIXME.  Remove this when we can reliably configure firewalld backend to
-  # be iptables.
-  context 'work around firewalld ordering issue' do
-    it_behaves_like 'a firewalld fixer', hosts
-  end
-
   context 'with NFSv4 stunnel and firewall' do
     opts = {
       :base_hiera              => base_hiera,

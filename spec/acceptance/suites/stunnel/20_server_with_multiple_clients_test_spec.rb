@@ -49,13 +49,6 @@ describe 'nfs server with multiple clients' do
     'firewalld::firewall_backend'           => 'iptables'
   }
 
-  # FIXME.  Remove this when we can reliably configure firewalld backend to
-  # be iptables.
-  # Workaround duplicated so can run this test file by itself.
-  context 'work around firewalld ordering issue' do
-    it_behaves_like 'a firewalld fixer', hosts
-  end
-
   context 'server exporting to 2 NFSv4 clients, both via stunnel' do
     opts = {
       :base_hiera      => base_hiera,

@@ -28,12 +28,6 @@ describe 'nfs basic' do
     'firewalld::firewall_backend'           => 'iptables'
   }
 
-  # FIXME.  Remove this when we can reliably configure firewalld backend to
-  # be iptables.
-  context 'work around firewalld ordering issue' do
-    it_behaves_like 'a firewalld fixer', hosts
-  end
-
   context 'with firewall only' do
     context 'NFSv4 with firewall' do
       opts = {

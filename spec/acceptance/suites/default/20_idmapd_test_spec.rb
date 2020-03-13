@@ -25,13 +25,6 @@ describe 'nfs basic idmapd' do
     'firewalld::firewall_backend'           => 'iptables'
   }
 
-  # FIXME.  Remove this when we can reliably configure firewalld backend to
-  # be iptables.
-  # Workaround duplicated so can run this test file by itself.
-  context 'work around firewalld ordering issue' do
-    it_behaves_like 'a firewalld fixer', hosts
-  end
-
   context 'long running test' do
     it 'should ensure vagrant connectivity' do
       on(hosts, 'date')

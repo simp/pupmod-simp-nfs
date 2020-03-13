@@ -43,12 +43,6 @@ describe 'nfs krb5' do
     'firewalld::firewall_backend'               => 'iptables'
   }
 
-  # FIXME.  Remove this when we can reliably configure firewalld backend to
-  # be iptables.
-  context 'work around firewalld ordering issue' do
-    it_behaves_like 'a firewalld fixer', hosts
-  end
-
   # We need to set up the Kerberos server prior to running NFS.
   # Otherwise, there won't be a keytab to use on the system!
   #
