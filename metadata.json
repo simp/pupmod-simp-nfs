@@ -46,7 +46,7 @@
     "optional_dependencies": [
       {
         "name": "simp/autofs",
-        "version_requirement": ">= 6.2.1 < 7.0.0"
+        "version_requirement": ">= 6.2.1 < 8.0.0"
       },
       {
         "name": "simp/krb5",
