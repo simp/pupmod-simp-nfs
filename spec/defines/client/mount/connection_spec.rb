@@ -39,9 +39,9 @@ describe 'nfs::client::mount::connection' do
           :tcpwrappers            => params[:tcpwrappers]
         } ) }
 
-        it { is_expected.to_not create_iptables__listen__tcp_stateful('nfs_callback_1_2_3_4') }
-        it { is_expected.to_not create_iptables__listen__tcp_stateful('nfs_status_tcp_1_2_3_4') }
-        it { is_expected.to_not create_iptables__listen__udp('nfs_status_udp_1_2_3_4') }
+        it { is_expected.to_not create_iptables__listen__tcp_stateful('nfs_callback_1.2.3.4') }
+        it { is_expected.to_not create_iptables__listen__tcp_stateful('nfs_status_tcp_1.2.3.4') }
+        it { is_expected.to_not create_iptables__listen__udp('nfs_status_udp_1.2.3.4') }
       end
 
       context 'when stunnel=false' do
@@ -63,9 +63,9 @@ describe 'nfs::client::mount::connection' do
           it { is_expected.to create_nfs__client__mount__connection(title) }
           it { is_expected.to_not create_class('iptables') }
           it { is_expected.to_not create_nfs__client__stunnel('1.2.3.4:2049') }
-          it { is_expected.to_not create_iptables__listen__tcp_stateful('nfs_callback_1_2_3_4') }
-          it { is_expected.to_not create_iptables__listen__tcp_stateful('nfs_status_tcp_1_2_3_4') }
-          it { is_expected.to_not create_iptables__listen__udp('nfs_status_udp_1_2_3_4') }
+          it { is_expected.to_not create_iptables__listen__tcp_stateful('nfs_callback_1.2.3.4') }
+          it { is_expected.to_not create_iptables__listen__tcp_stateful('nfs_status_tcp_1.2.3.4') }
+          it { is_expected.to_not create_iptables__listen__udp('nfs_status_udp_1.2.3.4') }
         end
 
         context 'when firewall=true' do
@@ -87,13 +87,13 @@ describe 'nfs::client::mount::connection' do
             it { is_expected.to create_nfs__client__mount__connection(title) }
             it { is_expected.to create_class('iptables') }
             it { is_expected.to_not create_nfs__client__stunnel('1.2.3.4:2049') }
-            it { is_expected.to create_iptables__listen__tcp_stateful('nfs_callback_1_2_3_4').with( {
+            it { is_expected.to create_iptables__listen__tcp_stateful('nfs_callback_1.2.3.4').with( {
               :trusted_nets => [ params[:nfs_server] ],
               :dports       => [ 876 ]
             } ) }
 
-            it { is_expected.to_not create_iptables__listen__tcp_stateful('nfs_status_tcp_1_2_3_4') }
-            it { is_expected.to_not create_iptables__listen__udp('nfs_status_udp_1_2_3_4') }
+            it { is_expected.to_not create_iptables__listen__tcp_stateful('nfs_status_tcp_1.2.3.4') }
+            it { is_expected.to_not create_iptables__listen__udp('nfs_status_udp_1.2.3.4') }
           end
 
           context 'when nfs_version=3' do
@@ -113,13 +113,13 @@ describe 'nfs::client::mount::connection' do
             it { is_expected.to compile.with_all_deps }
             it { is_expected.to create_nfs__client__mount__connection(title) }
             it { is_expected.to_not create_nfs__client__stunnel('1.2.3.4:2049') }
-            it { is_expected.to_not create_iptables__listen__tcp_stateful('nfs_callback_1_2_3_4') }
-            it { is_expected.to create_iptables__listen__tcp_stateful('nfs_status_tcp_1_2_3_4').with({
+            it { is_expected.to_not create_iptables__listen__tcp_stateful('nfs_callback_1.2.3.4') }
+            it { is_expected.to create_iptables__listen__tcp_stateful('nfs_status_tcp_1.2.3.4').with({
               :trusted_nets => [ params[:nfs_server] ],
               :dports       => [ 111, 32803, 662 ]
             } ) }
 
-            it { is_expected.to create_iptables__listen__udp('nfs_status_udp_1_2_3_4').with({
+            it { is_expected.to create_iptables__listen__udp('nfs_status_udp_1.2.3.4').with({
               :trusted_nets => [ params[:nfs_server] ],
               :dports       => [ 111, 32769, 662 ]
             } ) }

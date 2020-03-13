@@ -295,54 +295,39 @@ define nfs::client::mount (
 
     Class['nfs::install'] -> Class['autofs::install']
 
-    if $autofs_indirect_map_key {
-      $_mount_point = $name
-      if $autofs_indirect_map_key == '*' {
-        $_map_key = "wildcard-${name}"
-      } else {
-        $_map_key = $autofs_indirect_map_key
-      }
-    } else {
-      $_mount_point = '/-'
-      $_map_key = $name
-    }
-
-    # The map name is very particular
-    $_clean_name = regsubst( regsubst($name, '^/', ''), '/', '__', 'G' )
-    $_map_name = sprintf('/etc/autofs/%s.map', $_clean_name)
-
-    autofs::map::master { $name:
-      mount_point => $_mount_point,
-      map_name    => $_map_name,
-      require     => Nfs::Client::Mount::Connection[$name]
-    }
-
     if $autofs_add_key_subst {
       $_location = "${_remote}/&"
     } else {
       $_location = $_remote
     }
 
-    autofs::map::entry { $_map_key:
-      options  => "-${_nfs_options}",
-      location => $_location,
-      target   => $_clean_name,
-      require  => Nfs::Client::Mount::Connection[$name]
+    if $autofs_indirect_map_key {
+      $_mount_point = $name
+      $_mappings = [ {
+        'key'      => $autofs_indirect_map_key,
+        'options'  => "-${_nfs_options}",
+        'location' => $_location
+      } ]
+    } else {
+      $_mount_point = '/-'
+      $_mappings = {
+        'key'      => $name,
+        'options'  => "-${_nfs_options}",
+        'location' => $_location
+      }
+    }
+
+    autofs::map { $name:
+      mount_point => $_mount_point,
+      mappings    => $_mappings,
+      require     => Nfs::Client::Mount::Connection[$name]
     }
 
     if $_stunnel {
-      # This is a workaround for issues with hooking into stunnel
-      $_exec_attributes = {
-        command     => '/usr/bin/systemctl reload autofs',
-        refreshonly => true,
-        require     => Class['autofs::service']
-      }
-
-      ensure_resource( 'exec', 'reload_autofs', $_exec_attributes)
-
-      # This is so that the automounter gets reloaded when *any* of the
-      # related stunnel instances are refreshed
-      Stunnel::Instance <| tag == 'nfs' |> ~> Exec['reload_autofs']
+      # This is a workaround for issues with hooking into stunnel.  It ensures
+      # the automounter gets reloaded when *any* of the related stunnel
+      # instances are refreshed
+      Stunnel::Instance <| tag == 'nfs' |> ~> Exec['autofs_reload']
     }
 
   } else {

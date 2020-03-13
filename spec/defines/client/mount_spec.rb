@@ -43,19 +43,14 @@ describe 'nfs::client::mount' do
           end
 
           it { is_expected.to contain_class('autofs') }
-          it { is_expected.to_not contain_exec('reload_autofs') }
-          it 'should create a direct autofs map' do
-            is_expected.to contain_autofs__map__master(title).with( {
+          it { is_expected.to contain_autofs__map(title).with( {
               :mount_point => '/-',
-              :map_name    => '/etc/autofs/net__apps.map'
-            } )
-
-            is_expected.to contain_autofs__map__entry(title).with( {
-             :options  => '-nfsvers=4,port=2049,soft,sec=sys',
-             :location => "#{params[:nfs_server]}:#{params[:remote_path]}",
-             :target   => 'net__apps'
-           } )
-          end
+              :mappings    => {
+                'key'      => title,
+                'options'  => '-nfsvers=4,port=2049,soft,sec=sys',
+                'location' => "#{params[:nfs_server]}:#{params[:remote_path]}"
+              }
+          } ) }
         end
 
         context 'with explicit nfs and nfs::client parameters' do
@@ -93,20 +88,14 @@ describe 'nfs::client::mount' do
             include_examples 'a base client mount define'
             it { is_expected.to create_nfs__client__mount__connection(title).with_nfs_version(3) }
             it { is_expected.to contain_class('autofs') }
-            it 'should create a direct autofs map' do
-              is_expected.to contain_autofs__map__master(title).with( {
+            it { is_expected.to contain_autofs__map(title).with( {
                 :mount_point => '/-',
-                :map_name    => '/etc/autofs/net__apps.map'
-              } )
-
-              is_expected.to contain_autofs__map__entry(title).with( {
-               :options  => '-nfsvers=3,port=2049,soft',
-               :location => "#{params[:nfs_server]}:#{params[:remote_path]}",
-               :target   => 'net__apps'
-             } )
-            end
-
-            it { is_expected.to_not contain_exec('reload_autofs') }
+                :mappings    => {
+                  'key'      => title,
+                  'options'  => '-nfsvers=3,port=2049,soft',
+                  'location' => "#{params[:nfs_server]}:#{params[:remote_path]}"
+                }
+            } ) }
           end
 
           context 'with NFSV4 and stunnel' do
@@ -134,26 +123,17 @@ describe 'nfs::client::mount' do
             } ) }
 
             it { is_expected.to contain_class('autofs') }
-            it 'should create a direct autofs map' do
-              is_expected.to contain_autofs__map__master(title).with( {
+            it { is_expected.to contain_autofs__map(title).with( {
                 :mount_point => '/-',
-                :map_name    => '/etc/autofs/net__apps.map'
-              } )
-
-              is_expected.to contain_autofs__map__entry(title).with( {
-               :options  => '-nfsvers=4,port=2050,soft,sec=sys,proto=tcp',
-               :location => "127.0.0.1:#{params[:remote_path]}",
-               :target   => 'net__apps'
-              } )
-            end
-
-            it { is_expected.to contain_exec('reload_autofs').with( {
-              :command     => '/usr/bin/systemctl reload autofs',
-              :refreshonly => true
+                :mappings    => {
+                  'key'      => title,
+                  'options'  => '-nfsvers=4,port=2050,soft,sec=sys,proto=tcp',
+                  'location' => "127.0.0.1:#{params[:remote_path]}"
+                }
             } ) }
 
             it { is_expected.to contain_stunnel__instance("nfs_#{params[:nfs_server]}:2050_client_nfsd")
-              .that_notifies('Exec[reload_autofs]') }
+              .that_notifies('Exec[autofs_reload]') }
 
           end
 
@@ -169,20 +149,14 @@ describe 'nfs::client::mount' do
             } ) }
 
             it { is_expected.to contain_class('autofs') }
-            it 'should create a direct autofs map' do
-              is_expected.to contain_autofs__map__master(title).with( {
+            it { is_expected.to contain_autofs__map(title).with( {
                 :mount_point => '/-',
-                :map_name    => '/etc/autofs/net__apps.map'
-              } )
-
-              is_expected.to contain_autofs__map__entry(title).with( {
-               :options  => '-nfsvers=4,port=2049,soft,sec=sys',
-               :location => "#{params[:nfs_server]}:#{params[:remote_path]}",
-               :target   => 'net__apps'
-              } )
-            end
-
-            it { is_expected.to_not contain_exec('reload_autofs') }
+                :mappings    => {
+                  'key'      => title,
+                  'options'  => '-nfsvers=4,port=2049,soft,sec=sys',
+                  'location' => "#{params[:nfs_server]}:#{params[:remote_path]}"
+                }
+            } ) }
           end
         end #context 'with direct map' do
 
@@ -200,18 +174,14 @@ describe 'nfs::client::mount' do
             }
 
             it { is_expected.to compile.with_all_deps }
-            it 'should create an indirect autofs map' do
-              is_expected.to contain_autofs__map__master(title).with( {
+            it { is_expected.to contain_autofs__map(title).with( {
                 :mount_point => title,
-                :map_name    => '/etc/autofs/net__apps.map'
-              } )
-
-              is_expected.to contain_autofs__map__entry(params[:autofs_indirect_map_key]).with( {
-               :options  => '-nfsvers=3,port=2049,soft',
-               :location => "#{params[:nfs_server]}:#{params[:remote_path]}",
-               :target   => 'net__apps'
-             } )
-            end
+                :mappings    => [ {
+                  'key'      => params[:autofs_indirect_map_key],
+                  'options'  => '-nfsvers=3,port=2049,soft',
+                  'location' => "#{params[:nfs_server]}:#{params[:remote_path]}"
+                } ]
+            } ) }
           end
 
           context 'with NFSV4 and stunnel' do
@@ -223,18 +193,14 @@ describe 'nfs::client::mount' do
             }
 
             it { is_expected.to compile.with_all_deps }
-            it 'should create an indirect autofs map' do
-              is_expected.to contain_autofs__map__master(title).with( {
+            it { is_expected.to contain_autofs__map(title).with( {
                 :mount_point => title,
-                :map_name    => '/etc/autofs/net__apps.map'
-              } )
-
-              is_expected.to contain_autofs__map__entry(params[:autofs_indirect_map_key]).with( {
-               :options  => '-nfsvers=4,port=2049,soft,sec=sys,proto=tcp',
-               :location => "127.0.0.1:#{params[:remote_path]}",
-               :target   => 'net__apps'
-              } )
-            end
+                :mappings    => [ {
+                  'key'      => params[:autofs_indirect_map_key],
+                  'options'  => '-nfsvers=4,port=2049,soft,sec=sys,proto=tcp',
+                  'location' => "127.0.0.1:#{params[:remote_path]}"
+                } ]
+            } ) }
           end
 
           context 'with NFSV4 without stunnel' do
@@ -246,18 +212,14 @@ describe 'nfs::client::mount' do
             }
 
             it { is_expected.to compile.with_all_deps }
-            it 'should create an indirect autofs map' do
-              is_expected.to contain_autofs__map__master(title).with( {
+            it { is_expected.to contain_autofs__map(title).with( {
                 :mount_point => title,
-                :map_name    => '/etc/autofs/net__apps.map'
-              } )
-
-              is_expected.to contain_autofs__map__entry(params[:autofs_indirect_map_key]).with( {
-               :options  => '-nfsvers=4,port=2049,soft,sec=sys',
-               :location => "#{params[:nfs_server]}:#{params[:remote_path]}",
-               :target   => 'net__apps'
-              } )
-            end
+                :mappings    => [ {
+                  'key'      => params[:autofs_indirect_map_key],
+                  'options'  => '-nfsvers=4,port=2049,soft,sec=sys',
+                  'location' => "#{params[:nfs_server]}:#{params[:remote_path]}"
+                } ]
+            } ) }
           end
 
           context 'with key substitution' do
@@ -269,18 +231,14 @@ describe 'nfs::client::mount' do
             }
 
             it { is_expected.to compile.with_all_deps }
-            it 'should create an indirect autofs map' do
-              is_expected.to contain_autofs__map__master(title).with( {
+            it { is_expected.to contain_autofs__map(title).with( {
                 :mount_point => title,
-                :map_name    => '/etc/autofs/net__apps.map'
-              } )
-
-              is_expected.to contain_autofs__map__entry("wildcard-#{title}").with( {
-               :options  => '-nfsvers=4,port=2049,soft,sec=sys',
-               :location => "#{params[:nfs_server]}:#{params[:remote_path]}/&",
-               :target   => 'net__apps'
-              } )
-            end
+                :mappings    => [ {
+                  'key'      => params[:autofs_indirect_map_key],
+                  'options'  => '-nfsvers=4,port=2049,soft,sec=sys',
+                  'location' => "#{params[:nfs_server]}:#{params[:remote_path]}/&"
+                } ]
+            } ) }
           end
         end
       end #context 'with autofs' do
@@ -308,9 +266,7 @@ describe 'nfs::client::mount' do
           } ) }
 
           it { is_expected.to_not contain_class('autofs') }
-          it { is_expected.to_not contain_autofs__map__master(title) }
-          it { is_expected.to_not contain_autofs__map__entry(title) }
-          it { is_expected.to_not contain_exec('reload_autofs') }
+          it { is_expected.to_not contain_autofs__map(title) }
         end
 
         context 'with NFSV4 and stunnel' do
@@ -328,9 +284,7 @@ describe 'nfs::client::mount' do
           } ) }
 
           it { is_expected.to_not contain_class('autofs') }
-          it { is_expected.to_not contain_autofs__map__master(title) }
-          it { is_expected.to_not contain_autofs__map__entry(title) }
-          it { is_expected.to_not contain_exec('reload_autofs') }
+          it { is_expected.to_not contain_autofs__map(title) }
         end
 
         context 'with NFSV4 without stunnel' do
@@ -348,9 +302,7 @@ describe 'nfs::client::mount' do
           } ) }
 
           it { is_expected.to_not contain_class('autofs') }
-          it { is_expected.to_not contain_autofs__map__master(title) }
-          it { is_expected.to_not contain_autofs__map__entry(title) }
-          it { is_expected.to_not contain_exec('reload_autofs') }
+          it { is_expected.to_not contain_autofs__map(title) }
         end
 
         context 'with at_boot=false and ensure=present' do

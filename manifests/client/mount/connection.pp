@@ -91,10 +91,6 @@ define nfs::client::mount::connection (
   } elsif $firewall  {
     # Open up the firewall for incoming, side-band NFS channels.
 
-    # WORK AROUND iptables::listen::xxx issue with invalid firewalld services
-    # filenames caused by rules with IP addresses
-    $_safe_nfs_server = regsubst($nfs_server, '[\.:]', '_', 'G')
-
     if ($nfs_version == 4) {
       # Set up the NFSv4.0 delegation callback port IPTables opening.  This is
       # only needed for NFSv4.0, because, beginning with NFSv4.1, delegation
@@ -106,7 +102,7 @@ define nfs::client::mount::connection (
 
       # It is possible that this is called for multiple mounts on the same server
       ensure_resource('iptables::listen::tcp_stateful',
-        "nfs_callback_${_safe_nfs_server}",
+        "nfs_callback_${nfs_server}",
         {
           trusted_nets => [$nfs_server],
           # the port to use is communicated via the main nfsd channel, so no
@@ -130,7 +126,7 @@ define nfs::client::mount::connection (
         $nfs::statd_port
       ]
       ensure_resource('iptables::listen::tcp_stateful',
-        "nfs_status_tcp_${_safe_nfs_server}",
+        "nfs_status_tcp_${nfs_server}",
         {
           trusted_nets => [$nfs_server],
           dports       => $_tcp_status_ports
@@ -143,7 +139,7 @@ define nfs::client::mount::connection (
         $nfs::statd_port
       ]
       ensure_resource('iptables::listen::udp',
-        "nfs_status_udp_${_safe_nfs_server}",
+        "nfs_status_udp_${nfs_server}",
         {
           trusted_nets => [$nfs_server],
           dports       => $_udp_status_ports
