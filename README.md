@@ -535,6 +535,20 @@ This module does not yet manage the following:
   * If you need to configure this, consider using `nfs::idmapd::config::content`
     to specify full contents of the `/etc/idmapd.conf` file.
 
+This module does not address an intermittent systemd issue in which the
+`rpc.statd` NFSv3 daemon is not always stopped when the `rpc-statd` service is
+stopped. When this occurs,
+
+* `systemd` no longer has a record of that daemon's PID and cannot fix the
+  problem.
+* The `rpc-statd` service cannot be subsequently started.
+
+  * When the service tries to start another instance of `rpc.statd`, the new
+    instance detects the running instance and then immediately exits with a
+    failed exit code.
+
+* You must manually kill the running `rpc.statd` daemon to recover.
+
 SIMP Puppet modules are generally intended for use on Red Hat Enterprise Linux
 and compatible distributions, such as CentOS. Please see the [`metadata.json` file](./metadata.json)
 for the most up-to-date list of supported operating systems, Puppet versions,
