@@ -1,269 +1,291 @@
-# Provides the base segments for NFS server *and* client services.
+# @summary Provides the base configuration and services for an NFS server and/or client.
 #
 # @param is_server
 #   Explicitly state that this system should be an NFS server
 #
-#   * Further configuration will need to be made via the ``nfs::server``
-#     classes
+#   * Further configuration can be made via the `nfs::server` class
 #
 # @param is_client
 #   Explicitly state that this system should be an NFS client
 #
-#   * Further configuration will need to be made via the ```nfs::client``
-#     classes
+#   * Further configuration can be be made via the `nfs::client` class
 #
 # @param nfsv3
-#   Use NFSv3 for connections
+#   Allow use of NFSv3.  When false, only NFSv4 will be allowed.
 #
-# @param mountd_nfs_v1
-#   Act as an ``NFSv1`` server
+# @param gssd_avoid_dns
+#   Use a reverse DNS lookup, even if the server name looks like a canonical name
 #
-#   * Due to current issues in RHEL/CentOS this must be set to ``yes`` to
-#     properly unmount
+#   * Sets the `avoid-dns` option in the `gssd` section of `/etc/nfs.conf`
 #
-# @param mountd_nfs_v2
-#   Act as an ``NFSv2`` server
+# @param gssd_limit_to_legacy_enctypes
+#   Restrict sessions to weak encryption types
 #
-# @param mountd_nfs_v3
-#   Act as an ``NFSv3`` server
+#   * Sets the `limit-to-legacy-enctypes` option in the `gssd` section of
+#     `/etc/nfs.conf`
 #
-# @param rquotad
-#   The path to the ``rquotad`` executable
+# @param gssd_use_gss_proxy
+#   Use the gssproxy daemon to hold the credentials used in secure NFS and
+#   perform GSSAPI operations on behalf of NFS.
 #
-# @param rquotad_port
-#   The port upon which ``rquotad`` should listen
+#   * Sets the `use-gss-proxy` option in the `gssd` section of `/etc/nfs.conf`
+#     This is not yet documented in the rpc.gssd man page for EL8, but is
+#     available in the example `/etc/nsf.conf file` packaged with `nfs-utils`.
+#   * Sets GSS_USE_PROXY in `/etc/sysconfig/nfs` in EL7, because the
+#     `use-gss-proxy` option in `/etc/nfs.conf` is not yet used in EL7.
 #
-# @param lockd_tcpport
-#   The TCP port upon which ``lockd`` should listen
+# @param lockd_port
+#   The TCP port upon which `lockd` should listen on both the NFS server and
+#   the NFS client (NFSv3)
 #
-# @param lockd_udpport
-#   The UDP port upon which ``lockd`` should listen
+#   * Sets the `port` option in the `lockd` section of `/etc/nfs.conf`
+#   * Corresponds to the `nlockmgr` service TCP port reported by `rpcinfo`
 #
-# @param rpcnfsdargs
-#   Arbitrary arguments to pass to ``nfsd``
+# @param lockd_udp_port
+#   The UDP port upon which `lockd` should listen on both the NFS server and
+#   the NFS client (NFSv3)
 #
-#   * The defaults disable ``NFSv2`` from being served to clients
+#   * Sets the `udp-port` option in the `lockd` section of `/etc/nfs.conf`
+#   * Corresponds to the `nlockmgr` service UDP port reported by `rpcinfo`
 #
-# @param rpcnfsdcount
-#   The number of NFS server threads to start by default
+# @param nfsd_port
+#   The port upon which NFS daemon on the NFS server should listen
 #
-# @param nfsd_v4_grace
-#   The NFSv4 grace period, in seconds
+#   * Sets the `port` option in the `nfsd` section of `/etc/nfs.conf`
+#   * Corresponds to the `nfs` and `nfs_acl` service ports reported by
+#     `rpcinfo`
 #
-# @param mountd_port
-#   The port upon which ``mountd`` should listen
+# @param sm_notify_outgoing_port
+#   The port that `sm-notify` will use when notifying NFSv3 peers
+#
+#   * Sets the `outgoing-port` option in the `sm-notify` section of
+#     `/etc/nfs.conf`
 #
 # @param statd_port
-#   The port upon which ``statd`` should listen
+#   The port upon which `statd` should listen on both the NFS server
+#   and the NFS client (NFSv3)
+#
+#   * Sets the `port` option in the `statd` section of `/etc/nfs.conf`
+#   * Corresponds to the `status` service port reported by `rpcinfo`
 #
 # @param statd_outgoing_port
-#   The port that ``statd`` will use when connecting to client systems
+#   The port that `statd` will use when communicating with NFSv3 peers
+#
+#   * Sets the `outgoing-port` option in the `status` section of
+#     `/etc/nfs.conf`
+#
+# @param custom_nfs_conf_opts
+#   Hash that allows other configuration options to be set in `/etc/nfs.conf`
+#
+#   * Each key is a known section of `/etc/nfs.conf`, such as `nfsd`.
+#   * Each value is a Hash of config parameter names and values.
+#   * Configuration values are not validated.
+#   * If a new section needs to be added to `/etc/nfs.conf`, you can use
+#     `concat::fragment`.
+#
+#   @example Set NFS server's grace and lease times in Hiera
+#     nfs::custom_nfs_conf_opts:
+#       nfsd:
+#         grace-time: 60
+#         lease-time: 60
+#
+# @param custom_daemon_args
+#   Hash that allows other configuration options to be set as daemon
+#   arguments in `/etc/sysconfig/nfs` in EL7
+#
+#   * Necessary to address `/etc/nfs.conf` limitations - Not all configuration
+#     options in EL7 can be specified in `/etc/nfs.conf`
+#   * Each key is the name of the shell variables processed by
+#     `/usr/lib/systemd/scripts/nfs-utils_env.sh`
+#
+#     * `nfs-utils_env.sh` generates `/run/sysconfig/nfs-utils` which contains
+#       the NFS daemon command line shell variables used by NFS services
+#     * Unfortunately, not all shell variable names in `/etc/sysconfig/nfs`
+#       match the generated variable names in `/run/sysconfig/nfs-utils`.
+#       For example, `STATDARG` gets transformed into `STATDARGS`.
+#
+#   * Each value is the argument string which will be wrapped in double
+#     quotes in `/etc/sysconfig/nfs`.
+#
+#   @example Disable syslog messages from the NFSv3 `rpc.statd` daemon in Hiera
+#     nfs::custom_daemon_args:
+#       STATDARG: "--no-syslog"
+#
+# @param idmapd
+#   Whether to use `idmapd` for NFSv4 ID to name mapping
 #
 # @param secure_nfs
-#   Enable secure NFS mounts
+#   Whether to enable secure NFS mounts
+#
+# @param sunrpc_udp_slot_table_entries
+#   Set the default UDP slot table entries in the kernel
+#
+#   * Most NFS performance guides seem to recommend this setting
+#   * If you have a low memory system, you may want to reduce this
+#
+# @param sunrpc_tcp_slot_table_entries
+#   Set the default TCP slot table entries in the kernel
+#
+#   * Most NFS performance guides seem to recommend this setting
+#   * If you have a low memory system, you may want to reduce this
 #
 # @param ensure_latest_lvm2
-#   See ``nfs::lvm2`` for further description
+#   See `nfs::lvm2` for further description
 #
 # @param kerberos
-#   Use the SIMP ``krb5`` module for Kerberos support
+#   Use the SIMP `krb5` module for Kerberos support
 #
-#   * You may need to set variables in ``::krb5::config`` via Hiera or your ENC
+#   * You may need to set variables in `krb5::config` via Hiera or your ENC
 #     if you do not like the defaults.
 #
 # @param keytab_on_puppet
-#   If set, and ``$krb5`` is ``true`` then set the NFS server to pull its
-#   keytab directly from the Puppet server
+#   Whether the NFS server will pull its keytab directly from the Puppet server
+#
+#   * Only applicable if `$kerberos` is `true.
+#   * If `false`, you will need to ensure the appropriate services are restarted
+#     and cached credentials are destroyed (e.g., gssproxy cache), when the keytab
+#     is changed.
 #
 # @param firewall
-#   Use the SIMP ``iptables`` module to manage firewall connections
+#   Use the SIMP `iptables` module to manage firewall connections
 #
 # @param tcpwrappers
-#   Use the SIMP ``tcpwrappers`` module to manage tcpwrappers
+#   Use the SIMP `tcpwrappers` module to manage TCP wrappers
 #
 # @param stunnel
-#   Wrap ``stunnel`` around the NFS server connections
+#   Wrap `stunnel` around critical NFSv4 connections
 #
-#   * This is ideally suited for environments without a working Kerberos setup
-#     and may cause issues when used together
+#   * This is intended for environments without a working Kerberos setup
+#     and may cause issues when used with Kerberos.
+#   * Use of Kerberos is preferred.
+#   * This will configure the NFS server and client mount to only use
+#     TCP communication
+#   * Cannot be used for NFSv4.0 connections, because NFSv4.0 uses a side
+#     channel to each NFS client to recall delegation responsibilities.
+#   * The following connections will not be secured, due to tunneling
+#     limitations in deployments using multiple NFS servers
 #
-# @param stunnel_tcp_nodelay
-#   Enable TCP_NODELAY for all stunnel connections
+#     - Connections to the rbcbind service
+#     - Connections to the rpc-rquotad service
+#
+#   * Use of stunnel for an individual client mount can be controlled
+#     by the `stunnel` parameter in the `nfs::client::mount` define.
+#   * Use of stunnel for just the NFS server on this host can be controlled
+#     by the `stunnel` parameter in the `nfs::server` class.
+#
+# @param stunnel_nfsd_port
+#   Listening port on the NFS server for the tunneled connection to
+#   the NFS server daemon
+#
+#   * Decrypted traffic will be forwarded to `$nfsd_port` on the NFS server
 #
 # @param stunnel_socket_options
-#   Additional socket options to set for stunnel connections
+#   Additional socket options to set for all stunnel connections
 #
-# @author Trevor Vaughan <tvaughan@onyxpoint.com>
-# @author Kendall Moore <kendall.moore@onyxpoint.com>
+#   * Stunnel socket options for an individual client mount can be controlled
+#     by the `stunnel_socket_options` parameter in the `nfs::client::mount`
+#     define.
+#   * Stunnel socket options for just the NFS server on this host can be
+#     controlled by the `stunnel_socket_options` parameter in the
+#     `nfs::server` class.
+#
+# @param stunnel_verify
+#   The level at which to verify TLS connections
+#
+#   * Levels:
+#
+#       * level 0 - Request and ignore peer certificate.
+#       * level 1 - Verify peer certificate if present.
+#       * level 2 - Verify peer certificate.
+#       * level 3 - Verify peer with locally installed certificate.
+#       * level 4 - Ignore CA chain and only verify peer certificate.
+#
+#   * Stunnel verify for an individual client mount can be controlled
+#     by the `stunnel_verify` parameter in the `nfs::client::mount` define.
+#   * Stunnel verify for just the NFS server on this host can be controlled
+#     by the `stunnel_verify` parameter in the `nfs::server` class.
+#
+# @param tcpwrappers
+#   Use the SIMP `tcpwrappers` module to manage TCP wrappers
+#
+# @param trusted_nets
+#   The systems that are allowed to connect to this service
+#
+#   * Set to 'any' or 'ALL' to allow the world
+#
+# @author https://github.com/simp/pupmod-simp-nfs/graphs/contributors
 #
 class nfs (
-  Boolean              $is_server              = false,
-  Boolean              $is_client              = true,
-  Boolean              $nfsv3                  = false,
-  Boolean              $mountd_nfs_v1          = true,
-  Boolean              $mountd_nfs_v2          = false,
-  Boolean              $mountd_nfs_v3          = false,
-  Stdlib::Absolutepath $rquotad                = '/usr/sbin/rpc.rquotad',
-  Simplib::Port        $rquotad_port           = 875,
-  Simplib::Port        $lockd_tcpport          = 32803,
-  Simplib::Port        $lockd_udpport          = 32769,
-  String               $rpcnfsdargs            = '-N 2',
-  Integer[0]           $rpcnfsdcount           = 8,
-  Integer[0]           $nfsd_v4_grace          = 90,
-  Simplib::Port        $mountd_port            = 20048,
-  Simplib::Port        $statd_port             = 662,
-  Simplib::Port        $statd_outgoing_port    = 2020,
-  Boolean              $secure_nfs             = false,
-  Boolean              $ensure_latest_lvm2     = true,
-  Boolean              $kerberos               = simplib::lookup('simp_options::kerberos', { 'default_value' => false }),
-  Boolean              $keytab_on_puppet       = simplib::lookup('simp_options::kerberos', { 'default_value' => true}),
-  Boolean              $firewall               = simplib::lookup('simp_options::firewall', { 'default_value' => false}),
-  Boolean              $tcpwrappers            = simplib::lookup('simp_options::tcpwrappers', { 'default_value' => false }),
-  Boolean              $stunnel                = simplib::lookup('simp_options::stunnel', { 'default_value' => false }),
-  Boolean              $stunnel_tcp_nodelay    = true,
-  Array[String]        $stunnel_socket_options = [],
-  Boolean              $stunnel_systemd_deps   = true,
-  Array[String]        $stunnel_wantedby       = []
+  Boolean               $is_server                     = false,
+  Boolean               $is_client                     = true,
+  Boolean               $nfsv3                         = false,
+  Boolean               $gssd_avoid_dns                = true,
+  Boolean               $gssd_limit_to_legacy_enctypes = false,
+  Boolean               $gssd_use_gss_proxy            = true,
+  Simplib::Port         $lockd_port                    = 32803,
+  Simplib::Port         $lockd_udp_port                = 32769,
+  Simplib::Port         $nfsd_port                     = 2049,
+  Simplib::Port         $sm_notify_outgoing_port       = 2021,
+  Simplib::Port         $statd_port                    = 662,
+  Simplib::Port         $statd_outgoing_port           = 2020,
+  Nfs::NfsConfHash      $custom_nfs_conf_opts          = {},
+  Nfs::LegacyDaemonArgs $custom_daemon_args            = {},
+  Boolean               $idmapd                        = false,
+  Boolean               $secure_nfs                    = false,
+  Integer[1]            $sunrpc_udp_slot_table_entries = 128,
+  Integer[1]            $sunrpc_tcp_slot_table_entries = 128,
+  Boolean               $ensure_latest_lvm2            = true,
+  Boolean               $kerberos                      = simplib::lookup('simp_options::kerberos', { 'default_value' => false }),
+  Boolean               $keytab_on_puppet              = simplib::lookup('simp_options::kerberos', { 'default_value' => true}),
+  Boolean               $firewall                      = simplib::lookup('simp_options::firewall', { 'default_value' => false}),
+  Boolean               $stunnel                       = simplib::lookup('simp_options::stunnel', { 'default_value' => false }),
+  Simplib::Port         $stunnel_nfsd_port             = 20490,
+  Array[String]         $stunnel_socket_options        = ['l:TCP_NODELAY=1','r:TCP_NODELAY=1'],
+  Integer               $stunnel_verify                = 2,
+  Boolean               $tcpwrappers                   = simplib::lookup('simp_options::tcpwrappers', { 'default_value' => false }),
+  Simplib::Netlist      $trusted_nets                  = simplib::lookup('simp_options::trusted_nets', { 'default_value' => ['127.0.0.1'] })
 ) {
 
   simplib::assert_metadata($module_name)
-
-  if $stunnel_tcp_nodelay {
-    $_stunnel_socket_options = $stunnel_socket_options + [
-      'l:TCP_NODELAY=1',
-      'r:TCP_NODELAY=1'
-    ]
-  }
-  else {
-    $_stunnel_socket_options = $stunnel_socket_options
+  if (versioncmp($facts['os']['release']['full'], '7.4') < 0) {
+    warning("This version of simp-nfs may not work with ${facts['os']['name']} ${facts['os']['release']['full']}. Use simp-nfs module version < 7.0.0 instead")
   }
 
-  include '::nfs::service_names'
-  include '::nfs::install'
+  if $firewall {
+    simplib::assert_optional_dependency($module_name, 'simp/iptables')
+  }
 
   if $kerberos {
-    include '::krb5'
+    simplib::assert_optional_dependency($module_name, 'simp/krb5')
+  }
 
-    if ($::operatingsystem in ['RedHat', 'CentOS', 'OracleLinux']) {
-      if (versioncmp($::operatingsystemmajrelease,'6') > 0) {
-        # This is here because the SELinux rules for directory includes in krb5
-        # are broken.
+  if $tcpwrappers and (versioncmp($facts['os']['release']['major'], '8') < 0) {
+    simplib::assert_optional_dependency($module_name, 'simp/tcpwrappers')
+  }
 
-        include '::nfs::selinux_hotfix'
+  include 'nfs::install'
 
-        Class['::nfs::selinux_hotfix'] -> Class['::nfs::install']
-      }
-    }
-
-    if $keytab_on_puppet {
-      include '::krb5::keytab'
-    }
+  if $kerberos and (versioncmp($facts['os']['release']['major'], '8') < 0) {
+    # This is here because the SELinux rules for directory includes in krb5
+    # are broken in selinux-policy < 3.13.1-229.el7_6.9. It does no harm
+    # on an EL7 system with the fixed selinux-policy.
+    include 'nfs::selinux_hotfix'
+    Class['nfs::selinux_hotfix'] -> Class['nfs::install']
   }
 
   if $ensure_latest_lvm2 {
-    include '::nfs::lvm2'
-
+    # TODO Figure out if this is still needed.
+    include 'nfs::lvm2'
     Class['nfs::lvm2'] -> Class['nfs::install']
   }
 
   if $is_client {
-    include '::nfs::client'
-
+    include 'nfs::client'
     Class['nfs::install'] -> Class['nfs::client']
   }
 
   if $is_server {
-
-    include '::nfs::server'
-
+    include 'nfs::server'
     Class['nfs::install'] -> Class['nfs::server']
-
-    if $kerberos {
-      Class['krb5'] ~> Class['nfs::server']
-
-      if $keytab_on_puppet {
-        Class['krb5::keytab'] ~> Class['nfs::server']
-      }
-    }
-  }
-
-  if $secure_nfs {
-    if !empty($::nfs::service_names::rpcgssd) {
-      service { $::nfs::service_names::rpcgssd :
-        ensure     => 'running',
-        enable     => true,
-        hasrestart => true,
-        hasstatus  => true
-      }
-
-      # If you don't put your keytabs on the Puppet server, you'll need to add
-      # code to trigger this yourself!
-      if $keytab_on_puppet {
-        Class['krb5::keytab'] ~> Service[$::nfs::service_names::rpcgssd]
-      }
-
-      Concat['/etc/sysconfig/nfs'] -> Service[$::nfs::service_names::rpcgssd]
-      Service[$::nfs::service_names::rpcbind] -> Service[$::nfs::service_names::rpcgssd]
-    }
-  }
-
-  if $is_server or $nfsv3 {
-
-    service { $::nfs::service_names::nfs_lock :
-      ensure     => 'running',
-      enable     => true,
-      hasrestart => true,
-      hasstatus  => true,
-      require    => Concat['/etc/sysconfig/nfs']
-    }
-
-    if (!$is_server and $is_client and $stunnel) {
-      service { $::nfs::service_names::rpcbind :
-        ensure  => 'stopped',
-        require => Concat['/etc/sysconfig/nfs']
-      }
-    }
-    else {
-      service { $::nfs::service_names::rpcbind :
-        ensure     => 'running',
-        enable     => true,
-        hasrestart => true,
-        hasstatus  => true
-      }
-
-      Concat['/etc/sysconfig/nfs'] -> Service[$::nfs::service_names::rpcbind]
-      Service[$::nfs::service_names::rpcbind] -> Service[$::nfs::service_names::nfs_lock]
-    }
-  }
-  else {
-    service { $::nfs::service_names::rpcbind :
-      ensure  => 'stopped',
-      require => Class['nfs::install']
-    }
-  }
-
-  svckill::ignore { 'nfs-idmap': }
-  svckill::ignore { 'nfs-secure': }
-  svckill::ignore { 'nfs-mountd': }
-  svckill::ignore { 'nfs-rquotad': }
-
-  concat { '/etc/sysconfig/nfs':
-    owner          => 'root',
-    group          => 'root',
-    mode           => '0644',
-    ensure_newline => true,
-    warn           => true
-  }
-
-  concat::fragment { 'nfs_init':
-    order   => 5,
-    target  => '/etc/sysconfig/nfs',
-    content => template("${module_name}/etc/sysconfig/nfs.erb")
-  }
-
-  Class['nfs::install'] -> Concat['/etc/sysconfig/nfs']
-
-  if $is_server {
-    Concat['/etc/sysconfig/nfs'] ~> Service[$::nfs::service_names::nfs_server]
   }
 }

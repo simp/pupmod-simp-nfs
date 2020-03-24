@@ -6,27 +6,31 @@
 
 #### Table of Contents
 
-1. [Description](#description)
-2. [Setup - The basics of getting started with nfs](#setup)
+* [Description](#description)
+  * [This is a SIMP module](#this-is-a-simp-module)
+* [Setup](#setup)
+    * [What nfs affects](#what-nfs-affects)
     * [Setup requirements](#setup-requirements)
     * [Beginning with nfs](#beginning-with-nfs)
-3. [Usage - Configuration options and additional functionality](#usage)
+* [Usage](#usage)
     * [Basic Usage](#basic-usage)
     * [Usage with krb5](#usage-with-krb5)
-    * [Automatic mounting of home directories](#automatic-mounting-of-home-directories)
-4. [Reference - An under-the-hood peek at what the module is doing and how](#reference)
-5. [Limitations - OS compatibility, etc.](#limitations)
-6. [Development - Guide for contributing to the module](#development)
+    * [Usage with stunnel](#usage-with-stunnel)
+    * [Other security features](#other-security-features)
+* [Reference](#reference)
+* [Limitations](#limitations)
+* [Development - Guide for contributing to the module](#development)
     * [Acceptance Tests - Beaker env variables](#acceptance-tests)
 
 ## Description
 
-The SIMP nfs module can manage the exporting and mounting of nfs devices. It
-provides all the infrastructure needed to share a folder over the network.
+The is a module for managing the exporting and mounting of NFS devices. It
+provides all the infrastructure needed to share folders over the network.
 
 The module is broken into two parts: the server and the client. It supports
-security with either krb5 or stunnel, but not both. The services conflict at a
-system level.
+security with either krb5 or stunnel, but not both, as these security services
+conflict at a system level.  It also manages firewall and TCP wrapper settings,
+when enabled.
 
 ### This is a SIMP module
 
@@ -41,69 +45,77 @@ it can be used independently:
  * When included within the SIMP ecosystem, security compliance settings will
    be managed from the Puppet server.
  * If used independently, all SIMP-managed security subsystems are disabled by
-   default and must be explicitly opted into by administrators.  See
-   simp_options for more detail.
+   default and must be explicitly opted into by administrators.  See the
+   [SIMP `simp_options` module](https://github.com/simp/pupmod-simp-simp_options)
+   for more detail.
 
 ## Setup
 
+### What nfs affects
+
+The `nfs` module installs NFS packages, configures services for the
+NFS server and/or client and manages most NFS configuration files.
+
 ### Setup Requirements
 
-The only thing necessary to begin using nfs is to install ``pupmod-simp-nfs``
-and ``pupmod-simp-autofs`` into your modulepath.
+The only requirement is to include the `nfs` module and its dependencies
+in your modulepath.
+
+*  If you are using any of the `nfs` module's optional dependencies, e.g.
+  `autofs`, please also include those modules in the module path as well.
+   The list of optional dependencies can be found in the `nfs` module's
+   `metadata.json` file under `simp/optional_dependencies`.
 
 ### Beginning with nfs
 
-To get started with this module, a few settings have to be set in hiera.
+You can use the `nfs` module to manage NFS settings for a node that is a NFS
+client, a NFS server or both.
 
-To be applied to all nodes, in ``default.yaml``:
+#### NFS client
 
-``` yaml
-nfs::server: "your.server.fqdn"
-nfs::server::trusted_nets: "%{alias('trusted_nets')}"
-nfs::simp_iptables: true
-```
+Including one or more `nfs::client::mount` defines in a node's manifest
+will automatically include the `nfs::client` class, which, in turn, will
+ensure the appropriate packages are installed and appropriate services
+are configured and started.
 
-On the node intended to be the server:
+#### NFS server
+
+Including one or more `nfs::server::export` defines in a node's manifest
+and setting the hiera below will automatically include the `nfs::server`
+class, which, in turn, will ensure the appropriate packages are installed and
+appropriate services are configured.
 
 ``` yaml
 nfs::is_server: true
-
-classes:
-  - 'site::nfs_server'
+nfs::is_client: false
 ```
-On a node intended to be a client:
+
+#### NFS server and client
+
+Including one or more `nfs::server::export` or `nfs::client::mount` defines
+in a node's manifest and setting the hiera below will automatically include
+the `nfs::server` and `nfs::client` classes. This will, in turn, ensure
+the appropriate packages are installed and appropriate services are configured
+for both roles.
 
 ``` yaml
-classes:
-  - 'site::nfs_client'
+nfs::is_server: true
 ```
 
 ## Usage
 
 ### Basic Usage
 
-In order to export ``/srv/nfs_share`` and mount it as ``/mnt/nfs`` on a client,
-you need to create a couple of profile classes.
+#### Exporting a filesystem
 
-One to be added to the node intended to be the server, to define the exported
-path:
+To export `/srv/nfs_share`, add the following to the NFS server's manifest:
 
 ``` puppet
-class site::nfs_server (
-  $kerberos = simplib::lookup('simp_options::kerberos', { 'default_value' => false, 'value_type' => Boolean }),
-  $trusted_nets = defined('$::trusted_nets') ? { true => $::trusted_nets, default => hiera('trusted_nets') }
-  ){
-  include '::nfs'
-
-  if $kerberos {
-    $security = 'krb5p'
-  } else {
-    $security = 'sys'
+  nfs::server::export { 'nfs4_root':
+    client      => [ <trusted networks> ]
+    export_path => '/srv/nfs_share',
+    require     => File['/srv/nfs_share']
   }
-
-  include '::nfs'
-
-  $security = $kerberos ? { true => 'krb5p', false => 'sys' }
 
   file { '/srv/nfs_share':
     ensure => 'directory',
@@ -111,44 +123,69 @@ class site::nfs_server (
     group  => 'root',
     mode   => '0644'
   }
-
-  nfs::server::export { 'nfs4_root':
-    client      => $trusted_nets,
-    export_path => '/srv/nfs_share',
-    sec         => [$security],
-    require     => File['/srv/nfs_share']
-  }
-}
 ```
 
-And another profile class to be added to a node intended to be a client, to
-mount the exported filesystem on a node. Note that all that is needed is the
-native Puppet ``mount`` resource:
+Be sure to set the following in hiera, as well:
+
+``` yaml
+nfs::is_server: true
+```
+
+#### Mounting
+
+##### Static mount
+
+To mount `/srv/nfs_share` statically to `/mnt/nfs` on the NFS client using
+NFSv4, add the following to the NFS client's manifest:
 
 ``` puppet
-class site::nfs_client (
-    $kerberos = simplib::lookup('simp_options::kerberos', { 'default_value' => false, 'value_type' => Boolean }),
-  ){
-  include '::nfs'
+$mount_dir = '/mnt/nfs'
 
-  $security = $kerberos ? { true => 'krb5p', false =>  'sys' }
+nfs::client::mount { $mount_dir:
+  nfs_server  => '<NFS server IP>',
+  remote_path => '/srv/nfs_share',
+  autofs      => false
+}
 
-  file { '/mnt/nfs':
-    ensure => 'directory',
-    mode => '755',
-    owner => 'root',
-    group => 'root'
-  }
+# mount directory must exist if not using autofs
+file { $mount_dir:
+  ensure => 'directory',
+  owner  => 'root',
+  group  => 'root',
+  mode   => '0644'
+}
 
-  mount { "/mnt/nfs":
-    ensure  => 'mounted',
-    fstype  => 'nfs4',
-    device  => '<your_server_fqdn>:/srv/nfs_share',
-    options => "sec=${security}",
-    require => File['/mnt/nfs']
-  }
+File[$mount_dir] -> Nfs::Client::Mount[$mount_dir]
+```
+##### Automatic direct mount
+
+To automount `/exports/data` as `/data` using an direct mount,
+add the following to the NFS client's manifest:
+
+``` puppet
+nfs::client::mount { '/data':
+  nfs_server  => '<NFS server IP>',
+  remote_path => '/exports/data'
 }
 ```
+
+##### Automatic indirect mount
+
+To automount `/exports/apps` as `/apps` using an indirect mount with key
+substitution, add the following to the NFS client's manifest:
+
+``` puppet
+nfs::client::mount { '/apps':
+  nfs_server              => '<NFS server IP>',
+  remote_path             => '/exports/apps',
+  autofs_indirect_map_key => '*',
+  autofs_add_key_subst    => true
+}
+```
+
+##### Automatic mount of home directories for LDAP users
+
+Please reference the [SIMP documentation](https://simp.readthedocs.io/en/stable/user_guide/HOWTO/NFS.html#exporting-home-directories) for details on how to implement this feature.
 
 ### Usage with krb5
 
@@ -156,79 +193,49 @@ class site::nfs_client (
 
 > **WARNING**
 >
-> This functionality requires some manual configuration and is largely
-> untested.
+> This functionality requires some manual configuration and when keys
+> change may require manual purging of the `gssproxy` cache.
 
 --------------------
 
-This module, used with the [SIMP krb5 module](https://github.com/simp/pupmod-simp-krb5),
+This module, used with the [SIMP `krb5` module](https://github.com/simp/pupmod-simp-krb5),
 can automatically use kerberos to secure the exported filesystem. The module
 can create and manage the entire kerberos configuration automatically, but
-check the krb5 module itself if you want more control.
+check the `krb5` module itself if you want more control.
 
-Modify the examples provided above to include the following hieradata:
-
-To be applied on every node in ``default.yaml``:
+Modify the examples provided above to include the following hieradata on
+all nodes:
 
 ``` yaml
-simp_options::kerberos : true
-nfs::kerberos : true
-nfs::secure_nfs : true
+simp_options::kerberos: true
+nfs::secure_nfs: true
 
-krb5::config::dns_lookup_kdc : false
+krb5::config::dns_lookup_kdc: false
 krb5::kdc::auto_keytabs::global_services:
   - 'nfs'
 ```
 
-On the node intended to be the server, add ``krb5::kdc`` to the class list:
+On the node intended to be the KDC, include the following class:
 
 ``` yaml
-classes:
-  - 'krb5::kdc'
+include 'krb5::kdc'
 ```
 
-Add the following entry to both your ``site::nfs_server`` and
-``site::nfs_client`` manifests replacing ``<class_name>`` with the correct
-class name (either ``nfs_sever`` or ``nfs_client``)
+On the NFS server and client nodes, add the following to each node's manifest:
 
 ```puppet
-Class['krb5::keytab'] -> Class['site::<class_name>']
-
 # If your realm is not your domain name then change this
 # to the string that is your realm
-# If your kdc server is not the puppet server change admin_server
-# entry to the FQDN of your admin server/kdc.
+$myrealm = upcase($facts['domain'])
 
-myrealm = inline_template('<%= @domain.upcase %>')
-
-krb5::setting::realm { ${myrealm}:
-  admin_server => hiera('puppet::server'),
-  default_domain => ${myrealm}
+krb5::setting::realm { $myrealm:
+  admin_server   => <KDC fqnd>,
+  default_domain => $myrealm
 }
-
 ```
-
-SIMP does not have kerberos set up to work automatically with LDAP yet.
-You must add a pricipal for  each user you want to give access to the krb5 protected
-directories.  To do this log onto the KDC and run:
-
-```bash
-kadmin.local
-# Note the prompt is now kadmin.local!
-kadmin.local:  add_principal -pw <password> <username>
-...
-kadmin.local:  exit
-```
-When the user logs on after kerberos has been configured they must run:
-
-```bash
-kinit
-```
-It will ask them for their password.  Once the have done this they should be
-able to access any shares from that realm.
 
 SIMP does not have kerberos set up to work automatically with LDAP yet. You
-must add a pricipal for each user you want to give access to the krb5 protected
+must add a principal for each user you want to give access to the krb5 protected
 directories. To do this log onto the KDC and run:
 
 ```bash
@@ -247,13 +254,300 @@ kinit
 It will ask them for their password. Once the have done this they should be
 able to access any shares from that realm.
 
-### Automatic mounting of home directories
+### Usage with stunnel
 
-Please reference the [SIMP documentation](https://simp.readthedocs.io/en/stable/user_guide/HOWTO/NFS.html#exporting-home-directories) for details on how to implement this feature.
+When use of kerberos is not viable, but you want to encrypt NFS traffic,
+you can configure the NFS server and client to use `stunnel` automatically
+on NFSv4 connections.
+
+This module uses the [SIMP `stunnel` module](https://github.com/simp/pupmod-simp-stunnel)
+for `stunnel` management.
+
+#### NFSv4 stunnel, one NFS server
+
+In this scenario, we will consider a site with one NFS server.
+
+##### Export with stunnel
+
+To enable use of stunnel at the NFS server, set the following in hieradata:
+
+``` yaml
+nfs::is_server: true
+nfs::stunnel: true
+```
+To export `/srv/nfs_share`, add the following to the NFS server's manifest:
+
+``` puppet
+nfs::server::export { 'nfs4_root':
+  client      => [ <trusted networks> ]
+  export_path => '/srv/nfs_share',
+  # This MUST be set to true due to a NFS exports processing bug.
+  # See description in nfs::server::export.
+  insecure    => true,
+  require     => File['/srv/nfs_share']
+}
+
+file { '/srv/nfs_share':
+  ensure => 'directory',
+  owner  => 'root',
+  group  => 'root',
+  mode   => '0644'
+}
+```
+
+##### Mount with stunnel
+
+To enable use of stunnel at the NFS client, set the following in hieradata:
+
+``` yaml
+nfs::stunnel: true
+```
+
+To mount `/srv/nfs_share` statically to `/mnt/nfs` on the NFS client,
+add the following to the NFS client's manifest:
+
+``` puppet
+$mount_dir = '/mnt/nfs'
+
+nfs::client::mount { $mount_dir:
+  nfs_server  => '<NFS server IP>',
+  remote_path => '/srv/nfs_share',
+  autofs      => false
+}
+
+# mount directory must exist if not using autofs
+file { $mount_dir:
+ ensure => 'directory',
+ owner  => 'root',
+ group  => 'root',
+ mode   => '0644'
+}
+
+File[$mount_dir] -> Nfs::Client::Mount[$mount_dir]
+```
+
+In this simple case, the mount manifest looks exactly the same as
+in the unencrypted case.  Only the hieradata has changed.
+
+#### NFSv4 stunnel, multiple NFS servers
+
+In this scenario, we will consider a site with two NFS servers. The example
+shown can be extrapolated to any number of NFS servers.
+
+##### Server 1 export with stunnel
+
+The first NFS server will be configured exactly as is done with the
+single server example above.
+
+Server 1 hieradata:
+
+``` yaml
+nfs::is_server: true
+nfs::stunnel: true
+```
+
+Server 1 manifest:
+
+``` puppet
+nfs::server::export { 'nfs4_root':
+  client      => [ <trusted networks> ]
+  export_path => '/srv/nfs_share',
+  # This MUST be set to true due to a NFS exports processing bug
+  insecure    => true,
+  require     => File['/srv/nfs_share']
+}
+
+file { '/srv/nfs_share':
+  ensure => 'directory',
+  owner  => 'root',
+  group  => 'root',
+  mode   => '0644'
+}
+```
+
+##### Server 2 export with stunnel
+
+The second NFS server requires a little more configuration.
+
+To enable use of stunnel at this NFS server and prevent port conflicts
+with Server 1 on any client that wants to mount from both servers over
+stunnel, set the following in hieradata:
+
+``` yaml
+nfs::is_server: true
+nfs::stunnel: true
+
+# The nfsd port must be unique among all NFS servers at the site.
+# The stunnel nfsd port is configured here for consistency, but
+# could be left at the default.
+nfs::nfsd_port: 2050
+nfs::stunnel_nfsd_port: 20500
+```
+
+To export `/srv/nfs_share2`, add the following to Server 2's manifest:
+
+``` puppet
+nfs::server::export { 'nfs4_root':
+  client      => [ <trusted networks> ]
+  export_path => '/srv/nfs_share2',
+  # This MUST be set to true due to a NFS exports processing bug
+  insecure    => true,
+  require     => File['/srv/nfs_share2']
+}
+
+file { '/srv/nfs_share2':
+  ensure => 'directory',
+  owner  => 'root',
+  group  => 'root',
+  mode   => '0644'
+}
+```
+
+##### Mounts to servers with stunnel
+
+To enable use of stunnel at the NFS client, set the following in hieradata:
+
+``` yaml
+nfs::stunnel: true
+```
+
+To mount `/srv/nfs_share` from Server 1 statically to `/mnt/nfs`
+and `/srv/nfs_share2` from Server 2 statically to `/mnt/nfs2`,
+add the following to the NFS client's manifest:
+
+``` puppet
+# this mount uses the defaults, because Server 1 uses nfs
+# module defaults
+$mount_dir = '/mnt/nfs'
+nfs::client::mount { $mount_dir:
+  nfs_server  => '<NFS Server 1 IP>',
+  remote_path => '/srv/nfs_share',
+  autofs      => false
+}
+
+# this mount sets ports to match those of Server 2
+$mount_dir2 = '/mnt/nfs2'
+nfs::client::mount { $mount_dir2:
+  nfs_server        => '<NFS Server 2 IP>',
+  remote_path       => '/srv/nfs_share2',
+  autofs            => false,
+  nfsd_port         => 2050,
+  stunnel_nfsd_port => 20500
+}
+
+# mount directories must exist if not using autofs
+file { [ $mount_dir, $mount_dir2 ]:
+ ensure => 'directory',
+ owner  => 'root',
+ group  => 'root',
+ mode   => '0644'
+}
+
+File[$mount_dir] -> Nfs::Client::Mount[$mount_dir]
+File[$mount_dir2] -> Nfs::Client::Mount[$mount_dir2]
+```
+
+#### NFSv3 considerations
+
+NFSv3 traffic cannot be encrypted with `stunnel` because of two key reasons:
+
+* The NFS client sends the NFS server Network Status Manager (NSM) notifications
+  via UDP, exclusively.
+
+  * `stunnel` only handles TCP traffic.
+  * Loss of these notification may affect NFS performance.
+
+* In multi-NFS-server environments, there is no mechanism to configure `rpcbind`
+  to use a non-standard port.
+
+  * NFSv3 heavily relies upon `rpcbind` to determine the side-band channel ports
+    in use on the NFS nodes.  This includes the `statd` and `lockd` ports used
+    in NSM and NLM, respectively.
+  * A unique `rpcbind` port per server is required in order for a NFS client
+    to be able tunnel its server-specific RPC requests to the appropriate
+    server.
+
+Despite this limitation, this module still fully supports unencrypted NFSv3
+and allows the NFS server and client to use unencrypted NFSv3 concurrently
+with stunneled NFSv4.
+
+* If a NFS server is configured to both allow NFSv3 and to use stunnel,
+  it will accept unencrypted NFSv3 connections, unencrypted NFSv4
+  connections and stunneled NFSv4 connections.
+
+  The hieradata for this configuration is:
+
+  ``` yaml
+  nfs::is_server: true
+  nfs::nfsv3: true
+  nfs::stunnel: true
+  ```
+
+* If a NFS client is configured to both allow NFSv3 and to use stunnel,
+  it can use unencrypted NFSv3 mounts and stunneled NFSv4 mounts.
+
+  The hieradata for this configuration is:
+
+  ``` yaml
+  nfs::nfsv3: true
+  nfs::stunnel: true
+  ```
+
+### Other security features
+
+This module can be configured to automatically add firewall rules and allow
+NFS services in TCP wrappers using the
+[SIMP `iptables` module](https://github.com/simp/pupmod-simp-iptables) and the
+[SIMP `tcpwrappers` module](https://github.com/simp/pupmod-simp-tcpwrappers),
+respectively.
+
+To enable these features on the NFS server and NFS client nodes, add the
+following to their hieradata:
+
+``` yaml
+simp_options::firewall: true
+simp_options::tcpwrappers: true
+```
 
 ## Reference
 
+Please refer to the [REFERENCE.md](./REFERENCE.md).
+
 ## Limitations
+
+This module does not yet manage the following:
+
+* `/etc/nfsmounts.conf`
+* `gssproxy` configuration
+
+  * If you are using a custom keytab location, you must fix the `cred_store`
+    entries in `/etc/gssproxy/24-nfs-server.conf` and
+    `/etc/gssproxy/99-nfs-client.conf`.
+  * If a node's keytab has changed content and the old keytab entries
+    are no longer valid, you will have to manually clear the `gssproxy`
+    credential cache using `kdestroy -c <gssproxy cache>`.
+    Simply restarting the `gssproxy` service does not clear the cache
+    and re-read the keytab!
+
+* RDMA packages or its service
+* `idmapd` configuration for the `umich_ldap` translation method
+
+  * If you need to configure this, consider using `nfs::idmapd::config::content`
+    to specify full contents of the `/etc/idmapd.conf` file.
+
+This module does not address an intermittent systemd issue in which the
+`rpc.statd` NFSv3 daemon is not always stopped when the `rpc-statd` service is
+stopped. When this occurs,
+
+* `systemd` no longer has a record of that daemon's PID and cannot fix the
+  problem.
+* The `rpc-statd` service cannot be subsequently started.
+
+  * When the service tries to start another instance of `rpc.statd`, the new
+    instance detects the running instance and then immediately exits with a
+    failed exit code.
+
+* You must manually kill the running `rpc.statd` daemon to recover.
 
 SIMP Puppet modules are generally intended for use on Red Hat Enterprise Linux
 and compatible distributions, such as CentOS. Please see the [`metadata.json` file](./metadata.json)

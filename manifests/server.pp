@@ -1,259 +1,173 @@
-# **NOTE: THIS IS A [PRIVATE](https://github.com/puppetlabs/puppetlabs-stdlib#assert_private) CLASS**
+# @summary Manage configuration and services for a NFS server
 #
-# Configure a NFS server with a default configuration that nails up the ports
-# so that you can pass them through ``iptables``.
+# If using the `nfs::server::export` define, this will be automatically called
+# for you.
 #
-# This defaults to ``NFSv4``.
+# @param nfsd_vers3
+#   Allow use of NFSv3
+#
+#   * Sets the `vers3` option in the `nfsd` section of `/etc/nfs.conf`
+#   * Set this to `false` when `$nfs::nfsv3` is `true`, `$nfs::is_client` is
+#     `true`, and you want the NFS client on this host to be able to create
+#     NFSv3 mounts from other hosts, but do **not** want other hosts to be able
+#     create NFSv3 mounts of filesystems exported by this host's NFS server.
+#     Otherwise, it should remain at the default value.
+#
+# @param nfsd_vers4
+#   Allow use of NFSv4
+#
+#   * Sets the `vers4` option in the `nfsd` section of `/etc/nfs.conf`
+#
+# @param nfsd_vers4_0
+#   Allow use of NFSv4.0
+#
+#   * NFSv4.0 uses a side channel to the NFS client to recall delegation
+#     responsibilities.  When this is used, all communications cannot be
+#     encrypted with `stunnel`.
+#   * Sets the `vers4.0` option in the `nfsd` section of `/etc/nfs.conf`
+#
+# @param nfsd_vers4_1
+#   Allow use of NFSv4.1
+#
+#   * Sets the `vers4.1` option in the `nfsd` section of `/etc/nfs.conf`
+#
+# @param nfsd_vers4_2
+#   Allow use of NFSv4.2
+#
+#   * Sets the `vers4.2` option in the `nfsd` section of `/etc/nfs.conf`
+#   * NFSv4.2 is available beginning with EL8, so this setting will be
+#     ignored in EL7.
+#
+# @param mountd_port
+#   The port upon which `mountd` should listen on the server (NFSv3)
+#
+#   * Sets the `port` option in the `mountd` section of `/etc/nfs.conf`
+#   * Corresponds to the `mountd` service port reported by `rpcinfo`
+#
+# @param nfsd_port
+#   The port upon which NFS daemon on the NFS server should listen
+#
+#   * Sets the `port` option in the `nfsd` section of `/etc/nfs.conf`
+#   * Corresponds to the `nfs` and `nfs_acl` service ports reported by
+#     `rpcinfo`
+#
+# @param rquotad_port
+#   The port upon which `rquotad` on the NFS server should listen
+#
+#   * Sets the port command line option in `RPCRQUOTADOPTS` in
+#     `/etc/sysconfig/rpc-rquotad`
+#   * Corresponds to the `rquotad` service port reported by `rpcinfo`
+#
+# @param custom_rpcrquotad_opts
+#   * Additional arguments to pass to the `rpc.rquotad` daemon
+#
+# @param stunnel
+#   Controls enabling `stunnel` to encrypt critical NFSv4 connections
+#
+#   * This will configure the NFS server to only use TCP communication
+#   * This cannot be effectively used with NFSv4.0 connections because of the
+#     delegation side channel to the NFS client.
+#
+# @param stunnel_accept_address
+#   The address upon which the NFS server will listen for stunnel connections
+#
+#   * You should be set this to `0.0.0.0` for all interfaces
+#   * Unused when `$stunnel` is `false`
+#
+# @param stunnel_nfsd_accept_port
+#   Listening port on the NFS server for the tunneled connection to
+#   the NFS server daemon
+#
+#   * Decrypted traffic will be forwarded to `nfsd_port` on the NFS server
+#     daemon.
+#   * Unused when `$stunnel` is `false`
+#
+# @param stunnel_socket_options
+#   Additional socket options to set for stunnel connections
+#
+#   * Unused when `$stunnel` is `false`
+#
+# @param stunnel_verify
+#   The level at which to verify TLS connections from clients
+#
+#   * Levels:
+#
+#       * level 0 - Request and ignore peer certificate.
+#       * level 1 - Verify peer certificate if present.
+#       * level 2 - Verify peer certificate.
+#       * level 3 - Verify peer with locally installed certificate.
+#       * level 4 - Ignore CA chain and only verify peer certificate.
+#
+#   * Unused when `$stunnel` is `false`
+#
+# @param stunnel_wantedby
+#   The `systemd` targets that need `stunnel` to be active prior to being
+#   activated
+#
+#   * Unused when `$stunnel` is `false`
 #
 # @param trusted_nets
 #   The systems that are allowed to connect to this service
 #
-#   * Set to ``any`` or ``ALL`` to allow the world
+#   * Set to 'any' or 'ALL' to allow the world
 #
-# @param nfsv3
-#   Serve out ``NFSv3`` shares
-#
-# @param rpcrquotadopts
-#   Options that should be passed to ``rquotad`` at start time
-#
-# @param lockd_arg
-#   Options that should be passed to ``lockd`` at start time
-#
-# @param nfsd_module
-#   If set to ``noload`` will prevent the ``nfsd`` kernel module from being
-#   pre-loaded
-#
-#   * **NOTE:** if this is set to _anything_, the template will say ``noload``
-#
-# @param rpcmountdopts
-#   An arbitrary string of options to pass to ``mountd`` at start time
-#
-# @param statdarg
-#   An arbitrary string of options to pass to ``statd`` at start time
-#
-# @param statd_ha_callout
-#   The path to an application that should be used for ``statd`` HA
-#
-# @param rpcidmapdargs
-#   Artibrary arguments to pass to ``idmapd`` at start time
-#
-# @param rpcgssdargs
-#   Arbitrary arguments to pass to ``gssd`` at start time
-#
-# @param rpcsvcgssdargs
-#   Arbitrary arguments to pass to ``svcgssd`` at start time
-#
-# @param sunrpc_udp_slot_table_entries
-#
-#   Set the default UDP slot table entries in the kernel
-#
-#   * Most NFS server performance guides seem to recommend this setting
-#
-#   * If you have a low memory system, you may want to reduce this
-#
-# @param sunrpc_tcp_slot_table_entries
-#
-#   Set the default TCP slot table entries in the kernel
-#
-#   * Most NFS server performance guides seem to recommend this setting
-#
-#   * If you have a low memory system, you may want to reduce this
-#
-# @note Due to a bug in EL, ``$mountd_nfs_v1`` must be set to ``yes`` to
-#   properly unmount
-#
-# @note The ``rpcbind`` port and the ``rpc.quotad`` ports are open to the
-#   trusted networks so that the ``quota`` command works on the clients
-#
-# @param firewall
-#   Use the SIMP ``iptables`` module to manage firewall connections
-#
-# @param stunnel Use the SIMP ``stunnel`` module to manage stunnel
-#
-# @param tcpwrappers
-#   Use the SIMP ``tcpwrappers`` module to manage tcpwrappers
-#
-# @author Trevor Vaughan <tvaughan@onyxpoint.com>
-# @author Morgan Rhodes <morgan@puppet.com>
-# @author Kendall Moore <kendall.moore@onyxpoint.com>
+# @api private
+# @author https://github.com/simp/pupmod-simp-nfs/graphs/contributors
 #
 class nfs::server (
-  Simplib::Netlist               $trusted_nets                  = simplib::lookup('simp_options::trusted_nets', { 'default_value' => ['127.0.0.1'] }),
-  Boolean                        $nfsv3                         = $::nfs::nfsv3,
-  Optional[String]               $rpcrquotadopts                = undef,
-  Optional[String]               $lockd_arg                     = undef,
-  Optional[String]               $nfsd_module                   = undef,
-  Optional[String]               $rpcmountdopts                 = undef,
-  Optional[String]               $statdarg                      = undef,
-  Optional[Stdlib::Absolutepath] $statd_ha_callout              = undef,
-  Optional[String]               $rpcidmapdargs                 = undef,
-  Optional[String]               $rpcgssdargs                   = undef,
-  Optional[String]               $rpcsvcgssdargs                = undef,
-  Integer[1]                     $sunrpc_udp_slot_table_entries = 128,
-  Integer[1]                     $sunrpc_tcp_slot_table_entries = 128,
-  Boolean                        $firewall                      = $::nfs::firewall,
-  Boolean                        $stunnel                       = $::nfs::stunnel,
-  Boolean                        $tcpwrappers                   = $::nfs::tcpwrappers
+  Boolean          $nfsd_vers3                    = $nfs::nfsv3,
+  Boolean          $nfsd_vers4                    = true,
+  Boolean          $nfsd_vers4_0                  = false,
+  Boolean          $nfsd_vers4_1                  = true,
+  Boolean          $nfsd_vers4_2                  = true,
+  Simplib::Port    $mountd_port                   = 20048,
+  Simplib::Port    $nfsd_port                     = $nfs::nfsd_port,
+  Simplib::Port    $rquotad_port                  = 875,
+  Optional[String] $custom_rpcrquotad_opts        = undef,
+  Boolean          $stunnel                       = $nfs::stunnel,
+  Simplib::IP      $stunnel_accept_address        = '0.0.0.0',
+  Simplib::Port    $stunnel_nfsd_accept_port      = $nfs::stunnel_nfsd_port,
+  Array[String]    $stunnel_socket_options        = $nfs::stunnel_socket_options,
+  Integer          $stunnel_verify                = $nfs::stunnel_verify,
+  Array[String]    $stunnel_wantedby              = [ 'nfs-server.service' ],
+  Simplib::Netlist $trusted_nets                  = $nfs::trusted_nets
 ) inherits ::nfs {
 
   assert_private()
 
-  if $tcpwrappers {
-    include '::tcpwrappers'
+  if $stunnel and $nfsd_vers4_0 {
+    fail('NFSv4.0 within stunnel is unsupported. Set nfs::server::nfsd_vers4_0 or nfs::server::stunnel to false to fix.')
   }
 
-  if $stunnel {
-    contain '::nfs::server::stunnel'
+  include 'nfs::base::config'
+  include 'nfs::base::service'
+  include 'nfs::server::config'
+  include 'nfs::server::service'
 
-    # This is here due to some bug where allowing things through regularly
-    # isn't working correctly.
-    if $tcpwrappers {
-      tcpwrappers::allow { 'nfs': pattern => 'ALL' }
+  Class['nfs::base::config'] ~> Class['nfs::base::service']
+  Class['nfs::server::config'] ~> Class['nfs::server::service']
+  Class['nfs::base::service'] ~> Class['nfs::server::service']
+
+  include 'nfs::idmapd::server'
+
+  if $nfs::server::stunnel {
+    include 'nfs::server::stunnel'
+    Class['nfs::server::stunnel'] ~> Class['nfs::server::service']
+  }
+
+  if $nfs::firewall {
+    include 'nfs::server::firewall'
+  }
+
+  if $nfs::kerberos {
+    include 'krb5'
+
+    Class['krb5'] ~> Class['nfs::server::service']
+
+    if $nfs::keytab_on_puppet {
+      include 'krb5::keytab'
+
+      Class['krb5::keytab'] ~> Class['nfs::server::service']
     }
-  }
-
-  if $nfsv3 { include '::nfs::idmapd' }
-
-  concat::fragment { 'nfs_init_server':
-    target  => '/etc/sysconfig/nfs',
-    content => template("${module_name}/etc/sysconfig/nfs_server.erb")
-  }
-
-  concat { '/etc/exports':
-    owner          => 'root',
-    group          => 'root',
-    mode           => '0644',
-    ensure_newline => true,
-    warn           => true,
-    notify         => Exec['nfs_re-export']
-  }
-
-  exec { 'nfs_re-export':
-    command     => '/usr/sbin/exportfs -ra',
-    refreshonly => true,
-    logoutput   => true,
-    require     => [
-      Package['nfs-utils'],
-      Service[$::nfs::service_names::nfs_server]
-    ]
-  }
-
-  service { $::nfs::service_names::nfs_server :
-    ensure     => 'running',
-    enable     => true,
-    hasrestart => true,
-    hasstatus  => true
-  }
-
-  Service[$::nfs::service_names::rpcbind] -> Service[$::nfs::service_names::nfs_server]
-
-  # Plopping this in place so that NFS starts with the proper number of slot
-  # entries upon reboot.
-  file { '/etc/init.d/sunrpc_tuning':
-    ensure  => 'file',
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0754',
-    content => template("${module_name}/server/sunrpc_tuning.erb")
-  }
-
-  # $stunnel_port_override is a value that is set by the stunnel overlay.
-  if $stunnel and $::nfs::server::stunnel::stunnel_port_override {
-    if $firewall {
-      include '::iptables'
-
-      iptables::listen::tcp_stateful{ 'nfs_client_tcp_ports':
-        trusted_nets => $trusted_nets,
-        dports       => $::nfs::server::stunnel::stunnel_port_override
-      }
-      iptables::listen::udp { 'nfs_client_udp_ports':
-        trusted_nets => $trusted_nets,
-        dports       => $::nfs::server::stunnel::stunnel_port_override
-      }
-    }
-  }
-  else {
-    if ( $::nfs::mountd_nfs_v2 ) or ( $::nfs::mountd_nfs_v3 ) {
-      $_ports = [
-        111,
-        2049,
-        $::nfs::rquotad_port,
-        $::nfs::lockd_tcpport,
-        $::nfs::mountd_port,
-        $::nfs::statd_port
-      ] # <-- End ports
-    }
-    else {
-      $_ports = [
-        111,
-        2049,
-        $::nfs::rquotad_port
-      ]
-    }
-
-    if $firewall {
-      include '::iptables'
-
-      iptables::listen::tcp_stateful { 'nfs_client_tcp_ports':
-        trusted_nets => $trusted_nets,
-        dports       => $_ports
-      }
-      iptables::listen::udp { 'nfs_client_udp_ports':
-        trusted_nets => $trusted_nets,
-        dports       => $_ports
-      }
-    }
-  }
-
-  service { 'sunrpc_tuning':
-    enable  => true,
-    require => [
-      File['/etc/init.d/sunrpc_tuning'],
-      Service[$::nfs::service_names::nfs_server]
-    ]
-  }
-
-  if $tcpwrappers {
-    tcpwrappers::allow { [
-      'mountd',
-      'statd',
-      'rquotad',
-      'lockd',
-      'rpcbind'
-      ]:
-      pattern => $trusted_nets
-    }
-  }
-
-  sysctl { 'sunrpc.tcp_slot_table_entries':
-    ensure => 'present',
-    val    => $sunrpc_tcp_slot_table_entries,
-    silent => true,
-    notify => Service[$::nfs::service_names::nfs_server]
-  }
-
-  sysctl { 'sunrpc.udp_slot_table_entries':
-    ensure => 'present',
-    val    => $sunrpc_udp_slot_table_entries,
-    silent => true,
-    notify => Service[$::nfs::service_names::nfs_server]
-  }
-
-  if $::nfs::secure_nfs {
-    if !empty($::nfs::service_names::rpcsvcgssd) {
-      service { $::nfs::service_names::rpcsvcgssd :
-        ensure     => 'running',
-        enable     => true,
-        hasrestart => true,
-        hasstatus  => true
-      }
-
-      Service[$::nfs::service_names::rpcbind] -> Service[$::nfs::service_names::rpcsvcgssd]
-    }
-
-    Service[$::nfs::service_names::rpcbind] -> Sysctl['sunrpc.tcp_slot_table_entries']
-    Service[$::nfs::service_names::rpcbind] -> Sysctl['sunrpc.udp_slot_table_entries']
-    Sysctl['sunrpc.tcp_slot_table_entries'] ~> Service[$::nfs::service_names::nfs_lock]
-    Sysctl['sunrpc.udp_slot_table_entries'] ~> Service[$::nfs::service_names::nfs_lock]
   }
 }

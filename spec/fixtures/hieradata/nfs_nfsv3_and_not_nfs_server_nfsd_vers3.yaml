@@ -1,0 +1,4 @@
+---
+nfs::is_server : true
+nfs::nfsv3: true
+nfs::server::nfsd_vers3 : false

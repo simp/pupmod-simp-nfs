@@ -5,143 +5,116 @@ test_name 'nfs basic'
 describe 'nfs basic' do
 
   servers = hosts_with_role( hosts, 'nfs_server' )
-  clients = hosts_with_role( hosts, 'client' )
+  servers_with_client = hosts_with_role( hosts, 'nfs_server_and_client' )
+  servers_tcpwrappers = servers.select { |server| server.name.match(/el7/) }
 
-  let(:manifest) {
-    <<-EOM
-      include 'nfs'
-      include 'ssh'
-    EOM
+  clients = hosts_with_role( hosts, 'nfs_client' )
+  clients_tcpwrappers = clients.select { |client| client.name.match(/el7/) }
+
+  base_hiera = {
+    # Set us up for a basic NFS (firewall-only)
+    'simp_options::firewall'                => true,
+    'simp_options::kerberos'                => false,
+    'simp_options::stunnel'                 => false,
+    'simp_options::tcpwrappers'             => false,
+    'ssh::server::conf::permitrootlogin'    => true,
+    'ssh::server::conf::authorizedkeysfile' => '.ssh/authorized_keys',
+
+    # assuming all hosts configured to have same networks (public and private)
+    'simp_options::trusted_nets'            => host_networks(hosts[0]),
+
+    # make sure we are using iptables and not nftables because nftables
+    # core dumps with rules from the nfs module
+    'firewalld::firewall_backend'           => 'iptables'
   }
 
-  let(:hieradata) {
-    <<-EOM
----
-simp_options::firewall : true
-simp_options::kerberos : false
-simp_options::stunnel : false
-simp_options::tcpwrappers : false
-simp_options::trusted_nets : ['ALL','0.0.0.0/0']
+  context 'with firewall only' do
+    context 'NFSv4 with firewall' do
+      opts = {
+        :base_hiera              => base_hiera,
+        :export_insecure         => false,
+        :nfs_sec                 => 'sys',
+        :nfsv3                   => false,
+        :mount_autodetect_remote => [ true, false ],
+        :verify_reboot           => true
+      }
 
-ssh::server::conf::permitrootlogin : true
-ssh::server::conf::authorizedkeysfile : '.ssh/authorized_keys'
+      it_behaves_like 'a NFS share using static mounts with distinct client/server roles', servers, clients, opts
+      it_behaves_like 'a NFS share using static mounts with combined client/server roles', servers_with_client, opts
+      it_behaves_like 'a NFS share using autofs with distinct client/server roles', servers, clients, opts
+    end
 
-# Set us up for a basic server for right now (no Kerberos)
+    context 'NFSv3 with firewall' do
+      opts = {
+        :base_hiera              => base_hiera,
+        :export_insecure         => false,
+        :nfs_sec                 => 'sys',
+        :nfsv3                   => true,
+        :mount_autodetect_remote => [ true, false ], # used in combined client/server test
+        :verify_reboot           => true
+      }
 
-# These two need to be paired in our case since we expect to manage the Kerberos
-# infrastructure for our tests.
-nfs::secure_nfs: false
-nfs::is_server: #IS_SERVER#
-    EOM
-  }
-
-  context 'setup' do
-    hosts.each do |host|
-      it 'should work with no errors' do
-        hdata = hieradata.dup
-        if servers.include?(host)
-          hdata.gsub!(/#NFS_SERVER#/m, fact_on(host, 'fqdn'))
-          hdata.gsub!(/#IS_SERVER#/m, 'true')
-        else
-          hdata.gsub!(/#NFS_SERVER#/m, servers.last.to_s)
-          hdata.gsub!(/#IS_SERVER#/m, 'false')
-        end
-
-        set_hieradata_on(host, hdata)
-        apply_manifest_on(host, manifest, :catch_failures => true)
-      end
-
-      it 'should be idempotent' do
-        apply_manifest_on(host, manifest, :catch_changes => true)
-      end
+      it_behaves_like 'a NFS share using static mounts with distinct client/server roles', servers, clients, opts
+      it_behaves_like 'a NFS share using static mounts with combined client/server roles', servers_with_client, opts
+      it_behaves_like 'a NFS share using autofs with distinct client/server roles', servers, clients, opts
     end
   end
 
-  server_manifest = <<-EOM
-    include 'nfs'
-    include 'ssh'
-
-    file { '/srv/nfs_share':
-      ensure => 'directory',
-      owner  => 'root',
-      group  => 'root',
-      mode   => '0644'
-    }
-
-    file { '/srv/nfs_share/test_file':
-      ensure  => 'file',
-      owner   => 'root',
-      group   => 'root',
-      mode    => '0644',
-      content => 'This is a test'
-    }
-
-    nfs::server::export { 'nfs4_root':
-      clients     => ['*'],
-      export_path => '/srv/nfs_share',
-      sec         => ['sys']
-    }
-
-    File['/srv/nfs_share'] -> Nfs::Server::Export['nfs4_root']
-  EOM
-
-  context "as a server" do
-    servers.each do |host|
-      it 'should export a directory' do
-        apply_manifest_on(host, server_manifest, :catch_failures => true)
-      end
+  context 'long running test' do
+    it 'should ensure vagrant connectivity' do
+      on(hosts, 'date')
     end
   end
 
-  context "as a client" do
-    clients.each do |host|
-      servers.each do |server|
-        it "should mount a directory on the #{server} server" do
-          server_fqdn = fact_on(server, 'fqdn')
+  context 'with firewall and tcpwrappers' do
+    tcpwrappers_hiera = {
+      'simp_options::tcpwrappers' => true,
 
-          client_manifest = <<-EOM
-            include 'ssh'
+      # use as much TCP as possible for NFS
+      'nfs::custom_nfs_conf_opts' => {
+        'nfsd' => {
+          'tcp' => true,
+          'udp' => false
+        }
+      }
+    }
 
-            nfs::client::mount { '/mnt/#{server}':
-              nfs_server        => '#{server_fqdn}',
-              remote_path       => '/srv/nfs_share',
-              autodetect_remote => #{!servers.include?(host)},
-              autofs            => false
-            }
-          EOM
+    context 'NFSv4 with firewall and tcpwrappers' do
+      opts = {
+        :base_hiera      => base_hiera.merge(tcpwrappers_hiera),
+        :export_insecure => false,
+        :nfs_sec         => 'sys',
+        :nfsv3           => false,
+        :verify_reboot   => false
+      }
 
-          if servers.include?(host)
-            client_manifest = client_manifest + "\n" + server_manifest
-          end
+      it_behaves_like 'a NFS share using static mounts with distinct client/server roles',
+        servers_tcpwrappers, clients_tcpwrappers, opts
 
-          host.mkdir_p("/mnt/#{server}")
-          apply_manifest_on(host, client_manifest, :catch_failures => true)
-          on(host, %(grep -q 'This is a test' /mnt/#{server}/test_file))
-          on(host, %{puppet resource mount /mnt/#{server} ensure=absent})
-        end
+      it_behaves_like 'a NFS share using autofs with distinct client/server roles',
+        servers_tcpwrappers, clients_tcpwrappers, opts
+    end
 
-        it "should mount a directory on the #{server} server with autofs" do
-          server_fqdn = fact_on(server, 'fqdn')
+    context 'NFSv3 with firewall and tcpwrappers' do
+      opts = {
+        :base_hiera      => base_hiera.merge(tcpwrappers_hiera),
+        :export_insecure => false,
+        :nfs_sec         => 'sys',
+        :nfsv3           => true,
+        :verify_reboot   => false
+      }
 
-          autofs_client_manifest = <<-EOM
-            include 'ssh'
+      it_behaves_like 'a NFS share using static mounts with distinct client/server roles',
+        servers_tcpwrappers, clients_tcpwrappers, opts
 
-            nfs::client::mount { '/mnt/#{server}':
-              nfs_server        => '#{server_fqdn}',
-              remote_path       => '/srv/nfs_share',
-              autodetect_remote => #{!servers.include?(host)},
-              autofs            => true
-            }
-          EOM
+      it_behaves_like 'a NFS share using autofs with distinct client/server roles',
+        servers_tcpwrappers, clients_tcpwrappers, opts
+    end
 
-          if servers.include?(host)
-            autofs_client_manifest = autofs_client_manifest + "\n" + server_manifest
-          end
-
-          apply_manifest_on(host, autofs_client_manifest)
-          # apply_manifest_on(host, autofs_client_manifest, catch_failures: true)
-          apply_manifest_on(host, autofs_client_manifest, catch_changes: true)
-          on(host, %{puppet resource service autofs ensure=stopped})
+    context 'clean up for next test' do
+      (servers_tcpwrappers + clients_tcpwrappers).each do |host|
+        it 'should disable tcpwrappers by removing hosts.allow and hosts.deny files' do
+          on(host, 'rm -f /etc/hosts.allow /etc/hosts.deny')
         end
       end
     end

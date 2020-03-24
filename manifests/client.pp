@@ -1,74 +1,84 @@
-# **NOTE: THIS IS A [PRIVATE](https://github.com/puppetlabs/puppetlabs-stdlib#assert_private) CLASS**
+# @summary Manage configuration and services for a NFS client
 #
-# Set up the iptables hooks and the sysctl settings that are required for NFS
-# to function properly on a client system.
+# If using the `nfs::client::mount` define, this will be automatically called
+# for you.
 #
-# If using the ``nfs::client::stunnel::connect`` define, this will be
-# automatically called for you.
+# @param blkmap
+#   Whether to enable the `nfs-blkmap.service`
+#
+#   * Required for parallel NFS (pNFS).
+#   * Only applicable for NFSv4.1 or later
 #
 # @param callback_port
-#   The callback port
+#   The port used by the server to recall delegation of responsibilities to a
+#   NFSv4 client.
+#
+#   * Only applicable in NFSv4.0.  Beginning with NFSv4.1, a separate callback
+#     side channel is not required.
 #
 # @param stunnel
-#   Enable ``stunnel`` connections for this system
+#   Enable `stunnel` connections from this client to each NFS server
 #
-#   * Will *attempt* to determine if the server is trying to connect to itself
+#   * Stunnel can only be used for NFSv4 connections.
+#   * Can be explicitly configured for each mount in `nfs::client::mount`.
 #
-#   * If connecting to itself, will not use stunnel, otherwise will use stunnel
+# @param stunnel_socket_options
+#   Additional stunnel socket options to be applied to each stunnel
+#   connection to an NFS server
 #
-#   * If you are using host aliases for your NFS server names, this check
-#     may fail and you may need to disable ``$stunnel`` explicitly
+#   * Can be explicitly configured for each mount in `nfs::client::mount`.
 #
 # @param stunnel_verify
 #   The level at which to verify TLS connections
 #
-#   * See ``stunnel::connection::verify`` for details
+#   * Levels:
 #
-# @param firewall
-#   Use the SIMP IPTables module to manipulate the firewall settings
+#       * level 0 - Request and ignore peer certificate.
+#       * level 1 - Verify peer certificate if present.
+#       * level 2 - Verify peer certificate.
+#       * level 3 - Verify peer with locally installed certificate.
+#       * level 4 - Ignore CA chain and only verify peer certificate.
 #
-# @author Trevor Vaughan <tvaughan@onyxpoint.com>
-# @author Kendall Moore <kendall.moore@onyxpoint.com>
+#   * Can be explicitly configured for each mount in `nfs::client::mount`.
+#
+# @param stunnel_wantedby
+#   The `systemd` targets that need `stunnel` to be active prior to being
+#   activated
+#
+#   * Can be explicitly configured for each mount in `nfs::client::mount`.
+#
+# @api private
+# @author https://github.com/simp/pupmod-simp-nfs/graphs/contributors
 #
 class nfs::client (
-  Simplib::Port $callback_port = 876,
-  Boolean       $stunnel        = $::nfs::stunnel,
-  Integer[0]    $stunnel_verify = 2,
-  Boolean       $firewall       = $::nfs::firewall
+  Boolean          $blkmap                 = false,
+  Simplib::Port    $callback_port          = 876,
+  Boolean          $stunnel                = $nfs::stunnel,
+  Array[String]    $stunnel_socket_options = $nfs::stunnel_socket_options,
+  Integer[0]       $stunnel_verify         = $nfs::stunnel_verify,
+  Array[String]    $stunnel_wantedby       = ['remote-fs-pre.target']
 ) inherits ::nfs {
 
   assert_private()
 
-  if !$nfs::is_server {
-    file { '/etc/exports':
-      ensure  => 'file',
-      mode    => '0644',
-      owner   => 'root',
-      group   => 'root',
-      content => "\n"
+  include 'nfs::base::config'
+  include 'nfs::base::service'
+  include 'nfs::client::config'
+  include 'nfs::client::service'
+
+  Class['nfs::base::config'] ~> Class['nfs::base::service']
+  Class['nfs::client::config'] ~> Class['nfs::client::service']
+  Class['nfs::base::service'] ~> Class['nfs::client::service']
+
+  if $nfs::kerberos {
+    include 'krb5'
+
+    Class['krb5'] ~> Class['nfs::client::service']
+
+    if $nfs::keytab_on_puppet {
+      include 'krb5::keytab'
+
+      Class['krb5::keytab'] ~> Class['nfs::client::service']
     }
-  }
-
-  exec { 'modprobe_nfs':
-    command => '/sbin/modprobe nfs',
-    unless  => '/sbin/lsmod | /bin/grep -qw nfs',
-    require => [
-      Package['nfs-utils'],
-      File['/etc/modprobe.d/nfs.conf']
-    ],
-    notify  => Sysctl['fs.nfs.nfs_callback_tcpport']
-  }
-
-  sysctl { 'fs.nfs.nfs_callback_tcpport':
-    ensure => 'present',
-    val    => $callback_port,
-    silent => true
-  }
-
-  file { '/etc/modprobe.d/nfs.conf':
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0640',
-    content => "options nfs callback_tcpport=${callback_port}\n"
   }
 }

@@ -1,3 +1,4 @@
+# NFS security flavor
 type Nfs::SecurityFlavor = Enum[
   'none',
   'sys',
