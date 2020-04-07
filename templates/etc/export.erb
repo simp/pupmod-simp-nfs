@@ -97,9 +97,10 @@ _output = Array.new
 # Put it all together
 _client = Array(@clients.dup).flatten
 _client.map! { |cl| (['ALL','all','ANY','any'].include? cl) ? '*' : cl }.flatten!
-_client.push("127.0.0.1")
+_client.push('127.0.0.1')
+_client.push('::1') if @facts['ipv6_enabled']
 _client.uniq.sort.each do |cl|
-  if (cl == '127.0.0.1') && !@insecure
+  if ['127.0.0.1', '::1'].include?(cl) && !@insecure
     # Sometimes stunnel will bind on a high port, so we need to account for
     # that.
     _output.push("#{@export_path} #{cl}#{_options.split(')').first + ',insecure)'}")
