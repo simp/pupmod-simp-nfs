@@ -1,6 +1,9 @@
 ---
 fixtures:
   repositories:
+    augeas_core:
+      repo: https://github.com/simp/pupmod-puppetlabs-augeas_core.git
+      puppet_version: ">= 6.0.0"
     augeasproviders_core: https://github.com/simp/augeasproviders_core
     augeasproviders_grub: https://github.com/simp/augeasproviders_grub
     augeasproviders_sysctl: https://github.com/simp/augeasproviders_sysctl
@@ -9,7 +12,7 @@ fixtures:
     concat: https://github.com/simp/puppetlabs-concat
     firewalld:
       repo: https://github.com/simp/pupmod-voxpupuli-firewalld
-      ref: v4.2.4
+      ref: v4.3.0
     haveged: https://github.com/simp/pupmod-simp-haveged
     iptables: https://github.com/simp/pupmod-simp-iptables
     krb5: https://github.com/simp/pupmod-simp-krb5
@@ -21,6 +24,7 @@ fixtures:
       repo: https://github.com/simp/pupmod-puppetlabs-selinux_core.git
       puppet_version: ">= 6.0.0"
     simplib: https://github.com/simp/pupmod-simp-simplib
+    simp_firewalld: https://github.com/simp/pupmod-simp-simp_firewalld
     ssh: https://github.com/simp/pupmod-simp-ssh
     stdlib: https://github.com/simp/puppetlabs-stdlib
     stunnel: https://github.com/simp/pupmod-simp-stunnel
