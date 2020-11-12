@@ -1,3 +1,6 @@
+* Thu Nov 12 2020 Trevor Vaughan <tvaughan@onyxpoint.com> - 7.0.1-0
+- Update the required version of simp/svckill to the puppet 6 safe version.
+
 * Fri Jan 10 2020 Liz Nemsick <lnemsick.simp@gmail.com> - 7.0.0-0
 - Added EL8 support
 - Dropped EL6 support

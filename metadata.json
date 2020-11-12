@@ -1,6 +1,6 @@
 {
   "name": "simp-nfs",
-  "version": "7.0.0",
+  "version": "7.0.1",
   "author": "SIMP Team",
   "summary": "manages NFS server and client, also PKI and stunnelling",
   "license": "Apache-2.0",
@@ -35,7 +35,7 @@
     },
     {
       "name": "simp/svckill",
-      "version_requirement": ">= 3.6.0 < 4.0.0"
+      "version_requirement": ">= 3.6.1 < 4.0.0"
     },
     {
       "name": "simp/vox_selinux",
