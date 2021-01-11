@@ -362,6 +362,7 @@ pup5.pe-fips:
 pup5.pe-oel:
   <<: *pup_5_pe
   <<: *acceptance_base
+  <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_2
   script:
     - 'bundle exec rake beaker:suites[default,oel]'
 
@@ -388,6 +389,7 @@ pup5.pe-fips-krb5:
 pup5.pe-oel-krb5:
   <<: *pup_5_pe
   <<: *acceptance_base
+  <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_2
   script:
     - 'bundle exec rake beaker:suites[krb5,oel]'
 
@@ -414,6 +416,7 @@ pup5.pe-fips-stunnel:
 pup5.pe-oel-stunnel:
   <<: *pup_5_pe
   <<: *acceptance_base
+  <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_2
   script:
     - 'bundle exec rake beaker:suites[stunnel,oel]'
 
@@ -427,6 +430,7 @@ pup5.pe-oel-fips-stunnel:
 pup6.x:
   <<: *pup_6_x
   <<: *acceptance_base
+  <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_2
   script:
     - 'bundle exec rake beaker:suites[default,default]'
 
@@ -440,6 +444,7 @@ pup6.x-fips:
 pup6.x-krb5:
   <<: *pup_6_x
   <<: *acceptance_base
+  <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_2
   script:
     - 'bundle exec rake beaker:suites[krb5,default]'
 
@@ -453,6 +458,7 @@ pup6.x-fips-krb5:
 pup6.x-stunnel:
   <<: *pup_6_x
   <<: *acceptance_base
+  <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_2
   script:
     - 'bundle exec rake beaker:suites[stunnel,default]'
 
