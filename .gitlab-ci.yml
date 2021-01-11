@@ -427,48 +427,6 @@ pup5.pe-oel-fips-stunnel:
   script:
     - 'BEAKER_fips=yes bundle exec rake beaker:suites[stunnel,oel]'
 
-pup6.x:
-  <<: *pup_6_x
-  <<: *acceptance_base
-  <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_2
-  script:
-    - 'bundle exec rake beaker:suites[default,default]'
-
-pup6.x-fips:
-  <<: *pup_6_x
-  <<: *acceptance_base
-  <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_3
-  script:
-    - 'BEAKER_fips=yes bundle exec rake beaker:suites[default,default]'
-
-pup6.x-krb5:
-  <<: *pup_6_x
-  <<: *acceptance_base
-  <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_2
-  script:
-    - 'bundle exec rake beaker:suites[krb5,default]'
-
-pup6.x-fips-krb5:
-  <<: *pup_6_x
-  <<: *acceptance_base
-  <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_3
-  script:
-    - 'BEAKER_fips=yes bundle exec rake beaker:suites[krb5,default]'
-
-pup6.x-stunnel:
-  <<: *pup_6_x
-  <<: *acceptance_base
-  <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_2
-  script:
-    - 'bundle exec rake beaker:suites[stunnel,default]'
-
-pup6.x-fips-stunnel:
-  <<: *pup_6_x
-  <<: *acceptance_base
-  <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_3
-  script:
-    - 'BEAKER_fips=yes bundle exec rake beaker:suites[stunnel,default]'
-
 pup6.pe:
   <<: *pup_6_pe
   <<: *acceptance_base
@@ -547,3 +505,45 @@ pup6.pe-oel-fips-stunnel:
   <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_3
   script:
     - 'BEAKER_fips=yes bundle exec rake beaker:suites[stunnel,oel]'
+
+pup6.x:
+  <<: *pup_6_x
+  <<: *acceptance_base
+  <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_2
+  script:
+    - 'bundle exec rake beaker:suites[default,default]'
+
+pup6.x-fips:
+  <<: *pup_6_x
+  <<: *acceptance_base
+  <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_3
+  script:
+    - 'BEAKER_fips=yes bundle exec rake beaker:suites[default,default]'
+
+pup6.x-krb5:
+  <<: *pup_6_x
+  <<: *acceptance_base
+  <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_2
+  script:
+    - 'bundle exec rake beaker:suites[krb5,default]'
+
+pup6.x-fips-krb5:
+  <<: *pup_6_x
+  <<: *acceptance_base
+  <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_3
+  script:
+    - 'BEAKER_fips=yes bundle exec rake beaker:suites[krb5,default]'
+
+pup6.x-stunnel:
+  <<: *pup_6_x
+  <<: *acceptance_base
+  <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_2
+  script:
+    - 'bundle exec rake beaker:suites[stunnel,default]'
+
+pup6.x-fips-stunnel:
+  <<: *pup_6_x
+  <<: *acceptance_base
+  <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_3
+  script:
+    - 'BEAKER_fips=yes bundle exec rake beaker:suites[stunnel,default]'
