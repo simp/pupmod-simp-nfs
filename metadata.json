@@ -14,7 +14,8 @@
     "pki"
   ],
   "dependencies": [
-    { "name": "camptocamp/systemd",
+    {
+      "name": "camptocamp/systemd",
       "version_requirement": ">= 2.8.0 < 3.0.0"
     },
     {
@@ -54,7 +55,7 @@
       },
       {
         "name": "simp/iptables",
-      "version_requirement": ">= 6.4.0 < 7.0.0"
+        "version_requirement": ">= 6.4.0 < 7.0.0"
       },
       {
         "name": "simp/stunnel",
