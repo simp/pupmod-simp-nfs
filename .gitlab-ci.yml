@@ -510,6 +510,7 @@ pup6.pe-fips-krb5:
 pup6.pe-oel-krb5:
   <<: *pup_6_pe
   <<: *acceptance_base
+  <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_2
   script:
     - 'bundle exec rake beaker:suites[krb5,oel]'
 
@@ -536,6 +537,7 @@ pup6.pe-fips-stunnel:
 pup6.pe-oel-stunnel:
   <<: *pup_6_pe
   <<: *acceptance_base
+  <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_2
   script:
     - 'bundle exec rake beaker:suites[stunnel,oel]'
 
