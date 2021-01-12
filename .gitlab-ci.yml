@@ -353,25 +353,12 @@ pup5.pe:
   script:
     - 'bundle exec rake beaker:suites[default,default]'
 
-pup5.pe-fips:
-  <<: *pup_5_pe
-  <<: *acceptance_base
-  script:
-    - 'BEAKER_fips=yes bundle exec rake beaker:suites[default,default]'
-
 pup5.pe-oel:
-  <<: *pup_5_pe
-  <<: *acceptance_base
-  <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_2
-  script:
-    - 'bundle exec rake beaker:suites[default,oel]'
-
-pup5.pe-oel-fips:
   <<: *pup_5_pe
   <<: *acceptance_base
   <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_3
   script:
-    - 'BEAKER_fips=yes bundle exec rake beaker:suites[default,oel]'
+    - 'bundle exec rake beaker:suites[default,oel]'
 
 pup5.pe-krb5:
   <<: *pup_5_pe
@@ -379,26 +366,12 @@ pup5.pe-krb5:
   script:
     - 'bundle exec rake beaker:suites[krb5,default]'
 
-pup5.pe-fips-krb5:
-  <<: *pup_5_pe
-  <<: *acceptance_base
-  <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_3
-  script:
-    - 'BEAKER_fips=yes bundle exec rake beaker:suites[krb5,default]'
-
 pup5.pe-oel-krb5:
   <<: *pup_5_pe
   <<: *acceptance_base
-  <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_2
-  script:
-    - 'bundle exec rake beaker:suites[krb5,oel]'
-
-pup5.pe-oel-fips-krb5:
-  <<: *pup_5_pe
-  <<: *acceptance_base
   <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_3
   script:
-    - 'BEAKER_fips=yes bundle exec rake beaker:suites[krb5,oel]'
+    - 'bundle exec rake beaker:suites[krb5,oel]'
 
 pup5.pe-stunnel:
   <<: *pup_5_pe
@@ -406,26 +379,12 @@ pup5.pe-stunnel:
   script:
     - 'bundle exec rake beaker:suites[stunnel,default]'
 
-pup5.pe-fips-stunnel:
-  <<: *pup_5_pe
-  <<: *acceptance_base
-  <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_3
-  script:
-    - 'BEAKER_fips=yes bundle exec rake beaker:suites[stunnel,default]'
-
 pup5.pe-oel-stunnel:
   <<: *pup_5_pe
   <<: *acceptance_base
-  <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_2
-  script:
-    - 'bundle exec rake beaker:suites[stunnel,oel]'
-
-pup5.pe-oel-fips-stunnel:
-  <<: *pup_5_pe
-  <<: *acceptance_base
   <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_3
   script:
-    - 'BEAKER_fips=yes bundle exec rake beaker:suites[stunnel,oel]'
+    - 'bundle exec rake beaker:suites[stunnel,oel]'
 
 pup6.pe:
   <<: *pup_6_pe
