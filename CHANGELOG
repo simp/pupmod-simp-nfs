@@ -1,5 +1,5 @@
 * Mon Jan 11 2021 Chris Tessmer <chris.tessmer@onyxpoint.com> - 7.0.2
-- Removed EL6 support
+- Fixed formatting in the metadata.json file.
 
 * Thu Nov 12 2020 Trevor Vaughan <tvaughan@onyxpoint.com> - 7.0.1-0
 - Update the required version of simp/svckill to the puppet 6 safe version.
