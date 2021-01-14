@@ -26,16 +26,15 @@ module Acceptance
       #
       # +host+: Host (object)
       #
-      # This method ASSUMES the first non-loopback interface without DHCP
-      # configured or with DHCP that does not matches the outermost 'dhcp'
-      # key is the interface used for the internal network.
       def internal_network_info(host)
         networking = JSON.load(on(host, 'facter --json networking').stdout)
+
+        # this is the IP address beaker puts into /etc/hosts
+        internal_ip = host['vm_ip'] || host['ip'].to_s
+
         internal_ip_info = nil
-        main_dhcp = networking['networking']['dhcp']
         networking['networking']['interfaces'].each do |interface,settings|
-          next if interface == 'lo'
-          if ( ! settings.has_key?('dhcp') || (settings['dhcp'] != main_dhcp ) )
+          if ( settings['ip'] and settings['ip'] == internal_ip )
             internal_ip_info = {
               :interface => interface,
               :ip        => settings['ip'],
@@ -44,6 +43,7 @@ module Acceptance
             break
           end
         end
+
         internal_ip_info
       end
 
