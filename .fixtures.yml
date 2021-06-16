@@ -4,34 +4,33 @@ fixtures:
     augeas_core:
       repo: https://github.com/simp/pupmod-puppetlabs-augeas_core.git
       puppet_version: ">= 6.0.0"
-    augeasproviders_core: https://github.com/simp/augeasproviders_core
-    augeasproviders_grub: https://github.com/simp/augeasproviders_grub
-    augeasproviders_sysctl: https://github.com/simp/augeasproviders_sysctl
-    augeasproviders_ssh: https://github.com/simp/augeasproviders_ssh
-    autofs: https://github.com/simp/pupmod-simp-autofs
-    concat: https://github.com/simp/puppetlabs-concat
-    firewalld: https://github.com/simp/pupmod-voxpupuli-firewalld
-    haveged: https://github.com/simp/pupmod-simp-haveged
-    iptables: https://github.com/simp/pupmod-simp-iptables
-    krb5: https://github.com/simp/pupmod-simp-krb5
+    augeasproviders_core: https://github.com/simp/augeasproviders_core.git
+    augeasproviders_grub: https://github.com/simp/augeasproviders_grub.git
+    augeasproviders_sysctl: https://github.com/simp/augeasproviders_sysctl.git
+    augeasproviders_ssh: https://github.com/simp/augeasproviders_ssh.git
+    autofs: https://github.com/simp/pupmod-simp-autofs.git
+    concat: https://github.com/simp/puppetlabs-concat.git
+    firewalld: https://github.com/simp/pupmod-voxpupuli-firewalld.git
+    haveged: https://github.com/simp/pupmod-simp-haveged.git
+    iptables: https://github.com/simp/pupmod-simp-iptables.git
+    krb5: https://github.com/simp/pupmod-simp-krb5.git
     mount_core:
       repo: https://github.com/simp/pupmod-puppetlabs-mount_core.git
       puppet_version: ">= 6.0.0"
-    pki: https://github.com/simp/pupmod-simp-pki
+    pki: https://github.com/simp/pupmod-simp-pki.git
     selinux_core:
       repo: https://github.com/simp/pupmod-puppetlabs-selinux_core.git
       puppet_version: ">= 6.0.0"
-    simplib: https://github.com/simp/pupmod-simp-simplib
-    simp_firewalld: https://github.com/simp/pupmod-simp-simp_firewalld
-    ssh: https://github.com/simp/pupmod-simp-ssh
-    stdlib: https://github.com/simp/puppetlabs-stdlib
-    stunnel: https://github.com/simp/pupmod-simp-stunnel
-    svckill: https://github.com/simp/pupmod-simp-svckill
-    systemd: https://github.com/simp/puppet-systemd
-    tcpwrappers: https://github.com/simp/pupmod-simp-tcpwrappers
+    simplib: https://github.com/simp/pupmod-simp-simplib.git
+    simp_firewalld: https://github.com/simp/pupmod-simp-simp_firewalld.git
+    ssh: https://github.com/simp/pupmod-simp-ssh.git
+    stdlib: https://github.com/simp/puppetlabs-stdlib.git
+    stunnel: https://github.com/simp/pupmod-simp-stunnel.git
+    svckill: https://github.com/simp/pupmod-simp-svckill.git
+    systemd: https://github.com/simp/puppet-systemd.git
+    tcpwrappers: https://github.com/simp/pupmod-simp-tcpwrappers.git
     vox_selinux:
-      repo: https://github.com/simp/pupmod-voxpupuli-selinux
+      repo: https://github.com/simp/pupmod-voxpupuli-selinux.git
       branch: simp-master
-
   symlinks:
     nfs: "#{source_dir}"
