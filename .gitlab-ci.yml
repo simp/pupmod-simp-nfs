@@ -237,7 +237,7 @@ variables:
     MATRIX_RUBY_VERSION: '2.5'
 
 .pup_7_x: &pup_7_x
-  image: 'ruby:2.7'
+  image: 'docker.io/simpproject/simp_beaker_el7'
   variables:
     PUPPET_VERSION: '~> 7.0'
     BEAKER_PUPPET_COLLECTION: 'puppet7'
