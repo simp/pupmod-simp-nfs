@@ -9,7 +9,11 @@ describe 'nfs::client::mount' do
 
   on_supported_os.each do |os, os_facts|
     context "on #{os}" do
-      let(:facts) { os_facts }
+      let(:facts) {
+        # to workaround service provider issues related to masking haveged
+        # when tests are run on GitLab runners which are docker containers
+        os_facts.merge( { :haveged__rngd_enabled => false } )
+      }
 
       let(:title) { '/net/apps' }
       let(:nfs_server) { '1.2.3.4'}

@@ -9,7 +9,12 @@ describe 'nfs::client::mount::connection' do
       end
 
       let(:pre_condition) { "include 'nfs'" }
-      let(:facts) { os_facts }
+      let(:facts) {
+        # to workaround service provider issues related to masking haveged
+        # when tests are run on GitLab runners which are docker containers
+        os_facts.merge( { :haveged__rngd_enabled => false } )
+      }
+
       let(:title) { '/mnt/apps' }
 
       context 'when stunnel=true and nfs_version=4' do

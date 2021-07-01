@@ -8,7 +8,12 @@ describe 'nfs::client::stunnel' do
         Puppet::Parser::Functions.newfunction(:assert_private, :type => :rvalue) { |args| }
       end
 
-      let(:facts) { os_facts }
+      let(:facts) {
+        # to workaround service provider issues related to masking haveged
+        # when tests are run on GitLab runners which are docker containers
+        os_facts.merge( { :haveged__rngd_enabled => false } )
+      }
+
       let(:title) { '1.2.3.4:2049' }
       let(:params) {{
         :nfs_server             => '1.2.3.4',
