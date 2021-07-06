@@ -1,3 +1,8 @@
+* Tue Jul 06 2021 Trevor Vaughan <tvaughan@onyxpoint.com> - 7.1.0
+- Fixed
+  - Added _netdev to the default mount options
+  - Ensure that remote-fs.target is enabled
+
 * Wed Jun 16 2021 Chris Tessmer <chris.tessmer@onyxpoint.com> - 7.1.0
 - Removed support for Puppet 5
 - Ensured support for Puppet 7 in requirements and stdlib

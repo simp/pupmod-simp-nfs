@@ -258,9 +258,9 @@ define nfs::client::mount (
   #################################
 
   if ($nfs_version  == 4) {
-    $_nfs_base_options = "nfsvers=4,port=${_nfsd_port},${options},sec=${sec}"
+    $_nfs_base_options = "_netdev,nfsvers=4,port=${_nfsd_port},${options},sec=${sec}"
   } else {
-    $_nfs_base_options = "nfsvers=3,port=${_nfsd_port},${options}"
+    $_nfs_base_options = "_netdev,nfsvers=3,port=${_nfsd_port},${options}"
   }
 
   if $_stunnel {
@@ -331,6 +331,8 @@ define nfs::client::mount (
     }
 
   } else {
+    ensure_resource('service', 'remote-fs.target', { 'enable' => true })
+
     mount { $name:
       ensure   => $ensure,
       atboot   => $at_boot,
