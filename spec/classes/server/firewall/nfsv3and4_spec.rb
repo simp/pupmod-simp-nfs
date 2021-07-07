@@ -5,7 +5,12 @@ describe 'nfs' do
   describe 'private nfs::server::firewall::nfs3andv4' do
     on_supported_os.each do |os, os_facts|
       context "on #{os}" do
-        let(:facts) { os_facts}
+        let(:facts) {
+          # to workaround service provider issues related to masking haveged
+          # when tests are run on GitLab runners which are docker containers
+          os_facts.merge( { :haveged__rngd_enabled => false } )
+        }
+
         let(:params) { {
           # nfs class params
           :is_server    => true,

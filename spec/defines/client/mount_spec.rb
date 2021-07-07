@@ -9,7 +9,11 @@ describe 'nfs::client::mount' do
 
   on_supported_os.each do |os, os_facts|
     context "on #{os}" do
-      let(:facts) { os_facts }
+      let(:facts) {
+        # to workaround service provider issues related to masking haveged
+        # when tests are run on GitLab runners which are docker containers
+        os_facts.merge( { :haveged__rngd_enabled => false } )
+      }
 
       let(:title) { '/net/apps' }
       let(:nfs_server) { '1.2.3.4'}
@@ -27,6 +31,7 @@ describe 'nfs::client::mount' do
 
         context 'with defaults for nfs and nfs::client' do
           include_examples 'a base client mount define'
+          it { is_expected.not_to contain_service('remote-fs.target') }
           it 'should use nfs & nfs::client defaults for unspecified connection params' do
             is_expected.to create_nfs__client__mount__connection(title).with( {
               :nfs_server             => params[:nfs_server],
@@ -47,7 +52,7 @@ describe 'nfs::client::mount' do
               :mount_point => '/-',
               :mappings    => {
                 'key'      => title,
-                'options'  => '-nfsvers=4,port=2049,soft,sec=sys',
+                'options'  => '-_netdev,nfsvers=4,port=2049,soft,sec=sys',
                 'location' => "#{params[:nfs_server]}:#{params[:remote_path]}"
               }
           } ) }
@@ -92,7 +97,7 @@ describe 'nfs::client::mount' do
                 :mount_point => '/-',
                 :mappings    => {
                   'key'      => title,
-                  'options'  => '-nfsvers=3,port=2049,soft',
+                  'options'  => '-_netdev,nfsvers=3,port=2049,soft',
                   'location' => "#{params[:nfs_server]}:#{params[:remote_path]}"
                 }
             } ) }
@@ -127,7 +132,7 @@ describe 'nfs::client::mount' do
                 :mount_point => '/-',
                 :mappings    => {
                   'key'      => title,
-                  'options'  => '-nfsvers=4,port=2050,soft,sec=sys,proto=tcp',
+                  'options'  => '-_netdev,nfsvers=4,port=2050,soft,sec=sys,proto=tcp',
                   'location' => "127.0.0.1:#{params[:remote_path]}"
                 }
             } ) }
@@ -153,7 +158,7 @@ describe 'nfs::client::mount' do
                 :mount_point => '/-',
                 :mappings    => {
                   'key'      => title,
-                  'options'  => '-nfsvers=4,port=2049,soft,sec=sys',
+                  'options'  => '-_netdev,nfsvers=4,port=2049,soft,sec=sys',
                   'location' => "#{params[:nfs_server]}:#{params[:remote_path]}"
                 }
             } ) }
@@ -178,7 +183,7 @@ describe 'nfs::client::mount' do
                 :mount_point => title,
                 :mappings    => [ {
                   'key'      => params[:autofs_indirect_map_key],
-                  'options'  => '-nfsvers=3,port=2049,soft',
+                  'options'  => '-_netdev,nfsvers=3,port=2049,soft',
                   'location' => "#{params[:nfs_server]}:#{params[:remote_path]}"
                 } ]
             } ) }
@@ -197,7 +202,7 @@ describe 'nfs::client::mount' do
                 :mount_point => title,
                 :mappings    => [ {
                   'key'      => params[:autofs_indirect_map_key],
-                  'options'  => '-nfsvers=4,port=2049,soft,sec=sys,proto=tcp',
+                  'options'  => '-_netdev,nfsvers=4,port=2049,soft,sec=sys,proto=tcp',
                   'location' => "127.0.0.1:#{params[:remote_path]}"
                 } ]
             } ) }
@@ -216,7 +221,7 @@ describe 'nfs::client::mount' do
                 :mount_point => title,
                 :mappings    => [ {
                   'key'      => params[:autofs_indirect_map_key],
-                  'options'  => '-nfsvers=4,port=2049,soft,sec=sys',
+                  'options'  => '-_netdev,nfsvers=4,port=2049,soft,sec=sys',
                   'location' => "#{params[:nfs_server]}:#{params[:remote_path]}"
                 } ]
             } ) }
@@ -235,7 +240,7 @@ describe 'nfs::client::mount' do
                 :mount_point => title,
                 :mappings    => [ {
                   'key'      => params[:autofs_indirect_map_key],
-                  'options'  => '-nfsvers=4,port=2049,soft,sec=sys',
+                  'options'  => '-_netdev,nfsvers=4,port=2049,soft,sec=sys',
                   'location' => "#{params[:nfs_server]}:#{params[:remote_path]}/&"
                 } ]
             } ) }
@@ -256,12 +261,13 @@ describe 'nfs::client::mount' do
 
           include_examples 'a base client mount define'
           it { is_expected.to create_nfs__client__mount__connection(title).with_nfs_version(3) }
+          it { is_expected.to contain_service('remote-fs.target').with_enable(true) }
           it { is_expected.to contain_mount(title).with( {
             :ensure   => 'mounted',
             :atboot   => true,
             :device   => "#{params[:nfs_server]}:#{params[:remote_path]}",
             :fstype   => 'nfs',
-            :options  => 'nfsvers=3,port=2049,soft',
+            :options  => '_netdev,nfsvers=3,port=2049,soft',
             :remounts => false
           } ) }
 
@@ -274,12 +280,13 @@ describe 'nfs::client::mount' do
 
           include_examples 'a base client mount define'
           it { is_expected.to create_nfs__client__mount__connection(title).with_nfs_version(4) }
+          it { is_expected.to contain_service('remote-fs.target').with_enable(true) }
           it { is_expected.to contain_mount(title).with( {
             :ensure   => 'mounted',
             :atboot   => true,
             :device   => "127.0.0.1:#{params[:remote_path]}",
             :fstype   => 'nfs',
-            :options  => 'nfsvers=4,port=2049,soft,sec=sys,proto=tcp',
+            :options  => '_netdev,nfsvers=4,port=2049,soft,sec=sys,proto=tcp',
             :remounts => false
           } ) }
 
@@ -292,12 +299,13 @@ describe 'nfs::client::mount' do
 
           include_examples 'a base client mount define'
           it { is_expected.to create_nfs__client__mount__connection(title).with_nfs_version(4) }
+          it { is_expected.to contain_service('remote-fs.target').with_enable(true) }
           it { is_expected.to contain_mount(title).with( {
             :ensure   => 'mounted',
             :atboot   => true,
             :device   => "#{params[:nfs_server]}:#{params[:remote_path]}",
             :fstype   => 'nfs',
-            :options  => 'nfsvers=4,port=2049,soft,sec=sys',
+            :options  => '_netdev,nfsvers=4,port=2049,soft,sec=sys',
             :remounts => false
           } ) }
 
@@ -316,12 +324,13 @@ describe 'nfs::client::mount' do
 
           it { is_expected.to compile.with_all_deps }
           it { is_expected.to create_nfs__client__mount__connection(title).with_nfs_version(4) }
+          it { is_expected.to contain_service('remote-fs.target').with_enable(true) }
           it { is_expected.to contain_mount(title).with( {
             :ensure   => 'present',
             :atboot   => false,
             :device   => "#{params[:nfs_server]}:#{params[:remote_path]}",
             :fstype   => 'nfs',
-            :options  => 'nfsvers=4,port=2049,soft,sec=sys',
+            :options  => '_netdev,nfsvers=4,port=2049,soft,sec=sys',
             :remounts => false
           } ) }
         end
@@ -345,13 +354,14 @@ describe 'nfs::client::mount' do
 
           include_examples 'a base client mount define'
           it { is_expected.to create_nfs__client__mount__connection(title).with_nfs_version(4) }
+          it { is_expected.to contain_service('remote-fs.target').with_enable(true) }
           it 'should not use localhost for mount' do
             is_expected.to contain_mount(title).with( {
               :ensure   => 'mounted',
               :atboot   => true,
               :device   => "#{params[:nfs_server]}:#{params[:remote_path]}",
               :fstype   => 'nfs',
-              :options  => 'nfsvers=4,port=2049,soft,sec=sys',
+              :options  => '_netdev,nfsvers=4,port=2049,soft,sec=sys',
               :remounts => false
             } )
           end
@@ -360,13 +370,14 @@ describe 'nfs::client::mount' do
         context 'autodetect_remote=true and simplib::host_is_me($host)=true' do
           let(:params) { base_params.merge( { :autodetect_remote => true } ) }
 
+          it { is_expected.to contain_service('remote-fs.target').with_enable(true) }
           it 'should use localhost for mount' do
             is_expected.to contain_mount(title).with( {
               :ensure   => 'mounted',
               :atboot   => true,
               :device   => "127.0.0.1:#{params[:remote_path]}",
               :fstype   => 'nfs',
-              :options  => 'nfsvers=4,port=2049,soft,sec=sys',
+              :options  => '_netdev,nfsvers=4,port=2049,soft,sec=sys',
               :remounts => false
             } )
           end

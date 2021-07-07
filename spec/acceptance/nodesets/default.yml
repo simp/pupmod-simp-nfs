@@ -37,7 +37,7 @@ HOSTS:
       - nfs_server
       - nfs_server_and_client
     platform: el-8-x86_64
-    box: centos/8
+    box: generic/centos8
     hypervisor: <%= hypervisor %>
     yum_repos:
       epel:
@@ -49,7 +49,7 @@ HOSTS:
     roles:
       - nfs_client
     platform: el-8-x86_64
-    box: centos/8
+    box: generic/centos8
     hypervisor: <%= hypervisor %>
     yum_repos:
       epel:

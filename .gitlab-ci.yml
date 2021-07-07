@@ -452,3 +452,23 @@ pup6.x-fips-stunnel:
   <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_3
   script:
     - 'BEAKER_fips=yes bundle exec rake beaker:suites[stunnel,default]'
+
+pup7.x:
+  <<: *pup_7_x
+  <<: *acceptance_base
+  script:
+    - 'bundle exec rake beaker:suites[default,default]'
+
+pup7.x-krb5:
+  <<: *pup_7_x
+  <<: *acceptance_base
+  <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_2
+  script:
+    - 'bundle exec rake beaker:suites[krb5,default]'
+
+pup7.x-stunnel:
+  <<: *pup_7_x
+  <<: *acceptance_base
+  <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_2
+  script:
+    - 'bundle exec rake beaker:suites[stunnel,default]'
