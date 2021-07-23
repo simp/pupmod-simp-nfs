@@ -14,11 +14,6 @@ HOSTS:
     platform: el-7-x86_64
     box: centos/7
     hypervisor: <%= hypervisor %>
-    yum_repos:
-      epel:
-        mirrorlist: 'https://mirrors.fedoraproject.org/mirrorlist?repo=epel-7&arch=$basearch&country=us'
-        gpgkeys:
-          - https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-$releasever
 
   el7-client:
     roles:
@@ -26,11 +21,6 @@ HOSTS:
     platform: el-7-x86_64
     box: centos/7
     hypervisor: <%= hypervisor %>
-    yum_repos:
-      epel:
-        mirrorlist: 'https://mirrors.fedoraproject.org/mirrorlist?repo=epel-7&arch=$basearch&country=us'
-        gpgkeys:
-          - https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-$releasever
 
   el8-server:
     roles:
@@ -39,11 +29,6 @@ HOSTS:
     platform: el-8-x86_64
     box: generic/centos8
     hypervisor: <%= hypervisor %>
-    yum_repos:
-      epel:
-        mirrorlist: 'https://mirrors.fedoraproject.org/mirrorlist?repo=epel-8&arch=$basearch&country=us'
-        gpgkeys:
-          - https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-$releasever
 
   el8-client:
     roles:
@@ -51,16 +36,15 @@ HOSTS:
     platform: el-8-x86_64
     box: generic/centos8
     hypervisor: <%= hypervisor %>
-    yum_repos:
-      epel:
-        mirrorlist: 'https://mirrors.fedoraproject.org/mirrorlist?repo=epel-8&arch=$basearch&country=us'
-        gpgkeys:
-          - https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-$releasever
 
 CONFIG:
   log_level: verbose
   type: aio
   vagrant_memsize: 512
+  ssh:
+    keepalive: true
+    keepalive_interval: 10
+    keepalive_maxcount: 60
 <% if ENV['BEAKER_PUPPET_COLLECTION'] -%>
   puppet_collection: <%= ENV['BEAKER_PUPPET_COLLECTION'] %>
 <% end -%>
