@@ -1,6 +1,6 @@
 {
   "name": "simp-nfs",
-  "version": "7.1.0",
+  "version": "7.2.0",
   "author": "SIMP Team",
   "summary": "manages NFS server and client, also PKI and stunnelling",
   "license": "Apache-2.0",
@@ -15,8 +15,8 @@
   ],
   "dependencies": [
     {
-      "name": "camptocamp/systemd",
-      "version_requirement": ">= 2.8.0 < 3.0.0"
+      "name": "puppet/systemd",
+      "version_requirement": ">= 3.0.0 < 4.0.0"
     },
     {
       "name": "herculesteam/augeasproviders_sysctl",
