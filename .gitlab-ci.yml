@@ -343,6 +343,7 @@ pup6.pe-fips:
   <<: *acceptance_base
   script:
     - 'BEAKER_fips=yes bundle exec rake beaker:suites[default,default]'
+  timeout: 2h
 
 pup6.pe-oel:
   <<: *pup_6_pe
@@ -356,6 +357,7 @@ pup6.pe-oel-fips:
   <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_3
   script:
     - 'BEAKER_fips=yes bundle exec rake beaker:suites[default,oel]'
+  timeout: 2h
 
 pup6.pe-krb5:
   <<: *pup_6_pe
@@ -369,6 +371,7 @@ pup6.pe-fips-krb5:
   <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_3
   script:
     - 'BEAKER_fips=yes bundle exec rake beaker:suites[krb5,default]'
+  timeout: 2h
 
 pup6.pe-oel-krb5:
   <<: *pup_6_pe
@@ -383,6 +386,7 @@ pup6.pe-oel-fips-krb5:
   <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_3
   script:
     - 'BEAKER_fips=yes bundle exec rake beaker:suites[krb5,oel]'
+  timeout: 2h
 
 pup6.pe-stunnel:
   <<: *pup_6_pe
@@ -396,6 +400,7 @@ pup6.pe-fips-stunnel:
   <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_3
   script:
     - 'BEAKER_fips=yes bundle exec rake beaker:suites[stunnel,default]'
+  timeout: 2h
 
 pup6.pe-oel-stunnel:
   <<: *pup_6_pe
@@ -410,6 +415,7 @@ pup6.pe-oel-fips-stunnel:
   <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_3
   script:
     - 'BEAKER_fips=yes bundle exec rake beaker:suites[stunnel,oel]'
+  timeout: 2h
 
 pup6.x:
   <<: *pup_6_x
@@ -424,6 +430,7 @@ pup6.x-fips:
   <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_3
   script:
     - 'BEAKER_fips=yes bundle exec rake beaker:suites[default,default]'
+  timeout: 2h
 
 pup6.x-krb5:
   <<: *pup_6_x
@@ -438,6 +445,7 @@ pup6.x-fips-krb5:
   <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_3
   script:
     - 'BEAKER_fips=yes bundle exec rake beaker:suites[krb5,default]'
+  timeout: 2h
 
 pup6.x-stunnel:
   <<: *pup_6_x
@@ -452,6 +460,7 @@ pup6.x-fips-stunnel:
   <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_3
   script:
     - 'BEAKER_fips=yes bundle exec rake beaker:suites[stunnel,default]'
+  timeout: 2h
 
 pup7.x:
   <<: *pup_7_x
