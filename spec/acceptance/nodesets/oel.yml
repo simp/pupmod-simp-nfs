@@ -38,6 +38,7 @@ HOSTS:
     hypervisor: <%= hypervisor %>
 
 CONFIG:
+  vagrant_cpus: 2
   log_level: verbose
   type: aio
   ssh:
