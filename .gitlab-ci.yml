@@ -340,9 +340,9 @@ pup7.pe-unit:
   <<: *pup_7_pe
   <<: *unit_tests
 
-pup8.x-unit:
-  <<: *pup_8_x
-  <<: *unit_tests
+#pup8.x-unit:
+#  <<: *pup_8_x
+#  <<: *unit_tests
 
 # ------------------------------------------------------------------------------
 #             NOTICE: **This file is maintained with puppetsync**
@@ -484,22 +484,22 @@ pup7.x-fips-stunnel:
     - 'BEAKER_fips=yes bundle exec rake beaker:suites[stunnel,default]'
   timeout: 2h
 
-pup8.x:
-  <<: *pup_8_x
-  <<: *acceptance_base
-  script:
-    - 'bundle exec rake beaker:suites[default,default]'
+#pup8.x:
+#  <<: *pup_8_x
+#  <<: *acceptance_base
+#  script:
+#    - 'bundle exec rake beaker:suites[default,default]'
 
-pup8.x-krb5:
-  <<: *pup_8_x
-  <<: *acceptance_base
-  <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_2
-  script:
-    - 'bundle exec rake beaker:suites[krb5,default]'
+#pup8.x-krb5:
+#  <<: *pup_8_x
+#  <<: *acceptance_base
+#  <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_2
+#  script:
+#    - 'bundle exec rake beaker:suites[krb5,default]'
 
-pup8.x-stunnel:
-  <<: *pup_8_x
-  <<: *acceptance_base
-  <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_2
-  script:
-    - 'bundle exec rake beaker:suites[stunnel,default]'
+#pup8.x-stunnel:
+#  <<: *pup_8_x
+#  <<: *acceptance_base
+#  <<: *with_SIMP_ACCEPTANCE_MATRIX_LEVEL_2
+#  script:
+#    - 'bundle exec rake beaker:suites[stunnel,default]'
