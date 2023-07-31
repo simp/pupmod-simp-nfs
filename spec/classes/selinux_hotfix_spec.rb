@@ -1,6 +1,26 @@
 require 'spec_helper'
 
 describe 'nfs::selinux_hotfix' do
+
+  def mock_selinux_false_facts(os_facts)
+    os_facts[:selinux] = false
+    os_facts[:os][:selinux][:config_mode] = 'disabled'
+    os_facts[:os][:selinux][:current_mode] = 'disabled'
+    os_facts[:os][:selinux][:enabled] = false
+    os_facts[:os][:selinux][:enforced] = false
+    os_facts
+  end
+
+  def mock_selinux_enforcing_facts(os_facts)
+    os_facts[:selinux] = true
+    os_facts[:os][:selinux][:config_mode] = 'enforcing'
+    os_facts[:os][:selinux][:config_policy] = 'targeted'
+    os_facts[:os][:selinux][:current_mode] = 'enforcing'
+    os_facts[:os][:selinux][:enabled] = true
+    os_facts[:os][:selinux][:enforced] = true
+    os_facts
+  end
+
   on_supported_os.each do |os, os_facts|
     context "on #{os}" do
       let(:facts){ os_facts }
@@ -12,9 +32,9 @@ describe 'nfs::selinux_hotfix' do
 
       context 'selinux_current_mode fact not present' do
         let(:facts) {
-          new_facts = os_facts.dup
-          new_facts.delete(:selinux_current_mode)
-          new_facts
+          os_facts = mock_selinux_false_facts(os_facts)
+          os_facts.delete(:selinux_current_mode)
+          os_facts
         }
 
         it { is_expected.to compile.with_all_deps }
@@ -22,13 +42,14 @@ describe 'nfs::selinux_hotfix' do
       end
 
       context 'selinux_current_mode = disabled' do
-        let(:facts) { os_facts.merge({ :selinux_current_mode => 'disabled' }) }
+        let(:facts) { mock_selinux_false_facts(os_facts) }
+
         it { is_expected.to compile.with_all_deps }
         it { is_expected.to_not contain_vox_selinux__module('gss_hotfix') }
       end
 
       context 'selinux_current_mode != disabled' do
-        let(:facts) { os_facts.merge({ :selinux_current_mode => 'enforcing' }) }
+        let(:facts) { mock_selinux_enforcing_facts(os_facts) }
         it { is_expected.to compile.with_all_deps }
         it { is_expected.to contain_vox_selinux__module('gss_hotfix').with( {
           :ensure     => 'present',
