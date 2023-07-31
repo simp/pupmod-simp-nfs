@@ -10,7 +10,7 @@
 class nfs::selinux_hotfix {
   assert_private()
 
-  if $facts['selinux_current_mode'] and $facts['selinux_current_mode'] != 'disabled' {
+  if $facts['os']['selinux']['current_mode'] and $facts['os']['selinux']['current_mode'] != 'disabled' {
     vox_selinux::module { 'gss_hotfix':
       ensure     => 'present',
       content_te => file("${module_name}/selinux/gss_hotfix.te"),
