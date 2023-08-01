@@ -156,7 +156,7 @@ define nfs::server::export (
 
   # We have to do this if we have a 'sec=sys' situation
   if ('sys' in $sec) {
-    if $facts['selinux'] {
+    if $facts['os']['selinux']['enabled'] {
       ensure_resource('selboolean', 'nfsd_anon_write',
         {
           persistent => true,

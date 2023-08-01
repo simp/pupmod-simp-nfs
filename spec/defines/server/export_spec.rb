@@ -1,6 +1,27 @@
 require 'spec_helper'
 
 describe 'nfs::server::export' do
+
+  def mock_selinux_false_facts(os_facts)
+    os_facts[:selinux] = false
+    os_facts[:os][:selinux][:config_mode] = 'disabled'
+    os_facts[:os][:selinux][:current_mode] = 'disabled'
+    os_facts[:os][:selinux][:enabled] = false
+    os_facts[:os][:selinux][:enforced] = false
+    os_facts
+  end
+
+  def mock_selinux_enforcing_facts(os_facts)
+    os_facts[:selinux] = true
+    os_facts[:os][:selinux][:config_mode] = 'enforcing'
+    os_facts[:os][:selinux][:config_policy] = 'targeted'
+    os_facts[:os][:selinux][:current_mode] = 'enforcing'
+    os_facts[:os][:selinux][:enabled] = true
+    os_facts[:os][:selinux][:enforced] = true
+    os_facts
+  end
+
+
   on_supported_os.each do |os, os_facts|
     context "on #{os}" do
       let(:pre_condition) { 'class { "nfs": is_server => true }' }
@@ -131,8 +152,8 @@ describe 'nfs::server::export' do
             # to workaround service provider issues related to masking haveged
             # when tests are run on GitLab runners which are docker containers
             :haveged__rngd_enabled => false,
-            :selinux               => false
-          } )
+          })
+          mock_selinux_false_facts(os_facts)
         }
         it { is_expected.to compile.with_all_deps }
         it { is_expected.to_not contain_selboolean('nfsd_anon_write') }
