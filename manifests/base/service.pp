@@ -70,7 +70,7 @@ class nfs::base::service
     }
 
     exec { 'unmask_rpc-gssd.service':
-      command => '/usr/bin/systemctl mask rpc-gssd.service',
+      command => '/usr/bin/systemctl unmask rpc-gssd.service',
       onlyif  => '/usr/bin/systemctl status rpc-gssd.service | /usr/bin/grep -qw masked',
       notify  => Service['rpc-gssd.service']
     }
