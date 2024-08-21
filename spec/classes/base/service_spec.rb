@@ -72,7 +72,7 @@ describe 'nfs' do
               } ) }
 
               it { is_expected.to create_exec('unmask_rpc-gssd.service').with( {
-                :command => '/usr/bin/systemctl mask rpc-gssd.service',
+                :command => '/usr/bin/systemctl unmask rpc-gssd.service',
                 :onlyif  => '/usr/bin/systemctl status rpc-gssd.service | /usr/bin/grep -qw masked'
               } ) }
             end

@@ -1,3 +1,6 @@
+* Wed Aug 21 2024 Steven Pritchard <steve@sicura.us> - 7.6.1
+- Fix unmask_rpc-gssd.service exec resource (#109)
+
 * Mon Oct 23 2023 Steven Pritchard <steve@sicura.us> - 7.6.0
 - [puppetsync] Add EL9 support
 
