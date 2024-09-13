@@ -1,3 +1,6 @@
+* Fri Sep 13 2024 Steven Pritchard <steve@sicura.us> - 7.7.0
+- [puppetsync] Update module dependencies to support simp-iptables 7.x
+
 * Wed Aug 21 2024 Steven Pritchard <steve@sicura.us> - 7.6.1
 - Fix unmask_rpc-gssd.service exec resource (#109)
 
