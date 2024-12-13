@@ -8,16 +8,15 @@ test_name 'cross-mounted NFS servers plus clients'
 # * Each NFS client mounts directories from both NFS servers
 
 describe 'cross-mounted NFS servers plus clients' do
-
-  servers = hosts_with_role( hosts, 'nfs_server' )
+  servers = hosts_with_role(hosts, 'nfs_server')
 
   if servers.size < 2
-    fail("#{__FILE__} requires at least 2 hosts with role 'nfs_server'")
+    raise("#{__FILE__} requires at least 2 hosts with role 'nfs_server'")
   end
 
   server1 = servers[0]
   server2 = servers[1]
-  clients = hosts_with_role( hosts, 'nfs_client' )
+  clients = hosts_with_role(hosts, 'nfs_client')
 
   base_hiera = {
     'simp_options::firewall'                => true,
@@ -37,31 +36,31 @@ describe 'cross-mounted NFS servers plus clients' do
 
   context 'NFSv4 cross mounts' do
     opts = {
-      :base_hiera => base_hiera,
-      :server1_config => {
-        :server_ip         => internal_network_info(server1)[:ip],
-        :exported_dir      => '/srv/home',
-        :export_insecure   => false,
-        :export_sec        => 'sys',
-        :mount_nfs_version => 4,
-        :mount_sec         => 'sys',
-        :mount_stunnel     => false
+      base_hiera: base_hiera,
+      server1_config: {
+        server_ip: internal_network_info(server1)[:ip],
+        exported_dir: '/srv/home',
+        export_insecure: false,
+        export_sec: 'sys',
+        mount_nfs_version: 4,
+        mount_sec: 'sys',
+        mount_stunnel: false
       },
-      :server2_config => {
-        :server_ip         => internal_network_info(server2)[:ip],
-        :exported_dir      => '/srv/apps',
-        :export_insecure   => false,
-        :export_sec        => 'sys',
-        :mount_nfs_version => 4,
-        :mount_sec         => 'sys',
-        :mount_stunnel     => false
+      server2_config: {
+        server_ip: internal_network_info(server2)[:ip],
+        exported_dir: '/srv/apps',
+        export_insecure: false,
+        export_sec: 'sys',
+        mount_nfs_version: 4,
+        mount_sec: 'sys',
+        mount_stunnel: false
       },
       # applies to all clients
-      :client_config => {
+      client_config: {
         # index 0 => server1 mount, index 1 => server 2 mount
-        :mount_nfs_version => [4, 4],
-        :mount_sec         => ['sys', 'sys'],
-        :mount_stunnel     => [false, false]
+        mount_nfs_version: [4, 4],
+        mount_sec: ['sys', 'sys'],
+        mount_stunnel: [false, false]
       }
     }
 

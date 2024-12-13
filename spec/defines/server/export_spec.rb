@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe 'nfs::server::export' do
-
   def mock_selinux_false_facts(os_facts)
     os_facts[:selinux] = false
     os_facts[:os][:selinux][:config_mode] = 'disabled'
@@ -21,24 +20,24 @@ describe 'nfs::server::export' do
     os_facts
   end
 
-
   on_supported_os.each do |os, os_facts|
     context "on #{os}" do
       let(:pre_condition) { 'class { "nfs": is_server => true }' }
 
-      let(:facts) {
-        os_facts.merge( {
-          # to workaround service provider issues related to masking haveged
-          # when tests are run on GitLab runners which are docker containers
-          :haveged__rngd_enabled => false,
-          :ipv6_enabled          => true
-        } )
-      }
+      let(:facts) do
+        os_facts.merge({
+                         # to workaround service provider issues related to masking haveged
+                         # when tests are run on GitLab runners which are docker containers
+                         haveged__rngd_enabled: false,
+          ipv6_enabled: true
+                       })
+      end
 
       let(:title) { 'nfs_test' }
+
       base_params = {
-        :export_path => '/foo/bar/baz',
-        :clients     => ['0.0.0.0/0']
+        export_path: '/foo/bar/baz',
+        clients: ['0.0.0.0/0']
       }
 
       context 'with default parameters' do
@@ -60,24 +59,26 @@ describe 'nfs::server::export' do
       end
 
       context 'with parameters different from defaults' do
-        let(:params) { base_params.merge({
-          :insecure       => true,
-          :rw             => true,
-          :async          => true,
-          :no_wdelay      => true,
-          :nohide         => true,
-          :crossmnt       => true,
-          :subtree_check  => true,
-          :insecure_locks => true,
-          :nordirplus     => true,
-          :pnfs           => true,
-          :security_label => false,
-          :sec            => ['sys', 'krb5p'],
-          :no_root_squash => true,
-          :all_squash     => true,
-          :anonuid        => 65520,
-          :anongid        => 65530
-        }) }
+        let(:params) do
+          base_params.merge({
+                              insecure: true,
+          rw: true,
+          async: true,
+          no_wdelay: true,
+          nohide: true,
+          crossmnt: true,
+          subtree_check: true,
+          insecure_locks: true,
+          nordirplus: true,
+          pnfs: true,
+          security_label: false,
+          sec: ['sys', 'krb5p'],
+          no_root_squash: true,
+          all_squash: true,
+          anonuid: 65_520,
+          anongid: 65_530
+                            })
+        end
 
         it { is_expected.to contain_class('nfs::server') }
 
@@ -93,13 +94,15 @@ describe 'nfs::server::export' do
       end
 
       context 'with optional parameters set and mountpoint is a path' do
-        let(:params) { base_params.merge({
-          :comment    => 'some comment',
-          :mountpoint => '/mount/point/path',
-          :fsid       => 'test_vsid',
-          :refer      => ['/path@test_refer1', '/path@test_refer2'],
-          :replicas   => ['/path@test_replica1', '/path@test_replica2']
-        }) }
+        let(:params) do
+          base_params.merge({
+                              comment: 'some comment',
+          mountpoint: '/mount/point/path',
+          fsid: 'test_vsid',
+          refer: ['/path@test_refer1', '/path@test_refer2'],
+          replicas: ['/path@test_replica1', '/path@test_replica2']
+                            })
+        end
 
         it { is_expected.to compile.with_all_deps }
 
@@ -116,7 +119,8 @@ describe 'nfs::server::export' do
       end
 
       context 'with mountpoint is a true' do
-        let(:params) { base_params.merge({ :mountpoint => true }) }
+        let(:params) { base_params.merge({ mountpoint: true }) }
+
         it { is_expected.to compile.with_all_deps }
 
         it {
@@ -131,7 +135,8 @@ describe 'nfs::server::export' do
       end
 
       context 'with custom set' do
-        let(:params) { base_params.merge({ :custom => 'some custom setting' }) }
+        let(:params) { base_params.merge({ custom: 'some custom setting' }) }
+
         it { is_expected.to compile.with_all_deps }
 
         it {
@@ -147,16 +152,17 @@ describe 'nfs::server::export' do
 
       context "with selinux disabled and 'sys' in 'sec' parameter" do
         let(:params) { base_params }
-        let(:facts) {
-          os_facts.merge( {
-            # to workaround service provider issues related to masking haveged
-            # when tests are run on GitLab runners which are docker containers
-            :haveged__rngd_enabled => false,
-          })
+        let(:facts) do
+          os_facts.merge({
+                           # to workaround service provider issues related to masking haveged
+                           # when tests are run on GitLab runners which are docker containers
+                           haveged__rngd_enabled: false,
+                         })
           mock_selinux_false_facts(os_facts)
-        }
+        end
+
         it { is_expected.to compile.with_all_deps }
-        it { is_expected.to_not contain_selboolean('nfsd_anon_write') }
+        it { is_expected.not_to contain_selboolean('nfsd_anon_write') }
       end
     end
   end

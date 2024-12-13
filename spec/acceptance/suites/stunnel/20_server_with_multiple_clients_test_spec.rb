@@ -11,16 +11,15 @@ test_name 'nfs server with multiple clients'
 # Verifies server can support a mix of NFSv4 (stunneled) and NFSv3 (direct)
 # client mounts of the same exported filesystem.
 describe 'nfs server with multiple clients' do
-
-  clients = hosts_with_role( hosts, 'nfs_client' )
+  clients = hosts_with_role(hosts, 'nfs_client')
 
   if clients.size < 2
-    fail("#{__FILE__} requires at least 2 hosts with role 'nfs_client'")
+    raise("#{__FILE__} requires at least 2 hosts with role 'nfs_client'")
   end
 
   client1 = clients[0]
   client2 = clients[1]
-  servers = hosts_with_role( hosts, 'nfs_server' )
+  servers = hosts_with_role(hosts, 'nfs_server')
 
   base_hiera = {
     # Set us up for a stunneled NFS with firewall
@@ -51,20 +50,20 @@ describe 'nfs server with multiple clients' do
 
   context 'server exporting to 2 NFSv4 clients, both via stunnel' do
     opts = {
-      :base_hiera      => base_hiera,
-      :server_config   => {
-        :export_insecure => true,  # server allows mount via NFSv4 stunnel
-        :export_sec      => 'sys'  # server export NFS sec setting
+      base_hiera: base_hiera,
+      server_config: {
+        export_insecure: true, # server allows mount via NFSv4 stunnel
+        export_sec: 'sys' # server export NFS sec setting
       },
-      :mount1_config   => {
-        :nfs_version => 4,     # client1 mount with NFSv4
-        :sec         => 'sys', # client1 mount NFS sec setting
-        :stunnel     => true   # client1 mount enable stunnel
+      mount1_config: {
+        nfs_version: 4, # client1 mount with NFSv4
+        sec: 'sys', # client1 mount NFS sec setting
+        stunnel: true # client1 mount enable stunnel
       },
-      :mount2_config   => {
-        :nfs_version => 4,     # client2 mount with NFSv4
-        :sec         => 'sys', # client2 mount NFS sec setting
-        :stunnel     => true   # client1 mount enable stunnel
+      mount2_config: {
+        nfs_version: 4, # client2 mount with NFSv4
+        sec: 'sys', # client2 mount NFS sec setting
+        stunnel: true # client1 mount enable stunnel
       },
     }
 
@@ -73,21 +72,21 @@ describe 'nfs server with multiple clients' do
 
   context 'client mounting from 1 NFSv4 server via stunnel and 1 NFSv3 server directly' do
     opts = {
-      :base_hiera      => base_hiera,
-      :server_config   => {
-        :nfsv3           => true,  # NFSv3 and NFSv4
-        :export_insecure => true,  # server allows mount via NFSv4 stunnel
-        :export_sec      => 'sys'  # server export NFS sec setting
+      base_hiera: base_hiera,
+      server_config: {
+        nfsv3: true, # NFSv3 and NFSv4
+        export_insecure: true, # server allows mount via NFSv4 stunnel
+        export_sec: 'sys' # server export NFS sec setting
       },
-      :mount1_config   => {
-        :nfs_version => 4,     # client1 mount with NFSv4
-        :sec         => 'sys', # client1 mount NFS sec setting
-        :stunnel     => nil    # client1 mount, stunnel enabled by default
+      mount1_config: {
+        nfs_version: 4, # client1 mount with NFSv4
+        sec: 'sys', # client1 mount NFS sec setting
+        stunnel: nil # client1 mount, stunnel enabled by default
       },
-      :mount2_config   => {
-        :nfs_version => 3,     # client2 mount with NFSv3
-        :sec         => 'sys', # client2 mount NFS sec setting
-        :stunnel     => nil    # client2 mount, stunnel automatically disabled
+      mount2_config: {
+        nfs_version: 3, # client2 mount with NFSv3
+        sec: 'sys', # client2 mount NFS sec setting
+        stunnel: nil # client2 mount, stunnel automatically disabled
       }
     }
 
@@ -96,21 +95,21 @@ describe 'nfs server with multiple clients' do
 
   context 'client mounting from 2 NFSv3 servers directly' do
     opts = {
-      :base_hiera      => base_hiera,
-      :server_config   => {
-        :nfsv3           => true,  # NFSv3 and NFSv4
-        :export_insecure => true,  # server allows mount via NFSv4 stunnel
-        :export_sec      => 'sys'  # server export NFS sec setting
+      base_hiera: base_hiera,
+      server_config: {
+        nfsv3: true, # NFSv3 and NFSv4
+        export_insecure: true, # server allows mount via NFSv4 stunnel
+        export_sec: 'sys' # server export NFS sec setting
       },
-      :mount1_config   => {
-        :nfs_version => 3,     # client1 mount with NFSv3
-        :sec         => 'sys', # client1 mount NFS sec setting
-        :stunnel     => false  # client2 mount disable stunnel
+      mount1_config: {
+        nfs_version: 3, # client1 mount with NFSv3
+        sec: 'sys', # client1 mount NFS sec setting
+        stunnel: false # client2 mount disable stunnel
       },
-      :mount2_config   => {
-        :nfs_version => 3,     # client2 mount with NFSv3
-        :sec         => 'sys', # client2 mount NFS sec setting
-        :stunnel     => false  # client2 mount disable stunnel
+      mount2_config: {
+        nfs_version: 3, # client2 mount with NFSv3
+        sec: 'sys', # client2 mount NFS sec setting
+        stunnel: false # client2 mount disable stunnel
       }
     }
 

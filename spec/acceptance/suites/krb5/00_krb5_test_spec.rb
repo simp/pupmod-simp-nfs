@@ -3,12 +3,11 @@ require 'spec_helper_acceptance'
 test_name 'nfs krb5'
 
 describe 'nfs krb5' do
-
   # This test only uses hosts that have distinct NFS server/client roles,
   # because we don't have a separate KDC in the test's Kerberos infrastructure.
   # Instead, each NFS server also acts as the KDC.
-  servers = hosts_with_role( hosts, 'nfs_server' )
-  clients = hosts_with_role( hosts, 'nfs_client' )
+  servers = hosts_with_role(hosts, 'nfs_server')
+  clients = hosts_with_role(hosts, 'nfs_client')
 
   base_hiera = {
     # Set us up for a NFS using Kerberos
@@ -28,19 +27,19 @@ describe 'nfs krb5' do
     # Fake out sync source, as this is not a full SIMP server
     'krb5::keytab::keytab_source'              => 'file:///tmp/keytabs',
 
-     # Config for KDC on NFS server (unused on NFS clients)
+    # Config for KDC on NFS server (unused on NFS clients)
     'krb5::kdc::ldap'                          => false,
     'krb5::kdc::auto_keytabs::introspect'      => false,
     'krb5::kdc::auto_keytabs::hosts'           =>
       # Generate keytabs for everyone
-      hosts.map{|host| [ fact_on(host,'fqdn'), {'ensure' => 'present'} ]}.to_h,
+      hosts.map { |host| [ fact_on(host, 'fqdn'), { 'ensure' => 'present' } ] }.to_h,
     'krb5::kdc::auto_keytabs::global_services' => [ 'nfs' ],
 
     'nfs::secure_nfs'                          => true,
 
     # make sure we are using iptables and not nftables because nftables
     # core dumps with rules from the nfs module
-    'firewalld::firewall_backend'               => 'iptables'
+    'firewalld::firewall_backend' => 'iptables'
   }
 
   # We need to set up the Kerberos server prior to running NFS.
@@ -55,14 +54,14 @@ describe 'nfs krb5' do
       let(:server_fqdn) { fact_on(server, 'fqdn') }
 
       context 'Kerberos infrastructure set up' do
-        let(:kdc_manifest) {
+        let(:kdc_manifest) do
           <<~EOM
             include 'krb5::kdc'
             include 'ssh'
           EOM
-        }
+        end
 
-        let(:krb5_client_manifest) {
+        let(:krb5_client_manifest) do
           <<~EOM
             include 'krb5'
             include 'ssh'
@@ -71,28 +70,28 @@ describe 'nfs krb5' do
               admin_server => '#{server_fqdn}'
             }
           EOM
-        }
-
-        it "should create a KDC on NFS server #{server} with keytabs for all hosts" do
-          set_hieradata_on(server, base_hiera)
-          apply_manifest_on(server, kdc_manifest, :catch_failures => true)
         end
 
-        it "should set up #{server} keytab and fake keytab sync source" do
-          keytab_src = %(/var/kerberos/krb5kdc/generated_keytabs/#{fact_on(server,'fqdn')}/krb5.keytab)
+        it "creates a KDC on NFS server #{server} with keytabs for all hosts" do
+          set_hieradata_on(server, base_hiera)
+          apply_manifest_on(server, kdc_manifest, catch_failures: true)
+        end
+
+        it "sets up #{server} keytab and fake keytab sync source" do
+          keytab_src = %(/var/kerberos/krb5kdc/generated_keytabs/#{fact_on(server, 'fqdn')}/krb5.keytab)
           on(server, %(cp #{keytab_src} /etc))
           server.mkdir_p('/tmp/keytabs')
           on(server, "cp #{keytab_src} /tmp/keytabs/")
         end
 
         clients.each do |client|
-          # FIXME SIMP-7561
-          it "should clear the gssproxy credential cache on client #{client}" do
-            on(client, "if [ -f /var/lib/gssproxy/clients/krb5cc_0 ]; then /usr/bin/kdestroy -c /var/lib/gssproxy/clients/krb5cc_0 ; fi")
+          # FIXME: SIMP-7561
+          it "clears the gssproxy credential cache on client #{client}" do
+            on(client, 'if [ -f /var/lib/gssproxy/clients/krb5cc_0 ]; then /usr/bin/kdestroy -c /var/lib/gssproxy/clients/krb5cc_0 ; fi')
           end
 
-          it "should copy keytabs from KDC to fake keytab sync source on client #{client}" do
-            keytab_src = %(/var/kerberos/krb5kdc/generated_keytabs/#{fact_on(client,'fqdn')}/krb5.keytab)
+          it "copies keytabs from KDC to fake keytab sync source on client #{client}" do
+            keytab_src = %(/var/kerberos/krb5kdc/generated_keytabs/#{fact_on(client, 'fqdn')}/krb5.keytab)
             tmpdir = Dir.mktmpdir
 
             begin
@@ -101,21 +100,21 @@ describe 'nfs krb5' do
               # doing.
               server.do_scp_from(keytab_src, tmpdir, {})
               client.mkdir_p('/tmp/keytabs')
-              client.do_scp_to(File.join(tmpdir, File.basename(keytab_src)), "/tmp/keytabs/", {})
+              client.do_scp_to(File.join(tmpdir, File.basename(keytab_src)), '/tmp/keytabs/', {})
             ensure
               FileUtils.remove_entry_secure(tmpdir)
             end
           end
 
-          it "should set the Kerberos realm on client #{client}" do
+          it "sets the Kerberos realm on client #{client}" do
             set_hieradata_on(client, base_hiera)
-            apply_manifest_on(client, krb5_client_manifest, :catch_failures => true)
+            apply_manifest_on(client, krb5_client_manifest, catch_failures: true)
           end
         end
       end
 
       context 'long running test' do
-        it 'should ensure vagrant connectivity' do
+        it 'ensures vagrant connectivity' do
           on(hosts, 'date')
         end
       end
@@ -130,18 +129,18 @@ describe 'nfs krb5' do
         client_krb5_manifest_extras = <<~EOM
           # Keep Kerberos realm configured to know location of KDC
           krb5::setting::realm { $facts['domain'] :
-            admin_server => '#{fact_on(server,'fqdn')}'
+            admin_server => '#{fact_on(server, 'fqdn')}'
           }
         EOM
 
         opts = {
-          :base_hiera      => base_hiera,
-          :export_insecure => false,
-          :server_custom   => server_krb5_manifest_extras,
-          :client_custom   => client_krb5_manifest_extras,
-          :nfs_sec         => 'krb5p',
-          :nfsv3           => false,
-          :verify_reboot   => true
+          base_hiera: base_hiera,
+          export_insecure: false,
+          server_custom: server_krb5_manifest_extras,
+          client_custom: client_krb5_manifest_extras,
+          nfs_sec: 'krb5p',
+          nfsv3: false,
+          verify_reboot: true
         }
 
         it_behaves_like 'a NFS share using static mounts with distinct client/server roles', [ server ], clients, opts

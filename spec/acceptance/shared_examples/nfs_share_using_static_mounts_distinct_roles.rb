@@ -19,39 +19,40 @@ shared_examples 'a NFS share using static mounts with distinct client/server rol
   let(:file_basename) { 'test_file' }
   let(:file_search_string) { 'This is a test file' }
 
-  let(:server_opts) {{
-    :is_server             => true,
-    :is_client             => false,
-    :nfsv3                 => opts[:nfsv3],
-    :exported_dir          => exported_dir,
-    :exported_file         => File.join(exported_dir, file_basename),
-    :exported_file_content => "#{file_search_string} from #{exported_dir}",
-    :export_sec            => opts[:nfs_sec],
-    :export_insecure       => opts[:export_insecure],
-    :server_custom         => opts[:server_custom]
-  }}
+  let(:server_opts) do
+    {
+      is_server: true,
+   is_client: false,
+   nfsv3: opts[:nfsv3],
+   exported_dir: exported_dir,
+   exported_file: File.join(exported_dir, file_basename),
+   exported_file_content: "#{file_search_string} from #{exported_dir}",
+   export_sec: opts[:nfs_sec],
+   export_insecure: opts[:export_insecure],
+   server_custom: opts[:server_custom]
+    }
+  end
 
   let(:server_manifest) { create_export_manifest(server_opts) }
 
   servers.each do |server|
     context "as just a NFS server #{server}" do
-
-      it 'should ensure vagrant connectivity' do
+      it 'ensures vagrant connectivity' do
         on(hosts, 'date')
       end
 
-      it 'should apply server manifest to export' do
+      it 'applies server manifest to export' do
         server_hieradata = build_host_hiera(opts[:base_hiera], server_opts)
         set_hieradata_on(server, server_hieradata)
         print_test_config(server_hieradata, server_manifest)
-        apply_manifest_on(server, server_manifest, :catch_failures => true)
+        apply_manifest_on(server, server_manifest, catch_failures: true)
       end
 
-      it 'should be idempotent' do
-        apply_manifest_on(server, server_manifest, :catch_changes => true)
+      it 'is idempotent' do
+        apply_manifest_on(server, server_manifest, catch_changes: true)
       end
 
-      it 'should export shared dir' do
+      it 'exports shared dir' do
         on(server, 'exportfs -v')
         on(server, "exportfs -v | grep #{exported_dir}")
       end
@@ -61,37 +62,39 @@ shared_examples 'a NFS share using static mounts with distinct client/server rol
   clients.each do |client|
     servers.each do |server|
       context "as just a NFS client #{client} using NFS server #{server}" do
-        let(:client_opts) {{
-          :is_server         => false,
-          :is_client         => true,
-          :nfsv3             => opts[:nfsv3],
-          :mount_dir         => "/mnt/#{server.to_s}-#{File.basename(exported_dir)}",
-          :mount_server_ip   => internal_network_info(server)[:ip],
-          :mount_remote_dir  => exported_dir,
-          :mount_nfs_version => (opts[:nfsv3] ? 3 : 4),
-          :mount_sec         => opts[:nfs_sec]
-        }}
+        let(:client_opts) do
+          {
+            is_server: false,
+         is_client: true,
+         nfsv3: opts[:nfsv3],
+         mount_dir: "/mnt/#{server}-#{File.basename(exported_dir)}",
+         mount_server_ip: internal_network_info(server)[:ip],
+         mount_remote_dir: exported_dir,
+         mount_nfs_version: (opts[:nfsv3] ? 3 : 4),
+         mount_sec: opts[:nfs_sec]
+          }
+        end
 
-        let(:client_manifest) {
+        let(:client_manifest) do
           <<~EOM
             #{create_static_mount_manifest(client_opts)}
 
             #{opts[:client_custom]}
           EOM
-        }
+        end
 
-        it "should apply client manifest to mount dir from #{server}" do
+        it "applies client manifest to mount dir from #{server}" do
           client_hieradata = build_host_hiera(opts[:base_hiera], client_opts)
           set_hieradata_on(client, client_hieradata)
           print_test_config(client_hieradata, client_manifest)
-          apply_manifest_on(client, client_manifest, :catch_failures => true)
+          apply_manifest_on(client, client_manifest, catch_failures: true)
         end
 
-        it 'should be idempotent' do
-          apply_manifest_on(client, client_manifest, :catch_changes => true)
+        it 'is idempotent' do
+          apply_manifest_on(client, client_manifest, catch_changes: true)
         end
 
-        it 'should mount NFS share' do
+        it 'mounts NFS share' do
           on(client, %(grep -q '#{file_search_string}' #{client_opts[:mount_dir]}/#{file_basename}))
         end
 
@@ -106,7 +109,7 @@ shared_examples 'a NFS share using static mounts with distinct client/server rol
           # Unfortunately, even the --nonblock flock option simply hangs when we
           # have communication problem. So, we will timeout to detect communication
           # problems instead.
-          it 'should communicate lock status with NFS server' do
+          it 'communicates lock status with NFS server' do
             require 'timeout'
 
             begin
@@ -117,17 +120,17 @@ shared_examples 'a NFS share using static mounts with distinct client/server rol
               nfsd_grace_time = 90
               lock_seconds = 1
               timeout_seconds = nfsd_grace_time + lock_seconds + 2
-              Timeout::timeout(timeout_seconds) do
+              Timeout.timeout(timeout_seconds) do
                 on(client, "date; flock  #{client_opts[:mount_dir]}/#{file_basename} -c 'sleep #{lock_seconds}'; date")
               end
             rescue Timeout::Error
-              fail('Problem with NFSv3 connectivity during file lock')
+              raise('Problem with NFSv3 connectivity during file lock')
             end
           end
         end
 
         if opts[:verify_reboot]
-          it 'should ensure vagrant connectivity' do
+          it 'ensures vagrant connectivity' do
             on(hosts, 'date')
           end
 
@@ -142,7 +145,7 @@ shared_examples 'a NFS share using static mounts with distinct client/server rol
             it 'client manifest should be idempotent after reboot' do
               client.reboot
               wait_for_reboot_hack(client)
-              apply_manifest_on(client, client_manifest, :catch_changes => true)
+              apply_manifest_on(client, client_manifest, catch_changes: true)
             end
           end
 
@@ -153,7 +156,7 @@ shared_examples 'a NFS share using static mounts with distinct client/server rol
           it 'server manifest should be idempotent after reboot' do
             server.reboot
             wait_for_reboot_hack(server)
-            apply_manifest_on(server, server_manifest, :catch_changes => true)
+            apply_manifest_on(server, server_manifest, catch_changes: true)
           end
 
           it 'mount should be re-established after server reboot' do
@@ -161,10 +164,10 @@ shared_examples 'a NFS share using static mounts with distinct client/server rol
           end
         end
 
-        it 'should remove mount as prep for next test' do
+        it 'removes mount as prep for next test' do
           # use puppet resource instead of simple umount, in order to remove
           # persistent mount configuration
-          on(client, %{puppet resource mount #{client_opts[:mount_dir]} ensure=absent})
+          on(client, %(puppet resource mount #{client_opts[:mount_dir]} ensure=absent))
           on(client, "rm -rf #{client_opts[:mount_dir]}")
         end
       end

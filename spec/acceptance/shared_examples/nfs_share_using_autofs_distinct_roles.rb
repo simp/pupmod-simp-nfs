@@ -21,44 +21,44 @@
 #  * #SERVER_IP#
 #
 shared_examples 'a NFS share using autofs with distinct client/server roles' do |servers, clients, opts|
-  export_root_path =  '/srv/nfs_root'
+  export_root_path = '/srv/nfs_root'
   mount_root_path = '/mnt'
   mount_map = {
-     :direct            => {
-       :export_dir     => "#{export_root_path}/for_direct",
-       :exported_files => [ "#{export_root_path}/for_direct/test_file" ],
-       :mount_name     => "#{mount_root_path}/direct",
-       :mounted_files  => [ "#{mount_root_path}/direct/test_file" ]
+    direct: {
+      export_dir: "#{export_root_path}/for_direct",
+      exported_files: [ "#{export_root_path}/for_direct/test_file" ],
+      mount_name: "#{mount_root_path}/direct",
+      mounted_files: [ "#{mount_root_path}/direct/test_file" ]
+    },
+     indirect: {
+       export_dir: "#{export_root_path}/for_indirect",
+       exported_files: [ "#{export_root_path}/for_indirect/test_file" ],
+       mount_name: "#{mount_root_path}/indirect",
+       mounted_files: [ "#{mount_root_path}/indirect/autodir/test_file" ],
+       map_key: 'autodir',
+       add_key_subst: false,
      },
-     :indirect          => {
-       :export_dir     => "#{export_root_path}/for_indirect",
-       :exported_files => [ "#{export_root_path}/for_indirect/test_file" ],
-       :mount_name     => "#{mount_root_path}/indirect",
-       :mounted_files  => [ "#{mount_root_path}/indirect/autodir/test_file" ],
-       :map_key        => 'autodir',
-       :add_key_subst  => false,
-     },
-     :indirect_wildcard => {
-       :export_dir     => "#{export_root_path}/for_indirect_wildcard",
-       :exported_files => [
+     indirect_wildcard: {
+       export_dir: "#{export_root_path}/for_indirect_wildcard",
+       exported_files: [
          "#{export_root_path}/for_indirect_wildcard/sub1/test_file",
-         "#{export_root_path}/for_indirect_wildcard/sub2/test_file"
+         "#{export_root_path}/for_indirect_wildcard/sub2/test_file",
        ],
-       :mount_name     => "#{mount_root_path}/indirect_wildcard",
-       :mounted_files  => [
+       mount_name: "#{mount_root_path}/indirect_wildcard",
+       mounted_files: [
          "#{mount_root_path}/indirect_wildcard/sub1/test_file",
-         "#{mount_root_path}/indirect_wildcard/sub2/test_file"
+         "#{mount_root_path}/indirect_wildcard/sub2/test_file",
        ],
-       :map_key       => '*',
-       :add_key_subst => true,
-    }
+       map_key: '*',
+       add_key_subst: true,
+     }
   }
 
-  let(:export_dirs) { mount_map.map { |type,info| info[:export_dir] }.flatten }
-  let(:exported_files) { mount_map.map { |type,info| info[:exported_files] }.flatten }
-  let(:mounted_files) { mount_map.map { |type,info| info[:mounted_files] }.flatten }
+  let(:export_dirs) { mount_map.map { |_type, info| info[:export_dir] }.flatten }
+  let(:exported_files) { mount_map.map { |_type, info| info[:exported_files] }.flatten }
+  let(:mounted_files) { mount_map.map { |_type, info| info[:mounted_files] }.flatten }
   let(:file_content_base) { 'This is a test file from' }
-  let(:server_manifest) {
+  let(:server_manifest) do
     <<~EOM
       include 'ssh'
 
@@ -117,10 +117,10 @@ shared_examples 'a NFS share using autofs with distinct client/server roles' do 
 
       #{opts[:server_custom]}
     EOM
-  }
+  end
 
   let(:nfs_version) { opts[:nfsv3] ? 3 : 4 }
-  let(:client_manifest_base) {
+  let(:client_manifest_base) do
     <<~EOM
       include 'ssh'
 
@@ -143,7 +143,7 @@ shared_examples 'a NFS share using autofs with distinct client/server roles' do 
         sec                     => '#{opts[:nfs_sec]}',
         autofs                  => true,
         autofs_indirect_map_key => '#{mount_map[:indirect][:map_key]}',
-        autofs_add_key_subst    => #{mount_map[:indirect][:add_key_subst].to_s}
+        autofs_add_key_subst    => #{mount_map[:indirect][:add_key_subst]}
       }
 
       # indirect mount with wildcard and map key substitution
@@ -154,34 +154,34 @@ shared_examples 'a NFS share using autofs with distinct client/server roles' do 
         sec                     => '#{opts[:nfs_sec]}',
         autofs                  => true,
         autofs_indirect_map_key => '#{mount_map[:indirect_wildcard][:map_key]}',
-        autofs_add_key_subst    => #{mount_map[:indirect_wildcard][:add_key_subst].to_s}
+        autofs_add_key_subst    => #{mount_map[:indirect_wildcard][:add_key_subst]}
       }
 
       #{opts[:client_custom]}
     EOM
-  }
+  end
 
   servers.each do |server|
     context "as just a NFS server #{server}" do
-      it 'should ensure vagrant connectivity' do
+      it 'ensures vagrant connectivity' do
         on(hosts, 'date')
       end
 
-      it 'should apply server manifest to export' do
+      it 'applies server manifest to export' do
         server_hieradata = Marshal.load(Marshal.dump(opts[:base_hiera]))
         server_hieradata['nfs::is_client'] = false
         server_hieradata['nfs::is_server'] = true
         server_hieradata['nfs::nfsv3'] = opts[:nfsv3]
         set_hieradata_on(server, server_hieradata)
         print_test_config(server_hieradata, server_manifest)
-        apply_manifest_on(server, server_manifest, :catch_failures => true)
+        apply_manifest_on(server, server_manifest, catch_failures: true)
       end
 
-      it 'should be idempotent' do
-        apply_manifest_on(server, server_manifest, :catch_changes => true)
+      it 'is idempotent' do
+        apply_manifest_on(server, server_manifest, catch_changes: true)
       end
 
-      it 'should export shared dirs' do
+      it 'exports shared dirs' do
         export_dirs.each do |dir|
           on(server, 'exportfs -v')
           on(server, "exportfs -v | grep -w #{dir}")
@@ -195,35 +195,35 @@ shared_examples 'a NFS share using autofs with distinct client/server roles' do 
   clients.each do |client|
     servers.each do |server|
       context "as just a NFS client #{client} using NFS server #{server}" do
-        let(:server_ip) {
+        let(:server_ip) do
           info = internal_network_info(server)
-          expect(info[:ip]).to_not be_nil
+          expect(info[:ip]).not_to be_nil
           info[:ip]
-        }
+        end
 
         let(:mount_dir) { "/mnt/#{server}" }
-        let(:client_manifest) {
+        let(:client_manifest) do
           client_manifest = client_manifest_base.dup
           client_manifest.gsub!('#MOUNT_ROOT_DIR#', mount_dir)
           client_manifest.gsub!('#SERVER_IP#', server_ip)
           client_manifest
-        }
+        end
 
-        it "should apply client manifest to mount dir from #{server}" do
+        it "applies client manifest to mount dir from #{server}" do
           client_hieradata = Marshal.load(Marshal.dump(opts[:base_hiera]))
           client_hieradata['nfs::is_client'] = true
           client_hieradata['nfs::is_server'] = false
           client_hieradata['nfs::nfsv3'] = opts[:nfsv3]
           set_hieradata_on(client, client_hieradata)
           print_test_config(client_hieradata, client_manifest)
-          apply_manifest_on(client, client_manifest, :catch_failures => true)
+          apply_manifest_on(client, client_manifest, catch_failures: true)
         end
 
-        it 'should be idempotent' do
-          apply_manifest_on(client, client_manifest, :catch_changes => true)
+        it 'is idempotent' do
+          apply_manifest_on(client, client_manifest, catch_changes: true)
         end
 
-        it 'should automount NFS shares' do
+        it 'automounts NFS shares' do
           mounted_files.each do |file|
             auto_dir = File.dirname(file)
             filename = File.basename(file)
@@ -234,7 +234,7 @@ shared_examples 'a NFS share using autofs with distinct client/server roles' do 
         end
 
         if opts[:verify_reboot]
-          it 'should ensure vagrant connectivity' do
+          it 'ensures vagrant connectivity' do
             on(hosts, 'date')
           end
 
@@ -263,9 +263,9 @@ shared_examples 'a NFS share using autofs with distinct client/server roles' do 
           end
         end
 
-        it 'should stop and disable autofs service as prep for next test' do
+        it 'stops and disable autofs service as prep for next test' do
           # auto-mounted filesystems are unmounted when autofs service is stopped
-          on(client, %{puppet resource service autofs ensure=stopped enable=false})
+          on(client, %(puppet resource service autofs ensure=stopped enable=false))
         end
       end
     end
