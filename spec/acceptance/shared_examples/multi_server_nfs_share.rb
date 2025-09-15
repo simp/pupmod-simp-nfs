@@ -102,7 +102,7 @@ shared_examples 'a multi-server NFS share' do |server1, server2, clients, opts|
           mount_sec: (opts[:client_config][:mount_sec] ? opts[:client_config][:mount_sec][0] : nil),
           mount_nfsd_port: opts[:server1_config][:nfsd_port],
           mount_stunnel_nfsd_port: opts[:server1_config][:stunnel_nfsd_port],
-          mount_stunnel: (opts[:client_config][:mount_stunnel] ? opts[:client_config][:mount_stunnel][0] : nil)
+          mount_stunnel: (opts[:client_config][:mount_stunnel] ? opts[:client_config][:mount_stunnel][0] : nil),
         },
         { # mount to server 2
           mount_dir: "/mnt/#{server2}-#{File.basename(opts[:server2_config][:exported_dir])}",
@@ -113,9 +113,9 @@ shared_examples 'a multi-server NFS share' do |server1, server2, clients, opts|
           mount_sec: (opts[:client_config][:mount_sec] ? opts[:client_config][:mount_sec][1] : nil),
           mount_nfsd_port: opts[:server2_config][:nfsd_port],
           mount_stunnel_nfsd_port: opts[:server2_config][:stunnel_nfsd_port],
-          mount_stunnel: (opts[:client_config][:mount_stunnel] ? opts[:client_config][:mount_stunnel][1] : nil)
+          mount_stunnel: (opts[:client_config][:mount_stunnel] ? opts[:client_config][:mount_stunnel][1] : nil),
         },
-      ]
+      ],
     }
 
     context "as a NFS client #{clients[index]} using NFS servers #{server1} and #{server2}" do

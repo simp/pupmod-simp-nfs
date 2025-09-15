@@ -17,7 +17,7 @@ describe 'nfs' do
               is_server: true,
            nfsv3: true,
            tcpwrappers: true,
-           trusted_nets: [ '1.2.3.0/24' ]
+           trusted_nets: [ '1.2.3.0/24' ],
             }
           end
 
@@ -63,7 +63,7 @@ describe 'nfs' do
           let(:params) do
             {
               tcpwrappers: true,
-           trusted_nets: [ '1.2.3.0/24' ]
+           trusted_nets: [ '1.2.3.0/24' ],
             }
           end
 
@@ -102,7 +102,7 @@ describe 'nfs' do
               is_server: true,
            nfsv3: false,
            tcpwrappers: true,
-           trusted_nets: [ '1.2.3.0/24' ]
+           trusted_nets: [ '1.2.3.0/24' ],
             }
           end
 

@@ -44,7 +44,7 @@ describe 'cross-mounted NFS servers plus clients' do
 
     # make sure we are using iptables and not nftables because nftables
     # core dumps with rules from the nfs module
-    'firewalld::firewall_backend'           => 'iptables'
+    'firewalld::firewall_backend'           => 'iptables',
   }
 
   context 'NFSv4 cross mounts with stunnel' do
@@ -59,7 +59,7 @@ describe 'cross-mounted NFS servers plus clients' do
         export_sec: 'sys',
         mount_nfs_version: 4,
         mount_sec: 'sys',
-        mount_stunnel: true
+        mount_stunnel: true,
       },
       server2_config: {
         server_ip: internal_network_info(server2)[:ip],
@@ -70,15 +70,15 @@ describe 'cross-mounted NFS servers plus clients' do
         export_sec: 'sys',
         mount_nfs_version: 4,
         mount_sec: 'sys',
-        mount_stunnel: true
+        mount_stunnel: true,
       },
       # applies to all clients
       client_config: {
         # index 0 => server1 mount, index 1 => server 2 mount
         mount_nfs_version: [4, 4],
         mount_sec: ['sys', 'sys'],
-        mount_stunnel: [true, true]
-      }
+        mount_stunnel: [true, true],
+      },
     }
 
     it_behaves_like 'a NFS share with cross-mounted servers',

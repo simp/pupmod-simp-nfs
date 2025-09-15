@@ -55,7 +55,7 @@ describe 'nfs::selinux_hotfix' do
           is_expected.to contain_vox_selinux__module('gss_hotfix').with({
                                                                           ensure: 'present',
           builder: 'simple',
-          content_te: <<~EOM
+          content_te: <<~EOM,
             module gss_hotfix 1.0;
 
             require {

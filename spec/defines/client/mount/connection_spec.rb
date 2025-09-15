@@ -29,7 +29,7 @@ describe 'nfs::client::mount::connection' do
          stunnel_socket_options: ['l:TCP_NODELAY=1', 'r:TCP_NODELAY=1'],
          stunnel_verify: 2,
          stunnel_wantedby: [ 'remote-fs-pre.target' ],
-         tcpwrappers: true
+         tcpwrappers: true,
           }
         end
 
@@ -44,7 +44,7 @@ describe 'nfs::client::mount::connection' do
           stunnel_verify: params[:stunnel_verify],
           stunnel_wantedby: params[:stunnel_wantedby],
           firewall: params[:firewall],
-          tcpwrappers: params[:tcpwrappers]
+          tcpwrappers: params[:tcpwrappers],
                                                                           })
         }
 
@@ -66,7 +66,7 @@ describe 'nfs::client::mount::connection' do
            stunnel_socket_options: ['l:TCP_NODELAY=1', 'r:TCP_NODELAY=1'],
            stunnel_verify: 2,
            stunnel_wantedby: [ 'remote-fs-pre.target' ],
-           tcpwrappers: true
+           tcpwrappers: true,
             }
           end
 
@@ -92,7 +92,7 @@ describe 'nfs::client::mount::connection' do
              stunnel_socket_options: ['l:TCP_NODELAY=1', 'r:TCP_NODELAY=1'],
              stunnel_verify: 2,
              stunnel_wantedby: [ 'remote-fs-pre.target' ],
-             tcpwrappers: true
+             tcpwrappers: true,
               }
             end
 
@@ -103,7 +103,7 @@ describe 'nfs::client::mount::connection' do
             it {
               is_expected.to create_iptables__listen__tcp_stateful('nfs_callback_1.2.3.4').with({
                                                                                                   trusted_nets: [ params[:nfs_server] ],
-              dports: [ 876 ]
+              dports: [ 876 ],
                                                                                                 })
             }
 
@@ -123,7 +123,7 @@ describe 'nfs::client::mount::connection' do
              stunnel_socket_options: ['l:TCP_NODELAY=1', 'r:TCP_NODELAY=1'],
              stunnel_verify: 2,
              stunnel_wantedby: [ 'remote-fs-pre.target' ],
-             tcpwrappers: true
+             tcpwrappers: true,
               }
             end
 
@@ -134,14 +134,14 @@ describe 'nfs::client::mount::connection' do
             it {
               is_expected.to create_iptables__listen__tcp_stateful('nfs_status_tcp_1.2.3.4').with({
                                                                                                     trusted_nets: [ params[:nfs_server] ],
-              dports: [ 111, 32_803, 662 ]
+              dports: [ 111, 32_803, 662 ],
                                                                                                   })
             }
 
             it {
               is_expected.to create_iptables__listen__udp('nfs_status_udp_1.2.3.4').with({
                                                                                            trusted_nets: [ params[:nfs_server] ],
-              dports: [ 111, 32_769, 662 ]
+              dports: [ 111, 32_769, 662 ],
                                                                                          })
             }
           end

@@ -17,7 +17,7 @@ describe 'nfs' do
           it {
             is_expected.to create_exec('modprobe_nfsv4').with({
                                                                 command: '/sbin/modprobe nfsv4',
-            unless: '/sbin/lsmod | /usr/bin/grep -qw nfsv4'
+            unless: '/sbin/lsmod | /usr/bin/grep -qw nfsv4',
                                                               })
           }
 
@@ -26,7 +26,7 @@ describe 'nfs' do
                                                                           owner: 'root',
             group: 'root',
             mode: '0640',
-            content: <<~EOM
+            content: <<~EOM,
               # This file is managed by Puppet (simp-nfs module).  Changes will be overwritten
               # at the next puppet run.
               #
@@ -40,7 +40,7 @@ describe 'nfs' do
                                                               owner: 'root',
             group: 'root',
             mode: '0644',
-            content: "\n"
+            content: "\n",
                                                             })
           }
 

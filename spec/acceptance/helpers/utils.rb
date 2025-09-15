@@ -35,7 +35,7 @@ module Acceptance::Helpers::Utils
       internal_ip_info = {
         interface: interface,
         ip: settings['ip'],
-        netmask: settings['netmask']
+        netmask: settings['netmask'],
       }
       break
     end

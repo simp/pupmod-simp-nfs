@@ -44,7 +44,7 @@ describe 'nfs client with multiple servers' do
 
     # make sure we are using iptables and not nftables because nftables
     # core dumps with rules from the nfs module
-    'firewalld::firewall_backend'           => 'iptables'
+    'firewalld::firewall_backend'           => 'iptables',
   }
 
   context 'client mounting from 2 NFSv4 servers, both via stunnel' do
@@ -74,8 +74,8 @@ describe 'nfs client with multiple servers' do
         # index 0 => server1 mount, index 1 => server 2 mount
         mount_nfs_version: [4, 4],
         mount_sec: ['sys', 'sys'],
-        mount_stunnel: [nil, nil] # use default of true
-      }
+        mount_stunnel: [nil, nil], # use default of true
+      },
     }
 
     it_behaves_like 'a multi-server NFS share', server1, server2, clients, opts
@@ -108,8 +108,8 @@ describe 'nfs client with multiple servers' do
         # index 0 => server1 mount, index 1 => server 2 mount
         mount_nfs_version: [4, 3],
         mount_sec: ['sys', 'sys'],
-        mount_stunnel: [true, false]
-      }
+        mount_stunnel: [true, false],
+      },
     }
 
     it_behaves_like 'a multi-server NFS share', server1, server2, clients, opts
@@ -142,8 +142,8 @@ describe 'nfs client with multiple servers' do
         # index 0 => server1 mount, index 1 => server 2 mount
         mount_nfs_version: [3, 3],
         mount_sec: ['sys', 'sys'],
-        mount_stunnel: [false, false]
-      }
+        mount_stunnel: [false, false],
+      },
     }
 
     it_behaves_like 'a multi-server NFS share', server1, server2, clients, opts

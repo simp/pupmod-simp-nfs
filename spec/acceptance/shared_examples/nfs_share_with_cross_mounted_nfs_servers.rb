@@ -156,7 +156,7 @@ shared_examples 'a NFS share with cross-mounted servers' do |server1, server2, c
           mount_sec: (opts[:client_config][:mount_sec] ? opts[:client_config][:mount_sec][0] : nil),
           mount_nfsd_port: opts[:server1_config][:nfsd_port],
           mount_stunnel_nfsd_port: opts[:server1_config][:stunnel_nfsd_port],
-          mount_stunnel: (opts[:client_config][:mount_stunnel] ? opts[:client_config][:mount_stunnel][0] : nil)
+          mount_stunnel: (opts[:client_config][:mount_stunnel] ? opts[:client_config][:mount_stunnel][0] : nil),
         },
         { # mount to server 2
           mount_dir: "/mnt/#{server2}-#{File.basename(opts[:server2_config][:exported_dir])}",
@@ -167,9 +167,9 @@ shared_examples 'a NFS share with cross-mounted servers' do |server1, server2, c
           mount_sec: (opts[:client_config][:mount_sec] ? opts[:client_config][:mount_sec][1] : nil),
           mount_nfsd_port: opts[:server2_config][:nfsd_port],
           mount_stunnel_nfsd_port: opts[:server2_config][:stunnel_nfsd_port],
-          mount_stunnel: (opts[:client_config][:mount_stunnel] ? opts[:client_config][:mount_stunnel][1] : nil)
+          mount_stunnel: (opts[:client_config][:mount_stunnel] ? opts[:client_config][:mount_stunnel][1] : nil),
         },
-      ]
+      ],
     }
 
     clients_cleanup_opts << { host: clients[index], mount_dir: client_opts[:mounts][0][:mount_dir] }

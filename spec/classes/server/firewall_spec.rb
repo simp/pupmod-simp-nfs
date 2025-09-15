@@ -19,7 +19,7 @@ describe 'nfs' do
                 is_server: true,
               nfsv3: true,
               firewall: true,
-              stunnel: true
+              stunnel: true,
               }
             end
 
@@ -35,7 +35,7 @@ describe 'nfs' do
               {
                 # nfs class params
                 firewall: true,
-              stunnel: true
+              stunnel: true,
               }
             end
 
@@ -52,7 +52,7 @@ describe 'nfs' do
                 is_server: true,
               nfsv3: false,
               firewall: true,
-              stunnel: true
+              stunnel: true,
               }
             end
 
@@ -71,7 +71,7 @@ describe 'nfs' do
                 is_server: true,
               nfsv3: true,
               firewall: true,
-              stunnel: false
+              stunnel: false,
               }
             end
 
@@ -86,7 +86,7 @@ describe 'nfs' do
               {
                 # nfs class params
                 firewall: true,
-              stunnel: false
+              stunnel: false,
               }
             end
 
@@ -102,7 +102,7 @@ describe 'nfs' do
                 is_server: true,
               nfsv3: false,
               firewall: true,
-              stunnel: false
+              stunnel: false,
               }
             end
 

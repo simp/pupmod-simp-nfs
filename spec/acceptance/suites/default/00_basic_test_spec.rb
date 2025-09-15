@@ -24,7 +24,7 @@ describe 'nfs basic' do
 
     # make sure we are using iptables and not nftables because nftables
     # core dumps with rules from the nfs module
-    'firewalld::firewall_backend'           => 'iptables'
+    'firewalld::firewall_backend'           => 'iptables',
   }
 
   context 'with firewall only' do
@@ -35,7 +35,7 @@ describe 'nfs basic' do
         nfs_sec: 'sys',
         nfsv3: false,
         mount_autodetect_remote: [ true, false ],
-        verify_reboot: true
+        verify_reboot: true,
       }
 
       it_behaves_like 'a NFS share using static mounts with distinct client/server roles', servers, clients, opts
@@ -50,7 +50,7 @@ describe 'nfs basic' do
         nfs_sec: 'sys',
         nfsv3: true,
         mount_autodetect_remote: [ true, false ], # used in combined client/server test
-        verify_reboot: true
+        verify_reboot: true,
       }
 
       it_behaves_like 'a NFS share using static mounts with distinct client/server roles', servers, clients, opts
@@ -73,9 +73,9 @@ describe 'nfs basic' do
       'nfs::custom_nfs_conf_opts' => {
         'nfsd' => {
           'tcp' => true,
-          'udp' => false
-        }
-      }
+          'udp' => false,
+        },
+      },
     }
 
     context 'NFSv4 with firewall and tcpwrappers' do
@@ -84,7 +84,7 @@ describe 'nfs basic' do
         export_insecure: false,
         nfs_sec: 'sys',
         nfsv3: false,
-        verify_reboot: false
+        verify_reboot: false,
       }
 
       it_behaves_like 'a NFS share using static mounts with distinct client/server roles',
@@ -100,7 +100,7 @@ describe 'nfs basic' do
         export_insecure: false,
         nfs_sec: 'sys',
         nfsv3: true,
-        verify_reboot: false
+        verify_reboot: false,
       }
 
       it_behaves_like 'a NFS share using static mounts with distinct client/server roles',

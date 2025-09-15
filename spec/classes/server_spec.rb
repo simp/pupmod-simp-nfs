@@ -32,7 +32,7 @@ describe 'nfs' do
             let(:params) do
               {
                 is_server: true,
-             stunnel: true
+             stunnel: true,
               }
             end
 
@@ -52,7 +52,7 @@ describe 'nfs' do
           let(:params) do
             {
               is_server: true,
-           firewall: true
+           firewall: true,
             }
           end
 
@@ -67,7 +67,7 @@ describe 'nfs' do
               {
                 is_server: true,
              kerberos: true,
-             keytab_on_puppet: false
+             keytab_on_puppet: false,
               }
             end
 
@@ -82,7 +82,7 @@ describe 'nfs' do
               {
                 is_server: true,
              kerberos: true,
-             keytab_on_puppet: true
+             keytab_on_puppet: true,
               }
             end
 

@@ -28,7 +28,7 @@ shared_examples 'a NFS share using autofs with distinct client/server roles' do 
       export_dir: "#{export_root_path}/for_direct",
       exported_files: [ "#{export_root_path}/for_direct/test_file" ],
       mount_name: "#{mount_root_path}/direct",
-      mounted_files: [ "#{mount_root_path}/direct/test_file" ]
+      mounted_files: [ "#{mount_root_path}/direct/test_file" ],
     },
      indirect: {
        export_dir: "#{export_root_path}/for_indirect",
@@ -51,7 +51,7 @@ shared_examples 'a NFS share using autofs with distinct client/server roles' do 
        ],
        map_key: '*',
        add_key_subst: true,
-     }
+     },
   }
 
   let(:export_dirs) { mount_map.map { |_type, info| info[:export_dir] }.flatten }

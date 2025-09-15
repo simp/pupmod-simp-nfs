@@ -29,7 +29,7 @@ shared_examples 'a NFS share using static mounts with distinct client/server rol
    exported_file_content: "#{file_search_string} from #{exported_dir}",
    export_sec: opts[:nfs_sec],
    export_insecure: opts[:export_insecure],
-   server_custom: opts[:server_custom]
+   server_custom: opts[:server_custom],
     }
   end
 
@@ -71,7 +71,7 @@ shared_examples 'a NFS share using static mounts with distinct client/server rol
          mount_server_ip: internal_network_info(server)[:ip],
          mount_remote_dir: exported_dir,
          mount_nfs_version: (opts[:nfsv3] ? 3 : 4),
-         mount_sec: opts[:nfs_sec]
+         mount_sec: opts[:nfs_sec],
           }
         end
 

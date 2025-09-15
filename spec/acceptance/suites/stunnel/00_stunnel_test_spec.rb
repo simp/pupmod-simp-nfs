@@ -59,7 +59,7 @@ describe 'nfs stunnel' do
 
     # make sure we are using iptables and not nftables because nftables
     # core dumps with rules from the nfs module
-    'firewalld::firewall_backend'           => 'iptables'
+    'firewalld::firewall_backend'           => 'iptables',
   }
 
   context 'with NFSv4 stunnel and firewall' do
@@ -69,7 +69,7 @@ describe 'nfs stunnel' do
       nfs_sec: 'sys',
       nfsv3: false,
       mount_autodetect_remote: [ false ], # this is immaterial when using stunnel
-      verify_reboot: true
+      verify_reboot: true,
     }
 
     it_behaves_like 'a NFS share using static mounts with distinct client/server roles', servers, clients, opts
@@ -91,9 +91,9 @@ describe 'nfs stunnel' do
       'nfs::custom_nfs_conf_opts' => {
         'nfsd' => {
           'tcp' => true,
-          'udp' => false
-        }
-      }
+          'udp' => false,
+        },
+      },
     }
 
     opts = {
@@ -101,7 +101,7 @@ describe 'nfs stunnel' do
       export_insecure: true,
       nfs_sec: 'sys',
       nfsv3: false,
-      verify_reboot: false
+      verify_reboot: false,
     }
 
     it_behaves_like 'a NFS share using static mounts with distinct client/server roles',

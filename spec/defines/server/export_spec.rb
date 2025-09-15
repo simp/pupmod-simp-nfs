@@ -29,7 +29,7 @@ describe 'nfs::server::export' do
                          # to workaround service provider issues related to masking haveged
                          # when tests are run on GitLab runners which are docker containers
                          haveged__rngd_enabled: false,
-          ipv6_enabled: true
+          ipv6_enabled: true,
                        })
       end
 
@@ -37,7 +37,7 @@ describe 'nfs::server::export' do
 
       base_params = {
         export_path: '/foo/bar/baz',
-        clients: ['0.0.0.0/0']
+        clients: ['0.0.0.0/0'],
       }
 
       context 'with default parameters' do
@@ -76,7 +76,7 @@ describe 'nfs::server::export' do
           no_root_squash: true,
           all_squash: true,
           anonuid: 65_520,
-          anongid: 65_530
+          anongid: 65_530,
                             })
         end
 
@@ -100,7 +100,7 @@ describe 'nfs::server::export' do
           mountpoint: '/mount/point/path',
           fsid: 'test_vsid',
           refer: ['/path@test_refer1', '/path@test_refer2'],
-          replicas: ['/path@test_replica1', '/path@test_replica2']
+          replicas: ['/path@test_replica1', '/path@test_replica2'],
                             })
         end
 

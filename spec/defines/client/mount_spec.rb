@@ -27,7 +27,7 @@ describe 'nfs::client::mount' do
         let(:params) do
           {
             nfs_server: nfs_server,
-         remote_path: title
+         remote_path: title,
           }
         end
 
@@ -45,7 +45,7 @@ describe 'nfs::client::mount' do
               stunnel_socket_options: ['l:TCP_NODELAY=1', 'r:TCP_NODELAY=1'], # from nfs::client
               stunnel_verify: 2, # from nfs::client
               stunnel_wantedby: ['remote-fs-pre.target'], # from nfs::client
-              tcpwrappers: false # from nfs
+              tcpwrappers: false, # from nfs
                                                                              })
           end
 
@@ -56,8 +56,8 @@ describe 'nfs::client::mount' do
               mappings: {
                 'key'      => title,
                 'options'  => '-_netdev,nfsvers=4,port=2049,soft,sec=sys',
-                'location' => "#{params[:nfs_server]}:#{params[:remote_path]}"
-              }
+                'location' => "#{params[:nfs_server]}:#{params[:remote_path]}",
+              },
                                                            })
           }
         end
@@ -77,7 +77,7 @@ describe 'nfs::client::mount' do
               stunnel_socket_options: ['l:TCP_NODELAY=2', 'r:TCP_NODELAY=2'], # from nfs::client
               stunnel_verify: 1, # from nfs::client
               stunnel_wantedby: ['remote-fs-pre.target', 'some-other.service'], # from nfs::client
-              tcpwrappers: true # from nfs
+              tcpwrappers: true, # from nfs
                                                                              })
           end
         end
@@ -88,7 +88,7 @@ describe 'nfs::client::mount' do
           {
             nfs_server: nfs_server,
          remote_path: title,
-         autofs: true
+         autofs: true,
           }
         end
 
@@ -106,8 +106,8 @@ describe 'nfs::client::mount' do
                 mappings: {
                   'key'      => title,
                   'options'  => '-_netdev,nfsvers=3,port=2049,soft',
-                  'location' => "#{params[:nfs_server]}:#{params[:remote_path]}"
-                }
+                  'location' => "#{params[:nfs_server]}:#{params[:remote_path]}",
+                },
                                                              })
             }
           end
@@ -120,7 +120,7 @@ describe 'nfs::client::mount' do
                 stunnel_nfsd_port: 20_500,
                 stunnel_socket_options: ['l:TCP_NODELAY=2', 'r:TCP_NODELAY=2'],
                 stunnel_verify: 1,
-                stunnel_wantedby: ['remote-fs-pre.target', 'some-other.service']
+                stunnel_wantedby: ['remote-fs-pre.target', 'some-other.service'],
                                 })
             end
 
@@ -134,7 +134,7 @@ describe 'nfs::client::mount' do
               stunnel_nfsd_port: 20_500,
               stunnel_socket_options: ['l:TCP_NODELAY=2', 'r:TCP_NODELAY=2'],
               stunnel_verify: 1,
-              stunnel_wantedby: ['remote-fs-pre.target', 'some-other.service']
+              stunnel_wantedby: ['remote-fs-pre.target', 'some-other.service'],
                                                                                })
             }
 
@@ -145,8 +145,8 @@ describe 'nfs::client::mount' do
                 mappings: {
                   'key'      => title,
                   'options'  => '-_netdev,nfsvers=4,port=2050,soft,sec=sys,proto=tcp',
-                  'location' => "127.0.0.1:#{params[:remote_path]}"
-                }
+                  'location' => "127.0.0.1:#{params[:remote_path]}",
+                },
                                                              })
             }
 
@@ -165,7 +165,7 @@ describe 'nfs::client::mount' do
                                                                                  nfs_server: params[:nfs_server],
               nfs_version: 4,
               nfsd_port: 2049,
-              stunnel: false
+              stunnel: false,
                                                                                })
             }
 
@@ -176,8 +176,8 @@ describe 'nfs::client::mount' do
                 mappings: {
                   'key'      => title,
                   'options'  => '-_netdev,nfsvers=4,port=2049,soft,sec=sys',
-                  'location' => "#{params[:nfs_server]}:#{params[:remote_path]}"
-                }
+                  'location' => "#{params[:nfs_server]}:#{params[:remote_path]}",
+                },
                                                              })
             }
           end
@@ -192,7 +192,7 @@ describe 'nfs::client::mount' do
                 autofs_indirect_map_key: 'some_dir',
 
                 # this will be ignored
-                stunnel: true
+                stunnel: true,
                                 })
             end
 
@@ -203,8 +203,8 @@ describe 'nfs::client::mount' do
                 mappings: [ {
                   'key'      => params[:autofs_indirect_map_key],
                   'options'  => '-_netdev,nfsvers=3,port=2049,soft',
-                  'location' => "#{params[:nfs_server]}:#{params[:remote_path]}"
-                } ]
+                  'location' => "#{params[:nfs_server]}:#{params[:remote_path]}",
+                } ],
                                                              })
             }
           end
@@ -213,7 +213,7 @@ describe 'nfs::client::mount' do
             let(:params) do
               base_params.merge({
                                   autofs_indirect_map_key: 'some_dir',
-                stunnel: true
+                stunnel: true,
                                 })
             end
 
@@ -224,8 +224,8 @@ describe 'nfs::client::mount' do
                 mappings: [ {
                   'key'      => params[:autofs_indirect_map_key],
                   'options'  => '-_netdev,nfsvers=4,port=2049,soft,sec=sys,proto=tcp',
-                  'location' => "127.0.0.1:#{params[:remote_path]}"
-                } ]
+                  'location' => "127.0.0.1:#{params[:remote_path]}",
+                } ],
                                                              })
             }
           end
@@ -234,7 +234,7 @@ describe 'nfs::client::mount' do
             let(:params) do
               base_params.merge({
                                   autofs_indirect_map_key: 'some_dir',
-                stunnel: false
+                stunnel: false,
                                 })
             end
 
@@ -245,8 +245,8 @@ describe 'nfs::client::mount' do
                 mappings: [ {
                   'key'      => params[:autofs_indirect_map_key],
                   'options'  => '-_netdev,nfsvers=4,port=2049,soft,sec=sys',
-                  'location' => "#{params[:nfs_server]}:#{params[:remote_path]}"
-                } ]
+                  'location' => "#{params[:nfs_server]}:#{params[:remote_path]}",
+                } ],
                                                              })
             }
           end
@@ -255,7 +255,7 @@ describe 'nfs::client::mount' do
             let(:params) do
               base_params.merge({
                                   autofs_indirect_map_key: '*',
-                autofs_add_key_subst: true
+                autofs_add_key_subst: true,
                                 })
             end
 
@@ -266,8 +266,8 @@ describe 'nfs::client::mount' do
                 mappings: [ {
                   'key'      => params[:autofs_indirect_map_key],
                   'options'  => '-_netdev,nfsvers=4,port=2049,soft,sec=sys',
-                  'location' => "#{params[:nfs_server]}:#{params[:remote_path]}/&"
-                } ]
+                  'location' => "#{params[:nfs_server]}:#{params[:remote_path]}/&",
+                } ],
                                                              })
             }
           end
@@ -279,7 +279,7 @@ describe 'nfs::client::mount' do
           {
             nfs_server: nfs_server,
          remote_path: title,
-         autofs: false
+         autofs: false,
           }
         end
 
@@ -297,7 +297,7 @@ describe 'nfs::client::mount' do
             device: "#{params[:nfs_server]}:#{params[:remote_path]}",
             fstype: 'nfs',
             options: '_netdev,nfsvers=3,port=2049,soft',
-            remounts: false
+            remounts: false,
                                                      })
           }
 
@@ -318,7 +318,7 @@ describe 'nfs::client::mount' do
             device: "127.0.0.1:#{params[:remote_path]}",
             fstype: 'nfs',
             options: '_netdev,nfsvers=4,port=2049,soft,sec=sys,proto=tcp',
-            remounts: false
+            remounts: false,
                                                      })
           }
 
@@ -339,7 +339,7 @@ describe 'nfs::client::mount' do
             device: "#{params[:nfs_server]}:#{params[:remote_path]}",
             fstype: 'nfs',
             options: '_netdev,nfsvers=4,port=2049,soft,sec=sys',
-            remounts: false
+            remounts: false,
                                                      })
           }
 
@@ -352,7 +352,7 @@ describe 'nfs::client::mount' do
             base_params.merge({
                                 at_boot: false,
               ensure: 'present',
-              stunnel: false
+              stunnel: false,
                               })
           end
 
@@ -366,7 +366,7 @@ describe 'nfs::client::mount' do
             device: "#{params[:nfs_server]}:#{params[:remote_path]}",
             fstype: 'nfs',
             options: '_netdev,nfsvers=4,port=2049,soft,sec=sys',
-            remounts: false
+            remounts: false,
                                                      })
           }
         end
@@ -383,7 +383,7 @@ describe 'nfs::client::mount' do
             nfs_server: nfs_server,
          remote_path: title,
          stunnel: false,
-         autofs: false # same logic exercised for static and auto mounts
+         autofs: false, # same logic exercised for static and auto mounts
           }
         end
 
@@ -400,7 +400,7 @@ describe 'nfs::client::mount' do
               device: "#{params[:nfs_server]}:#{params[:remote_path]}",
               fstype: 'nfs',
               options: '_netdev,nfsvers=4,port=2049,soft,sec=sys',
-              remounts: false
+              remounts: false,
                                                      })
           end
         end
@@ -416,7 +416,7 @@ describe 'nfs::client::mount' do
               device: "127.0.0.1:#{params[:remote_path]}",
               fstype: 'nfs',
               options: '_netdev,nfsvers=4,port=2049,soft,sec=sys',
-              remounts: false
+              remounts: false,
                                                      })
           end
         end
@@ -427,7 +427,7 @@ describe 'nfs::client::mount' do
           let(:params) do
             {
               nfs_server: '1.2.3.4',
-           remote_path: 'home'
+           remote_path: 'home',
             }
           end
 
@@ -439,7 +439,7 @@ describe 'nfs::client::mount' do
             {
               nfs_server: '1.2.3.4',
            remote_path: '/home',
-           nfs_version: 3
+           nfs_version: 3,
             }
           end
 

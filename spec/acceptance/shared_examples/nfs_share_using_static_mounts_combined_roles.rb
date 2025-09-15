@@ -39,11 +39,11 @@ shared_examples 'a NFS share using static mounts with combined client/server rol
          mount_nfs_version: (opts[:nfsv3] ? 3 : 4),
          mount_sec: opts[:nfs_sec],
          mount_autodetect_remote: autodetect_remote,
-         client_custom: <<~EOM
-            #{opts[:client_custom]}
+         client_custom: <<~EOM,
+           #{opts[:client_custom]}
 
-            Nfs::Server::Export['#{exported_dir}'] -> Nfs::Client::Mount['#{mount_dir}']
-            Service['nfs-server.service'] -> Nfs::Client::Mount['#{mount_dir}']
+           Nfs::Server::Export['#{exported_dir}'] -> Nfs::Client::Mount['#{mount_dir}']
+           Service['nfs-server.service'] -> Nfs::Client::Mount['#{mount_dir}']
           EOM
           }
         end

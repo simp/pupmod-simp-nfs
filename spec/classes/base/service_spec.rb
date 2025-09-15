@@ -21,7 +21,7 @@ describe 'nfs' do
             it {
               is_expected.to create_exec('mask_rpc-statd.service').with({
                                                                           command: '/usr/bin/systemctl mask rpc-statd.service',
-              unless: '/usr/bin/systemctl status rpc-statd.service | /usr/bin/grep -qw masked'
+              unless: '/usr/bin/systemctl status rpc-statd.service | /usr/bin/grep -qw masked',
                                                                         })
             }
           end
@@ -35,14 +35,14 @@ describe 'nfs' do
               is_expected.to create_service('rpcbind.service').with({
                                                                       ensure: 'running',
               enable: true,
-              hasrestart: true
+              hasrestart: true,
                                                                     })
             }
 
             it {
               is_expected.to create_service('rpc-statd.service').with({
                                                                         ensure: 'running',
-              hasrestart: true
+              hasrestart: true,
                                                                       })
             }
 
@@ -50,7 +50,7 @@ describe 'nfs' do
             it {
               is_expected.to create_exec('unmask_rpc-statd.service').with({
                                                                             command: '/usr/bin/systemctl unmask rpc-statd.service',
-              onlyif: '/usr/bin/systemctl status rpc-statd.service | /usr/bin/grep -qw masked'
+              onlyif: '/usr/bin/systemctl status rpc-statd.service | /usr/bin/grep -qw masked',
                                                                           })
             }
           end
@@ -65,7 +65,7 @@ describe 'nfs' do
             it {
               is_expected.to create_exec('mask_rpc-gssd.service').with({
                                                                          command: '/usr/bin/systemctl mask rpc-gssd.service',
-              unless: '/usr/bin/systemctl status rpc-gssd.service | /usr/bin/grep -qw masked'
+              unless: '/usr/bin/systemctl status rpc-gssd.service | /usr/bin/grep -qw masked',
                                                                        })
             }
           end
@@ -75,7 +75,7 @@ describe 'nfs' do
               let(:params) do
                 {
                   secure_nfs: true,
-               gssd_use_gss_proxy: false
+               gssd_use_gss_proxy: false,
                 }
               end
 
@@ -83,14 +83,14 @@ describe 'nfs' do
               it {
                 is_expected.to create_service('rpc-gssd.service').with({
                                                                          ensure: 'running',
-                hasrestart: true
+                hasrestart: true,
                                                                        })
               }
 
               it {
                 is_expected.to create_exec('unmask_rpc-gssd.service').with({
                                                                              command: '/usr/bin/systemctl unmask rpc-gssd.service',
-                onlyif: '/usr/bin/systemctl status rpc-gssd.service | /usr/bin/grep -qw masked'
+                onlyif: '/usr/bin/systemctl status rpc-gssd.service | /usr/bin/grep -qw masked',
                                                                            })
               }
             end
@@ -98,7 +98,7 @@ describe 'nfs' do
             context 'with nfs::gssd_use_gss_proxy true' do
               let(:params) do
                 {
-                  secure_nfs: true
+                  secure_nfs: true,
                   # nfs::gssd_use_gss_proxy default is true
                 }
               end
@@ -110,7 +110,7 @@ describe 'nfs' do
                 is_expected.to create_service('gssproxy.service').with({
                                                                          ensure: 'running',
                 enable: true,
-                hasrestart: true
+                hasrestart: true,
                                                                        })
               }
             end

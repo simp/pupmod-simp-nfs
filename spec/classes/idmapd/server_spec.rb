@@ -15,7 +15,7 @@ describe 'nfs' do
           let(:params) do
             {
               is_server: true,
-           idmapd: true
+           idmapd: true,
             }
           end
 
@@ -26,14 +26,14 @@ describe 'nfs' do
             is_expected.to create_service('nfs-idmapd.service').with({
                                                                        ensure: 'running',
               enable: true,
-              hasrestart: true
+              hasrestart: true,
                                                                      })
           }
 
           it {
             is_expected.to create_exec('unmask_nfs-idmapd.service').with({
                                                                            command: '/usr/bin/systemctl unmask nfs-idmapd.service',
-              onlyif: '/usr/bin/systemctl status nfs-idmapd.service | /usr/bin/grep -qw masked'
+              onlyif: '/usr/bin/systemctl status nfs-idmapd.service | /usr/bin/grep -qw masked',
                                                                          })
           }
         end
@@ -42,7 +42,7 @@ describe 'nfs' do
           let(:params) do
             {
               is_server: true,
-           idmapd: false
+           idmapd: false,
             }
           end
 
@@ -51,14 +51,14 @@ describe 'nfs' do
           it { is_expected.not_to create_class('nfs::idmapd::config') }
           it {
             is_expected.to create_service('nfs-idmapd.service').with({
-                                                                       ensure: 'stopped'
+                                                                       ensure: 'stopped',
                                                                      })
           }
 
           it {
             is_expected.to create_exec('mask_nfs-idmapd.service').with({
                                                                          command: '/usr/bin/systemctl mask nfs-idmapd.service',
-              unless: '/usr/bin/systemctl status nfs-idmapd.service | /usr/bin/grep -qw masked'
+              unless: '/usr/bin/systemctl status nfs-idmapd.service | /usr/bin/grep -qw masked',
                                                                        })
           }
         end

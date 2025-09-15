@@ -41,7 +41,7 @@ describe 'nfs::idmapd::config' do
      local_realms: ['realm1', 'realm2'],
      trans_method: ['nsswitch', 'static'],
      gss_methods: ['nsswitch', 'static'],
-     static_translation: { 'key1' => 'value1', 'key2' => 'value2' }
+     static_translation: { 'key1' => 'value1', 'key2' => 'value2' },
       }
     end
 

@@ -39,7 +39,7 @@ describe 'nfs krb5' do
 
     # make sure we are using iptables and not nftables because nftables
     # core dumps with rules from the nfs module
-    'firewalld::firewall_backend' => 'iptables'
+    'firewalld::firewall_backend' => 'iptables',
   }
 
   # We need to set up the Kerberos server prior to running NFS.
@@ -140,7 +140,7 @@ describe 'nfs krb5' do
           client_custom: client_krb5_manifest_extras,
           nfs_sec: 'krb5p',
           nfsv3: false,
-          verify_reboot: true
+          verify_reboot: true,
         }
 
         it_behaves_like 'a NFS share using static mounts with distinct client/server roles', [ server ], clients, opts

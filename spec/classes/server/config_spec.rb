@@ -20,7 +20,7 @@ describe 'nfs' do
           it {
             is_expected.to create_concat__fragment('nfs_conf_mountd').with({
                                                                              target: '/etc/nfs.conf',
-            content: <<~EOM
+            content: <<~EOM,
 
               [mountd]
                 port = 20048
@@ -31,7 +31,7 @@ describe 'nfs' do
           it {
             is_expected.to create_concat__fragment('nfs_conf_nfsd').with({
                                                                            target: '/etc/nfs.conf',
-            content: <<~EOM
+            content: <<~EOM,
 
               [nfsd]
                 port = 2049
@@ -59,7 +59,7 @@ describe 'nfs' do
                                                                             owner: 'root',
             group: 'root',
             mode: '0644',
-            content: <<~EOM
+            content: <<~EOM,
               # This file is managed by Puppet (simp-nfs module).  Changes will be overwritten
               # at the next puppet run.
               #
@@ -72,7 +72,7 @@ describe 'nfs' do
             is_expected.to create_concat('/etc/exports').with({
                                                                 owner: 'root',
             group: 'root',
-            mode: '0644'
+            mode: '0644',
                                                               })
           }
 
@@ -80,7 +80,7 @@ describe 'nfs' do
             is_expected.to create_systemd__unit_file('simp_etc_exports.path').with({
                                                                                      enable: true,
             active: true,
-            content: <<~EOM
+            content: <<~EOM,
               # This file is managed by Puppet (simp-nfs module).  Changes will be overwritten
               # at the next puppet run.
 
@@ -97,7 +97,7 @@ describe 'nfs' do
           it {
             is_expected.to create_systemd__unit_file('simp_etc_exports.service').with({
                                                                                         enable: true,
-            content: <<~EOM
+            content: <<~EOM,
               # This file is managed by Puppet (simp-nfs module).  Changes will be overwritten
               # at the next puppet run.
 
@@ -117,7 +117,7 @@ describe 'nfs' do
           it {
             is_expected.to create_concat__fragment('nfs_conf_nfsd').with({
                                                                            target: '/etc/nfs.conf',
-            content: <<~EOM
+            content: <<~EOM,
 
               [nfsd]
                 port = 2049
@@ -137,7 +137,7 @@ describe 'nfs' do
             let(:params) do
               {
                 is_server: true,
-             stunnel: true
+             stunnel: true,
               }
             end
 
@@ -146,7 +146,7 @@ describe 'nfs' do
             it 'explicitlies enabled tcp and disable udp in nfsd config' do
               is_expected.to create_concat__fragment('nfs_conf_nfsd').with({
                                                                              target: '/etc/nfs.conf',
-              content: <<~EOM
+              content: <<~EOM,
 
                 [nfsd]
                   port = 2049
@@ -173,9 +173,9 @@ describe 'nfs' do
                  # ask for protocol settings that are the opposite of those
                  # required for stunnnel
                  'tcp' => false,
-                 'udp' => true
-               }
-             }
+                 'udp' => true,
+               },
+             },
               }
             end
 
@@ -184,7 +184,7 @@ describe 'nfs' do
             it 'overrides tcp and udp settings in nfsd config' do
               is_expected.to create_concat__fragment('nfs_conf_nfsd').with({
                                                                              target: '/etc/nfs.conf',
-              content: <<~EOM
+              content: <<~EOM,
 
                 [nfsd]
                   port = 2049
@@ -209,9 +209,9 @@ describe 'nfs' do
                 is_server: true,
              custom_nfs_conf_opts: {
                'exportfs' => {
-                 'debug' => 'all'
-               }
-             }
+                 'debug' => 'all',
+               },
+             },
               }
             end
 
@@ -220,7 +220,7 @@ describe 'nfs' do
             it {
               is_expected.to create_concat__fragment('nfs_conf_exportfs').with({
                                                                                  target: '/etc/nfs.conf',
-              content: <<~EOM
+              content: <<~EOM,
 
                 [exportfs]
                   debug = all
@@ -235,9 +235,9 @@ describe 'nfs' do
                 is_server: true,
              custom_nfs_conf_opts: {
                'mountd' => {
-                 'threads' => 16
-               }
-             }
+                 'threads' => 16,
+               },
+             },
               }
             end
 
@@ -246,7 +246,7 @@ describe 'nfs' do
             it {
               is_expected.to create_concat__fragment('nfs_conf_mountd').with({
                                                                                target: '/etc/nfs.conf',
-              content: <<~EOM
+              content: <<~EOM,
 
                 [mountd]
                   port = 20048
@@ -262,9 +262,9 @@ describe 'nfs' do
                 is_server: true,
              custom_nfs_conf_opts: {
                'nfsd' => {
-                 'threads' => 32
-               }
-             }
+                 'threads' => 32,
+               },
+             },
               }
             end
 
@@ -273,7 +273,7 @@ describe 'nfs' do
             it {
               is_expected.to create_concat__fragment('nfs_conf_nfsd').with({
                                                                              target: '/etc/nfs.conf',
-              content: <<~EOM
+              content: <<~EOM,
 
                 [nfsd]
                   port = 2049
@@ -296,9 +296,9 @@ describe 'nfs' do
                   is_server: true,
                custom_nfs_conf_opts: {
                  'nfsd' => {
-                   'threads' => 32
-                 }
-               }
+                   'threads' => 32,
+                 },
+               },
                 }
               end
 
@@ -307,7 +307,7 @@ describe 'nfs' do
               it 'alsoes set RPCNFSDCOUNT in /etc/sysconfig/nfs' do
                 is_expected.to create_concat__fragment('nfs_RPCNFSDCOUNT').with({
                                                                                   target: '/etc/sysconfig/nfs',
-                  content: 'RPCNFSDCOUNT="32"'
+                  content: 'RPCNFSDCOUNT="32"',
                                                                                 })
               end
             end
@@ -319,9 +319,9 @@ describe 'nfs' do
                 is_server: true,
              custom_nfs_conf_opts: {
                'nfsdcltrack' => {
-                 'storagedir' => '/some/path'
-               }
-             }
+                 'storagedir' => '/some/path',
+               },
+             },
               }
             end
 
@@ -330,7 +330,7 @@ describe 'nfs' do
             it {
               is_expected.to create_concat__fragment('nfs_conf_nfsdcltrack').with({
                                                                                     target: '/etc/nfs.conf',
-              content: <<~EOM
+              content: <<~EOM,
 
                 [nfsdcltrack]
                   storagedir = /some/path
@@ -346,7 +346,7 @@ describe 'nfs' do
               let(:params) do
                 {
                   is_server: true,
-               custom_daemon_args: { 'RPCIDMAPDARGS' => '-C' }
+               custom_daemon_args: { 'RPCIDMAPDARGS' => '-C' },
                 }
               end
 
@@ -355,7 +355,7 @@ describe 'nfs' do
               it {
                 is_expected.to create_concat__fragment('nfs_RPCIDMAPDARGS').with({
                                                                                    target: '/etc/sysconfig/nfs',
-                content: 'RPCIDMAPDARGS="-C"'
+                content: 'RPCIDMAPDARGS="-C"',
                                                                                  })
               }
             end
@@ -364,7 +364,7 @@ describe 'nfs' do
               let(:params) do
                 {
                   is_server: true,
-               custom_daemon_args: { 'RPCMOUNTDARGS' => '-f /some/export/file' }
+               custom_daemon_args: { 'RPCMOUNTDARGS' => '-f /some/export/file' },
                 }
               end
 
@@ -373,7 +373,7 @@ describe 'nfs' do
               it {
                 is_expected.to create_concat__fragment('nfs_RPCMOUNTDARGS').with({
                                                                                    target: '/etc/sysconfig/nfs',
-                content: 'RPCMOUNTDARGS="-f /some/export/file"'
+                content: 'RPCMOUNTDARGS="-f /some/export/file"',
                                                                                  })
               }
             end
@@ -382,7 +382,7 @@ describe 'nfs' do
               let(:params) do
                 {
                   is_server: true,
-               custom_daemon_args: { 'RPCNFSDARGS' => '--syslog' }
+               custom_daemon_args: { 'RPCNFSDARGS' => '--syslog' },
                 }
               end
 
@@ -391,7 +391,7 @@ describe 'nfs' do
               it {
                 is_expected.to create_concat__fragment('nfs_RPCNFSDARGS').with({
                                                                                  target: '/etc/sysconfig/nfs',
-                content: 'RPCNFSDARGS="--syslog"'
+                content: 'RPCNFSDARGS="--syslog"',
                                                                                })
               }
             end
@@ -419,7 +419,7 @@ describe 'nfs' do
           let(:params) do
             {
               is_server: true,
-           tcpwrappers: true
+           tcpwrappers: true,
             }
           end
 

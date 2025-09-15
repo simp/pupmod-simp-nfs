@@ -58,33 +58,33 @@ module Acceptance::Helpers::ManifestHelpers
   # that directory, and then exports the directory
   def create_export_manifest(opts)
     <<~EOM
-          include 'ssh'
+      include 'ssh'
 
-          file { '#{opts[:exported_dir]}':
-            ensure => 'directory',
-            owner  => 'root',
-            group  => 'root',
-            mode   => '0644'
-          }
+      file { '#{opts[:exported_dir]}':
+        ensure => 'directory',
+        owner  => 'root',
+        group  => 'root',
+        mode   => '0644'
+      }
 
-          file { '#{opts[:exported_file]}':
-            ensure  => 'file',
-            owner   => 'root',
-            group   => 'root',
-            mode    => '0644',
-            content => "#{opts[:exported_file_content]}\\n"
-          }
+      file { '#{opts[:exported_file]}':
+        ensure  => 'file',
+        owner   => 'root',
+        group   => 'root',
+        mode    => '0644',
+        content => "#{opts[:exported_file_content]}\\n"
+      }
 
-          nfs::server::export { '#{opts[:exported_dir]}':
-            clients     => ['*'],
-            export_path => '#{opts[:exported_dir]}',
-            sec         => ['#{opts[:export_sec]}'],
-            insecure    => #{opts[:export_insecure]}
-          }
+      nfs::server::export { '#{opts[:exported_dir]}':
+        clients     => ['*'],
+        export_path => '#{opts[:exported_dir]}',
+        sec         => ['#{opts[:export_sec]}'],
+        insecure    => #{opts[:export_insecure]}
+      }
 
-          File['#{opts[:exported_dir]}'] -> Nfs::Server::Export['#{opts[:exported_dir]}']
+      File['#{opts[:exported_dir]}'] -> Nfs::Server::Export['#{opts[:exported_dir]}']
 
-          #{opts[:server_custom]}
+      #{opts[:server_custom]}
         EOM
   end
 
@@ -94,24 +94,24 @@ module Acceptance::Helpers::ManifestHelpers
     custom_mount_options = build_custom_mount_options(opts)
 
     <<~EOM
-          include 'ssh'
+      include 'ssh'
 
-          nfs::client::mount { '#{opts[:mount_dir]}':
-            nfs_server  => '#{opts[:mount_server_ip]}',
-            remote_path => '#{opts[:mount_remote_dir]}',
-            autofs      => false,
-          #{custom_mount_options}
-          }
+      nfs::client::mount { '#{opts[:mount_dir]}':
+        nfs_server  => '#{opts[:mount_server_ip]}',
+        remote_path => '#{opts[:mount_remote_dir]}',
+        autofs      => false,
+      #{custom_mount_options}
+      }
 
-          # mount directory must exist if not using autofs
-          file { '#{opts[:mount_dir]}':
-            ensure => 'directory',
-            owner  => 'root',
-            group  => 'root',
-            mode   => '0644'
-          }
+      # mount directory must exist if not using autofs
+      file { '#{opts[:mount_dir]}':
+        ensure => 'directory',
+        owner  => 'root',
+        group  => 'root',
+        mode   => '0644'
+      }
 
-          File['#{opts[:mount_dir]}'] -> Nfs::Client::Mount['#{opts[:mount_dir]}']
+      File['#{opts[:mount_dir]}'] -> Nfs::Client::Mount['#{opts[:mount_dir]}']
         EOM
   end
 

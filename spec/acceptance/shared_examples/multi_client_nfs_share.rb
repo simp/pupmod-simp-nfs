@@ -41,7 +41,7 @@ shared_examples 'a multi-client NFS share' do |servers, client1, client2, opts|
        exported_file: File.join(exported_dir, file_basename),
        exported_file_content: "#{file_search_string} from #{exported_dir}",
        export_sec: opts[:server_config][:export_sec],
-       export_insecure: opts[:server_config][:export_insecure]
+       export_insecure: opts[:server_config][:export_insecure],
         }
       end
 
@@ -70,7 +70,7 @@ shared_examples 'a multi-client NFS share' do |servers, client1, client2, opts|
 
       {
         client1 => opts[:mount1_config],
-        client2 => opts[:mount2_config]
+        client2 => opts[:mount2_config],
       }.each do |client, config|
         context "as NFS client #{client}" do
           let(:client_opts) do
@@ -83,7 +83,7 @@ shared_examples 'a multi-client NFS share' do |servers, client1, client2, opts|
            mount_remote_dir: exported_dir,
            mount_nfs_version: config[:nfs_version],
            mount_sec: config[:sec],
-           mount_stunnel: config[:stunnel]
+           mount_stunnel: config[:stunnel],
             }
           end
 

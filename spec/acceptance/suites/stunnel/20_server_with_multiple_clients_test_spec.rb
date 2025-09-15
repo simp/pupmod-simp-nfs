@@ -45,7 +45,7 @@ describe 'nfs server with multiple clients' do
 
     # make sure we are using iptables and not nftables because nftables
     # core dumps with rules from the nfs module
-    'firewalld::firewall_backend'           => 'iptables'
+    'firewalld::firewall_backend'           => 'iptables',
   }
 
   context 'server exporting to 2 NFSv4 clients, both via stunnel' do
@@ -53,17 +53,17 @@ describe 'nfs server with multiple clients' do
       base_hiera: base_hiera,
       server_config: {
         export_insecure: true, # server allows mount via NFSv4 stunnel
-        export_sec: 'sys' # server export NFS sec setting
+        export_sec: 'sys', # server export NFS sec setting
       },
       mount1_config: {
         nfs_version: 4, # client1 mount with NFSv4
         sec: 'sys', # client1 mount NFS sec setting
-        stunnel: true # client1 mount enable stunnel
+        stunnel: true, # client1 mount enable stunnel
       },
       mount2_config: {
         nfs_version: 4, # client2 mount with NFSv4
         sec: 'sys', # client2 mount NFS sec setting
-        stunnel: true # client1 mount enable stunnel
+        stunnel: true, # client1 mount enable stunnel
       },
     }
 
@@ -76,18 +76,18 @@ describe 'nfs server with multiple clients' do
       server_config: {
         nfsv3: true, # NFSv3 and NFSv4
         export_insecure: true, # server allows mount via NFSv4 stunnel
-        export_sec: 'sys' # server export NFS sec setting
+        export_sec: 'sys', # server export NFS sec setting
       },
       mount1_config: {
         nfs_version: 4, # client1 mount with NFSv4
         sec: 'sys', # client1 mount NFS sec setting
-        stunnel: nil # client1 mount, stunnel enabled by default
+        stunnel: nil, # client1 mount, stunnel enabled by default
       },
       mount2_config: {
         nfs_version: 3, # client2 mount with NFSv3
         sec: 'sys', # client2 mount NFS sec setting
-        stunnel: nil # client2 mount, stunnel automatically disabled
-      }
+        stunnel: nil, # client2 mount, stunnel automatically disabled
+      },
     }
 
     it_behaves_like 'a multi-client NFS share', servers, client1, client2, opts
@@ -99,18 +99,18 @@ describe 'nfs server with multiple clients' do
       server_config: {
         nfsv3: true, # NFSv3 and NFSv4
         export_insecure: true, # server allows mount via NFSv4 stunnel
-        export_sec: 'sys' # server export NFS sec setting
+        export_sec: 'sys', # server export NFS sec setting
       },
       mount1_config: {
         nfs_version: 3, # client1 mount with NFSv3
         sec: 'sys', # client1 mount NFS sec setting
-        stunnel: false # client2 mount disable stunnel
+        stunnel: false, # client2 mount disable stunnel
       },
       mount2_config: {
         nfs_version: 3, # client2 mount with NFSv3
         sec: 'sys', # client2 mount NFS sec setting
-        stunnel: false # client2 mount disable stunnel
-      }
+        stunnel: false, # client2 mount disable stunnel
+      },
     }
 
     it_behaves_like 'a multi-client NFS share', servers, client1, client2, opts

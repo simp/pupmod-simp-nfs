@@ -17,7 +17,7 @@ describe 'nfs' do
          firewall: true,
          stunnel: true,
          tcpwrappers: true,
-         trusted_nets: [ '1.2.3.0/24' ]
+         trusted_nets: [ '1.2.3.0/24' ],
           }
         end
 
@@ -35,7 +35,7 @@ describe 'nfs' do
           systemd_wantedby: [ 'nfs-server.service' ],
            firewall: true,
            tcpwrappers: true,
-           tag: ['nfs']
+           tag: ['nfs'],
                                                                })
         }
       end

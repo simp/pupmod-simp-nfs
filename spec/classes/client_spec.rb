@@ -27,7 +27,7 @@ describe 'nfs' do
             let(:params) do
               {
                 kerberos: true,
-             keytab_on_puppet: false
+             keytab_on_puppet: false,
               }
             end
 
@@ -41,7 +41,7 @@ describe 'nfs' do
             let(:params) do
               {
                 kerberos: true,
-             keytab_on_puppet: true
+             keytab_on_puppet: true,
               }
             end
 

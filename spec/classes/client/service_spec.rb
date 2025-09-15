@@ -19,7 +19,7 @@ describe 'nfs' do
                                                                       ensure: 'running',
             enable: true,
             hasrestart: false,
-            restart: '/usr/bin/systemctl restart nfs-utils.service nfs-client.target'
+            restart: '/usr/bin/systemctl restart nfs-utils.service nfs-client.target',
                                                                     })
           }
 
@@ -27,7 +27,7 @@ describe 'nfs' do
             is_expected.to create_sysctl('sunrpc.tcp_slot_table_entries').with({
                                                                                  ensure: 'present',
             val: 128,
-            silent: true
+            silent: true,
                                                                                })
           }
 
@@ -35,7 +35,7 @@ describe 'nfs' do
             is_expected.to create_sysctl('sunrpc.udp_slot_table_entries').with({
                                                                                  ensure: 'present',
             val: 128,
-            silent: true
+            silent: true,
                                                                                })
           }
 
@@ -43,7 +43,7 @@ describe 'nfs' do
             is_expected.to create_sysctl('fs.nfs.nfs_callback_tcpport').with({
                                                                                ensure: 'present',
             val: 876,
-            silent: true
+            silent: true,
                                                                              })
           }
 
@@ -59,7 +59,7 @@ describe 'nfs' do
             is_expected.to create_service('nfs-blkmap.service').with({
                                                                        ensure: 'running',
             enable: true,
-            hasrestart: true
+            hasrestart: true,
                                                                      })
           }
         end

@@ -21,7 +21,7 @@ describe 'nfs basic idmapd' do
 
     # make sure we are using iptables and not nftables because nftables
     # core dumps with rules from the nfs module
-    'firewalld::firewall_backend'           => 'iptables'
+    'firewalld::firewall_backend'           => 'iptables',
   }
 
   context 'long running test' do
@@ -36,7 +36,7 @@ describe 'nfs basic idmapd' do
       export_insecure: false,
       nfs_sec: 'sys',
       nfsv3: false,
-      verify_reboot: true
+      verify_reboot: true,
     }
 
     it_behaves_like 'a NFS share using static mounts with distinct client/server roles', servers, clients, opts

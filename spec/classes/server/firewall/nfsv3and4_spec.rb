@@ -17,7 +17,7 @@ describe 'nfs' do
             is_server: true,
           nfsv3: true,
           firewall: true,
-          trusted_nets: [ '1.2.3.0/24' ]
+          trusted_nets: [ '1.2.3.0/24' ],
           }
         end
 
@@ -27,14 +27,14 @@ describe 'nfs' do
         it {
           is_expected.to create_iptables__listen__tcp_stateful('nfs_client_tcp_ports').with({
                                                                                               trusted_nets: params[:trusted_nets],
-          dports: [111, 2049, 875, 20_048, 662, 32_803]
+          dports: [111, 2049, 875, 20_048, 662, 32_803],
                                                                                             })
         }
 
         it {
           is_expected.to create_iptables__listen__udp('nfs_client_udp_ports').with({
                                                                                      trusted_nets: params[:trusted_nets],
-          dports: [111, 2049, 875, 20_048, 662, 32_769]
+          dports: [111, 2049, 875, 20_048, 662, 32_769],
                                                                                    })
         }
       end
