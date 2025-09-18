@@ -3,9 +3,8 @@ require 'spec_helper_acceptance'
 test_name 'nfs basic idmapd'
 
 describe 'nfs basic idmapd' do
-
-  servers = hosts_with_role( hosts, 'nfs_server' )
-  clients = hosts_with_role( hosts, 'nfs_client' )
+  servers = hosts_with_role(hosts, 'nfs_server')
+  clients = hosts_with_role(hosts, 'nfs_client')
 
   base_hiera = {
     # Set us up for a NFSv4 with basic idmapd settings (default config)
@@ -22,35 +21,35 @@ describe 'nfs basic idmapd' do
 
     # make sure we are using iptables and not nftables because nftables
     # core dumps with rules from the nfs module
-    'firewalld::firewall_backend'           => 'iptables'
+    'firewalld::firewall_backend'           => 'iptables',
   }
 
   context 'long running test' do
-    it 'should ensure vagrant connectivity' do
+    it 'ensures vagrant connectivity' do
       on(hosts, 'date')
     end
   end
 
   context 'with idmapd enabled' do
     opts = {
-      :base_hiera      => base_hiera,
-      :export_insecure => false,
-      :nfs_sec         => 'sys',
-      :nfsv3           => false,
-      :verify_reboot   => true
+      base_hiera: base_hiera,
+      export_insecure: false,
+      nfs_sec: 'sys',
+      nfsv3: false,
+      verify_reboot: true,
     }
 
     it_behaves_like 'a NFS share using static mounts with distinct client/server roles', servers, clients, opts
 
     context 'idmapd config verification' do
       hosts.each do |host|
-        it "should configure /etc/idmapd.conf on #{host}" do
+        it "configures /etc/idmapd.conf on #{host}" do
           on(host, "grep 'file is managed by Puppet' /etc/idmapd.conf")
         end
       end
 
       clients.each do |client|
-        it "should add nfsidmap to /etc/request-key.conf on #{client}" do
+        it "adds nfsidmap to /etc/request-key.conf on #{client}" do
           on(client, "grep '/usr/sbin/nfsidmap' /etc/request-key.conf")
         end
       end
