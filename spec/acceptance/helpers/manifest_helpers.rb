@@ -64,7 +64,7 @@ module Acceptance::Helpers::ManifestHelpers
         ensure => 'directory',
         owner  => 'root',
         group  => 'root',
-        mode   => '0644'
+        mode   => '0644',
       }
 
       file { '#{opts[:exported_file]}':
@@ -72,20 +72,20 @@ module Acceptance::Helpers::ManifestHelpers
         owner   => 'root',
         group   => 'root',
         mode    => '0644',
-        content => "#{opts[:exported_file_content]}\\n"
+        content => "#{opts[:exported_file_content]}\\n",
       }
 
       nfs::server::export { '#{opts[:exported_dir]}':
         clients     => ['*'],
         export_path => '#{opts[:exported_dir]}',
         sec         => ['#{opts[:export_sec]}'],
-        insecure    => #{opts[:export_insecure]}
+        insecure    => #{opts[:export_insecure]},
       }
 
       File['#{opts[:exported_dir]}'] -> Nfs::Server::Export['#{opts[:exported_dir]}']
 
       #{opts[:server_custom]}
-        EOM
+    EOM
   end
 
   # Create a manifest that creates a mount directory and then statically
@@ -108,11 +108,11 @@ module Acceptance::Helpers::ManifestHelpers
         ensure => 'directory',
         owner  => 'root',
         group  => 'root',
-        mode   => '0644'
+        mode   => '0644',
       }
 
       File['#{opts[:mount_dir]}'] -> Nfs::Client::Mount['#{opts[:mount_dir]}']
-        EOM
+    EOM
   end
 
   def print_test_config(hieradata, manifest)

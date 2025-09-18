@@ -11,20 +11,20 @@ describe 'nfs::client::stunnel' do
       let(:facts) do
         # to workaround service provider issues related to masking haveged
         # when tests are run on GitLab runners which are docker containers
-        os_facts.merge({ haveged__rngd_enabled: false })
+        os_facts.merge(haveged__rngd_enabled: false)
       end
 
       let(:title) { '1.2.3.4:2049' }
       let(:params) do
         {
           nfs_server: '1.2.3.4',
-       nfsd_accept_port: 2049,
-       nfsd_connect_port: 20_490,
-       stunnel_socket_options: ['l:TCP_NODELAY=1', 'r:TCP_NODELAY=1'],
-       stunnel_verify: 2,
-       stunnel_wantedby: [ 'remote-fs-pre.target' ],
-       firewall: true,
-       tcpwrappers: true,
+          nfsd_accept_port: 2049,
+          nfsd_connect_port: 20_490,
+          stunnel_socket_options: ['l:TCP_NODELAY=1', 'r:TCP_NODELAY=1'],
+          stunnel_verify: 2,
+          stunnel_wantedby: ['remote-fs-pre.target'],
+          firewall: true,
+          tcpwrappers: true,
         }
       end
 
@@ -36,16 +36,16 @@ describe 'nfs::client::stunnel' do
 
         it { is_expected.to compile.with_all_deps }
         it {
-          is_expected.to create_stunnel__instance("nfs_#{title}_client_nfsd").with({
-                                                                                     connect: ['1.2.3.4:20490'],
-          accept: '127.0.0.1:2049',
-          verify: params[:stunnel_verify],
-          socket_options: params[:stunnel_socket_options],
-          systemd_wantedby: params[:stunnel_wantedby],
-          firewall: params[:firewall],
-          tcpwrappers: params[:tcpwrappers],
-          tag: ['nfs'],
-                                                                                   })
+          is_expected.to create_stunnel__instance("nfs_#{title}_client_nfsd").with(
+            connect: ['1.2.3.4:20490'],
+            accept: '127.0.0.1:2049',
+            verify: params[:stunnel_verify],
+            socket_options: params[:stunnel_socket_options],
+            systemd_wantedby: params[:stunnel_wantedby],
+            firewall: params[:firewall],
+            tcpwrappers: params[:tcpwrappers],
+            tag: ['nfs'],
+          )
         }
       end
 

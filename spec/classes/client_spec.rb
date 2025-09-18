@@ -8,12 +8,11 @@ describe 'nfs' do
         let(:facts) do
           # to workaround service provider issues related to masking haveged
           # when tests are run on GitLab runners which are docker containers
-          os_facts.merge({ haveged__rngd_enabled: false })
+          os_facts.merge(haveged__rngd_enabled: false)
         end
 
         context 'with default nfs and nfs::client parameters' do
           it { is_expected.to compile.with_all_deps }
-          it { is_expected.to create_class('nfs::client::config') }
           it { is_expected.to create_class('nfs::base::config') }
           it { is_expected.to create_class('nfs::base::service') }
           it { is_expected.to create_class('nfs::client::config') }
@@ -27,7 +26,7 @@ describe 'nfs' do
             let(:params) do
               {
                 kerberos: true,
-             keytab_on_puppet: false,
+                keytab_on_puppet: false,
               }
             end
 
@@ -41,7 +40,7 @@ describe 'nfs' do
             let(:params) do
               {
                 kerberos: true,
-             keytab_on_puppet: true,
+                keytab_on_puppet: true,
               }
             end
 

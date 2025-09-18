@@ -22,14 +22,14 @@ shared_examples 'a NFS share using static mounts with distinct client/server rol
   let(:server_opts) do
     {
       is_server: true,
-   is_client: false,
-   nfsv3: opts[:nfsv3],
-   exported_dir: exported_dir,
-   exported_file: File.join(exported_dir, file_basename),
-   exported_file_content: "#{file_search_string} from #{exported_dir}",
-   export_sec: opts[:nfs_sec],
-   export_insecure: opts[:export_insecure],
-   server_custom: opts[:server_custom],
+      is_client: false,
+      nfsv3: opts[:nfsv3],
+      exported_dir: exported_dir,
+      exported_file: File.join(exported_dir, file_basename),
+      exported_file_content: "#{file_search_string} from #{exported_dir}",
+      export_sec: opts[:nfs_sec],
+      export_insecure: opts[:export_insecure],
+      server_custom: opts[:server_custom],
     }
   end
 
@@ -65,13 +65,13 @@ shared_examples 'a NFS share using static mounts with distinct client/server rol
         let(:client_opts) do
           {
             is_server: false,
-         is_client: true,
-         nfsv3: opts[:nfsv3],
-         mount_dir: "/mnt/#{server}-#{File.basename(exported_dir)}",
-         mount_server_ip: internal_network_info(server)[:ip],
-         mount_remote_dir: exported_dir,
-         mount_nfs_version: (opts[:nfsv3] ? 3 : 4),
-         mount_sec: opts[:nfs_sec],
+            is_client: true,
+            nfsv3: opts[:nfsv3],
+            mount_dir: "/mnt/#{server}-#{File.basename(exported_dir)}",
+            mount_server_ip: internal_network_info(server)[:ip],
+            mount_remote_dir: exported_dir,
+            mount_nfs_version: (opts[:nfsv3] ? 3 : 4),
+            mount_sec: opts[:nfs_sec],
           }
         end
 
@@ -94,9 +94,11 @@ shared_examples 'a NFS share using static mounts with distinct client/server rol
           apply_manifest_on(client, client_manifest, catch_changes: true)
         end
 
+        # rubocop:disable RSpec/RepeatedExample
         it 'mounts NFS share' do
           on(client, %(grep -q '#{file_search_string}' #{client_opts[:mount_dir]}/#{file_basename}))
         end
+        # rubocop:enable RSpec/RepeatedExample
 
         if opts[:nfsv3]
           # Want to verify the NLM ports are correctly configured.  According
@@ -149,6 +151,7 @@ shared_examples 'a NFS share using static mounts with distinct client/server rol
             end
           end
 
+          # rubocop:disable RSpec/RepeatedExample
           it 'mount should be re-established after client reboot' do
             on(client, %(grep -q '#{file_search_string}' #{client_opts[:mount_dir]}/#{file_basename}))
           end
@@ -162,6 +165,7 @@ shared_examples 'a NFS share using static mounts with distinct client/server rol
           it 'mount should be re-established after server reboot' do
             on(client, %(grep -q '#{file_search_string}' #{client_opts[:mount_dir]}/#{file_basename}))
           end
+          # rubocop:enable RSpec/RepeatedExample
         end
 
         it 'removes mount as prep for next test' do

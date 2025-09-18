@@ -66,7 +66,7 @@ shared_examples 'a NFS share using autofs with distinct client/server roles' do 
         ensure => 'directory',
         owner  => 'root',
         group  => 'root',
-        mode   => '0644'
+        mode   => '0644',
       }
 
       $export_dirs = [
@@ -78,14 +78,14 @@ shared_examples 'a NFS share using autofs with distinct client/server roles' do 
           ensure => 'directory',
           owner  => 'root',
           group  => 'root',
-          mode   => '0644'
+          mode   => '0644',
         }
 
         nfs::server::export { $_export_dir:
           clients     => ['*'],
           export_path => $_export_dir,
           sec         => ['#{opts[:nfs_sec]}'],
-          insecure    => #{opts[:export_insecure]}
+          insecure    => #{opts[:export_insecure]},
         }
 
         File["${_export_dir}"] -> Nfs::Server::Export["${_export_dir}"]
@@ -99,7 +99,7 @@ shared_examples 'a NFS share using autofs with distinct client/server roles' do 
         ensure => 'directory',
         owner  => 'root',
         group  => 'root',
-        mode   => '0644'
+        mode   => '0644',
       }
 
       $files.each |String $_file| {
@@ -143,7 +143,7 @@ shared_examples 'a NFS share using autofs with distinct client/server roles' do 
         sec                     => '#{opts[:nfs_sec]}',
         autofs                  => true,
         autofs_indirect_map_key => '#{mount_map[:indirect][:map_key]}',
-        autofs_add_key_subst    => #{mount_map[:indirect][:add_key_subst]}
+        autofs_add_key_subst    => #{mount_map[:indirect][:add_key_subst]},
       }
 
       # indirect mount with wildcard and map key substitution
@@ -154,7 +154,7 @@ shared_examples 'a NFS share using autofs with distinct client/server roles' do 
         sec                     => '#{opts[:nfs_sec]}',
         autofs                  => true,
         autofs_indirect_map_key => '#{mount_map[:indirect_wildcard][:map_key]}',
-        autofs_add_key_subst    => #{mount_map[:indirect_wildcard][:add_key_subst]}
+        autofs_add_key_subst    => #{mount_map[:indirect_wildcard][:add_key_subst]},
       }
 
       #{opts[:client_custom]}
@@ -197,7 +197,6 @@ shared_examples 'a NFS share using autofs with distinct client/server roles' do 
       context "as just a NFS client #{client} using NFS server #{server}" do
         let(:server_ip) do
           info = internal_network_info(server)
-          expect(info[:ip]).not_to be_nil
           info[:ip]
         end
 
@@ -207,6 +206,10 @@ shared_examples 'a NFS share using autofs with distinct client/server roles' do 
           client_manifest.gsub!('#MOUNT_ROOT_DIR#', mount_dir)
           client_manifest.gsub!('#SERVER_IP#', server_ip)
           client_manifest
+        end
+
+        it "checks server IP for #{server}" do
+          expect(info[:ip]).not_to be_nil
         end
 
         it "applies client manifest to mount dir from #{server}" do

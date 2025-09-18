@@ -35,13 +35,13 @@ shared_examples 'a multi-client NFS share' do |servers, client1, client2, opts|
       let(:server_opts) do
         {
           is_server: true,
-       is_client: false,
-       nfsv3: opts[:server_config][:nfsv3],
-       exported_dir: exported_dir,
-       exported_file: File.join(exported_dir, file_basename),
-       exported_file_content: "#{file_search_string} from #{exported_dir}",
-       export_sec: opts[:server_config][:export_sec],
-       export_insecure: opts[:server_config][:export_insecure],
+          is_client: false,
+          nfsv3: opts[:server_config][:nfsv3],
+          exported_dir: exported_dir,
+          exported_file: File.join(exported_dir, file_basename),
+          exported_file_content: "#{file_search_string} from #{exported_dir}",
+          export_sec: opts[:server_config][:export_sec],
+          export_insecure: opts[:server_config][:export_insecure],
         }
       end
 
@@ -76,14 +76,14 @@ shared_examples 'a multi-client NFS share' do |servers, client1, client2, opts|
           let(:client_opts) do
             {
               is_server: false,
-           is_client: true,
-           nfsv3: (config[:nfs_version] == 3),
-           mount_dir: "/mnt/#{server}-#{File.basename(exported_dir)}",
-           mount_server_ip: internal_network_info(server)[:ip],
-           mount_remote_dir: exported_dir,
-           mount_nfs_version: config[:nfs_version],
-           mount_sec: config[:sec],
-           mount_stunnel: config[:stunnel],
+              is_client: true,
+              nfsv3: (config[:nfs_version] == 3),
+              mount_dir: "/mnt/#{server}-#{File.basename(exported_dir)}",
+              mount_server_ip: internal_network_info(server)[:ip],
+              mount_remote_dir: exported_dir,
+              mount_nfs_version: config[:nfs_version],
+              mount_sec: config[:sec],
+              mount_stunnel: config[:stunnel],
             }
           end
 

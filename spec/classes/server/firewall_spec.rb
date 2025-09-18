@@ -8,7 +8,7 @@ describe 'nfs' do
         let(:facts) do
           # to workaround service provider issues related to masking haveged
           # when tests are run on GitLab runners which are docker containers
-          os_facts.merge({ haveged__rngd_enabled: false })
+          os_facts.merge(haveged__rngd_enabled: false)
         end
 
         context 'when stunnel enabled' do
@@ -17,9 +17,9 @@ describe 'nfs' do
               {
                 # nfs class params
                 is_server: true,
-              nfsv3: true,
-              firewall: true,
-              stunnel: true,
+                nfsv3: true,
+                firewall: true,
+                stunnel: true,
               }
             end
 
@@ -35,7 +35,7 @@ describe 'nfs' do
               {
                 # nfs class params
                 firewall: true,
-              stunnel: true,
+                stunnel: true,
               }
             end
 
@@ -50,9 +50,9 @@ describe 'nfs' do
               {
                 # nfs class params
                 is_server: true,
-              nfsv3: false,
-              firewall: true,
-              stunnel: true,
+                nfsv3: false,
+                firewall: true,
+                stunnel: true,
               }
             end
 
@@ -69,9 +69,9 @@ describe 'nfs' do
               {
                 # nfs class params
                 is_server: true,
-              nfsv3: true,
-              firewall: true,
-              stunnel: false,
+                nfsv3: true,
+                firewall: true,
+                stunnel: false,
               }
             end
 
@@ -86,7 +86,7 @@ describe 'nfs' do
               {
                 # nfs class params
                 firewall: true,
-              stunnel: false,
+                stunnel: false,
               }
             end
 
@@ -100,9 +100,9 @@ describe 'nfs' do
               {
                 # nfs class params
                 is_server: true,
-              nfsv3: false,
-              firewall: true,
-              stunnel: false,
+                nfsv3: false,
+                firewall: true,
+                stunnel: false,
               }
             end
 

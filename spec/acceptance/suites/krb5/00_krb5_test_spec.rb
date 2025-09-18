@@ -32,7 +32,7 @@ describe 'nfs krb5' do
     'krb5::kdc::auto_keytabs::introspect'      => false,
     'krb5::kdc::auto_keytabs::hosts'           =>
       # Generate keytabs for everyone
-      hosts.map { |host| [ fact_on(host, 'fqdn'), { 'ensure' => 'present' } ] }.to_h,
+      hosts.map { |host| [ fact_on(host, 'networking.fqdn'), { 'ensure' => 'present' } ] }.to_h,
     'krb5::kdc::auto_keytabs::global_services' => [ 'nfs' ],
 
     'nfs::secure_nfs'                          => true,
@@ -51,7 +51,8 @@ describe 'nfs krb5' do
   # the Puppet master.
   servers.each do |server|
     context "with server #{server} as NFS server and KDC" do
-      let(:server_fqdn) { fact_on(server, 'fqdn') }
+      let(:server_fqdn) { fact_on(server, 'networking.fqdn') }
+      let(:client_fqdn) { fact_on(client, 'networking.fqdn') }
 
       context 'Kerberos infrastructure set up' do
         let(:kdc_manifest) do
@@ -66,8 +67,8 @@ describe 'nfs krb5' do
             include 'krb5'
             include 'ssh'
 
-            krb5::setting::realm { $facts['domain'] :
-              admin_server => '#{server_fqdn}'
+            krb5::setting::realm { $facts['networking']['domain'] :
+              admin_server => '#{server_fqdn}',
             }
           EOM
         end
@@ -78,7 +79,7 @@ describe 'nfs krb5' do
         end
 
         it "sets up #{server} keytab and fake keytab sync source" do
-          keytab_src = %(/var/kerberos/krb5kdc/generated_keytabs/#{fact_on(server, 'fqdn')}/krb5.keytab)
+          keytab_src = %(/var/kerberos/krb5kdc/generated_keytabs/#{server_fqdn}/krb5.keytab)
           on(server, %(cp #{keytab_src} /etc))
           server.mkdir_p('/tmp/keytabs')
           on(server, "cp #{keytab_src} /tmp/keytabs/")
@@ -91,7 +92,7 @@ describe 'nfs krb5' do
           end
 
           it "copies keytabs from KDC to fake keytab sync source on client #{client}" do
-            keytab_src = %(/var/kerberos/krb5kdc/generated_keytabs/#{fact_on(client, 'fqdn')}/krb5.keytab)
+            keytab_src = %(/var/kerberos/krb5kdc/generated_keytabs/#{client_fqdn}/krb5.keytab)
             tmpdir = Dir.mktmpdir
 
             begin
@@ -128,8 +129,8 @@ describe 'nfs krb5' do
 
         client_krb5_manifest_extras = <<~EOM
           # Keep Kerberos realm configured to know location of KDC
-          krb5::setting::realm { $facts['domain'] :
-            admin_server => '#{fact_on(server, 'fqdn')}'
+          krb5::setting::realm { $facts['networking']['domain'] :
+            admin_server => '#{server_fqdn}',
           }
         EOM
 

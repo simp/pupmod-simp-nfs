@@ -31,8 +31,9 @@ describe 'nfs::selinux_hotfix' do
 
       context 'selinux_current_mode fact not present' do
         let(:facts) do
-          os_facts = mock_selinux_false_facts(os_facts)
+          os_facts = mock_selinux_false_facts(Marshal.load(Marshal.dump(os_facts)))
           os_facts.delete(:selinux_current_mode)
+          os_facts[:os][:selinux].delete(:current_mode)
           os_facts
         end
 
@@ -41,39 +42,39 @@ describe 'nfs::selinux_hotfix' do
       end
 
       context 'selinux_current_mode = disabled' do
-        let(:facts) { mock_selinux_false_facts(os_facts) }
+        let(:facts) { mock_selinux_false_facts(Marshal.load(Marshal.dump(os_facts))) }
 
         it { is_expected.to compile.with_all_deps }
         it { is_expected.not_to contain_vox_selinux__module('gss_hotfix') }
       end
 
       context 'selinux_current_mode != disabled' do
-        let(:facts) { mock_selinux_enforcing_facts(os_facts) }
+        let(:facts) { mock_selinux_enforcing_facts(Marshal.load(Marshal.dump(os_facts))) }
 
         it { is_expected.to compile.with_all_deps }
         it {
-          is_expected.to contain_vox_selinux__module('gss_hotfix').with({
-                                                                          ensure: 'present',
-          builder: 'simple',
-          content_te: <<~EOM,
-            module gss_hotfix 1.0;
+          is_expected.to contain_vox_selinux__module('gss_hotfix').with(
+            ensure: 'present',
+            builder: 'simple',
+            content_te: <<~EOM,
+              module gss_hotfix 1.0;
 
-            require {
-            \ttype gssd_t;
-            \ttype gssproxy_t;
-            \ttype krb5_conf_t;
-            \tclass dir { read search open };
-            }
+              require {
+              \ttype gssd_t;
+              \ttype gssproxy_t;
+              \ttype krb5_conf_t;
+              \tclass dir { read search open };
+              }
 
-            #============= gssd_t ==============
-            allow gssd_t krb5_conf_t:dir search;
-            allow gssd_t krb5_conf_t:dir { read open };
+              #============= gssd_t ==============
+              allow gssd_t krb5_conf_t:dir search;
+              allow gssd_t krb5_conf_t:dir { read open };
 
-            #============= gssproxy_t ==============
-            allow gssproxy_t krb5_conf_t:dir search;
-            allow gssproxy_t krb5_conf_t:dir { read open };
+              #============= gssproxy_t ==============
+              allow gssproxy_t krb5_conf_t:dir search;
+              allow gssproxy_t krb5_conf_t:dir { read open };
             EOM
-                                                                        })
+          )
         }
       end
     end

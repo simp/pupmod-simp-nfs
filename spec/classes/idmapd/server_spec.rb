@@ -8,14 +8,14 @@ describe 'nfs' do
         let(:facts) do
           # to workaround service provider issues related to masking haveged
           # when tests are run on GitLab runners which are docker containers
-          os_facts.merge({ haveged__rngd_enabled: false })
+          os_facts.merge(haveged__rngd_enabled: false)
         end
 
         context 'with nfs::idmapd=true' do
           let(:params) do
             {
               is_server: true,
-           idmapd: true,
+              idmapd: true,
             }
           end
 
@@ -23,18 +23,18 @@ describe 'nfs' do
           it { is_expected.to create_class('nfs::idmapd::server') }
           it { is_expected.to create_class('nfs::idmapd::config') }
           it {
-            is_expected.to create_service('nfs-idmapd.service').with({
-                                                                       ensure: 'running',
+            is_expected.to create_service('nfs-idmapd.service').with(
+              ensure: 'running',
               enable: true,
               hasrestart: true,
-                                                                     })
+            )
           }
 
           it {
-            is_expected.to create_exec('unmask_nfs-idmapd.service').with({
-                                                                           command: '/usr/bin/systemctl unmask nfs-idmapd.service',
+            is_expected.to create_exec('unmask_nfs-idmapd.service').with(
+              command: '/usr/bin/systemctl unmask nfs-idmapd.service',
               onlyif: '/usr/bin/systemctl status nfs-idmapd.service | /usr/bin/grep -qw masked',
-                                                                         })
+            )
           }
         end
 
@@ -42,7 +42,7 @@ describe 'nfs' do
           let(:params) do
             {
               is_server: true,
-           idmapd: false,
+              idmapd: false,
             }
           end
 
@@ -50,16 +50,16 @@ describe 'nfs' do
           it { is_expected.to create_class('nfs::idmapd::server') }
           it { is_expected.not_to create_class('nfs::idmapd::config') }
           it {
-            is_expected.to create_service('nfs-idmapd.service').with({
-                                                                       ensure: 'stopped',
-                                                                     })
+            is_expected.to create_service('nfs-idmapd.service').with(
+              ensure: 'stopped',
+            )
           }
 
           it {
-            is_expected.to create_exec('mask_nfs-idmapd.service').with({
-                                                                         command: '/usr/bin/systemctl mask nfs-idmapd.service',
+            is_expected.to create_exec('mask_nfs-idmapd.service').with(
+              command: '/usr/bin/systemctl mask nfs-idmapd.service',
               unless: '/usr/bin/systemctl status nfs-idmapd.service | /usr/bin/grep -qw masked',
-                                                                       })
+            )
           }
         end
       end

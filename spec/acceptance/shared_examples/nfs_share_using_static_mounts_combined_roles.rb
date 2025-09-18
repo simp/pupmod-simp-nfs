@@ -25,26 +25,26 @@ shared_examples 'a NFS share using static mounts with combined client/server rol
         let(:host_opts) do
           {
             is_server: true,
-         is_client: true,
-         nfsv3: opts[:nfsv3],
-         exported_dir: exported_dir,
-         exported_file: File.join(exported_dir, file_basename),
-         exported_file_content: "#{file_search_string} from #{exported_dir}",
-         export_sec: opts[:nfs_sec],
-         export_insecure: opts[:export_insecure],
-         server_custom: opts[:server_custom],
-         mount_dir: mount_dir,
-         mount_server_ip: internal_network_info(host)[:ip],
-         mount_remote_dir: exported_dir,
-         mount_nfs_version: (opts[:nfsv3] ? 3 : 4),
-         mount_sec: opts[:nfs_sec],
-         mount_autodetect_remote: autodetect_remote,
-         client_custom: <<~EOM,
-           #{opts[:client_custom]}
+            is_client: true,
+            nfsv3: opts[:nfsv3],
+            exported_dir: exported_dir,
+            exported_file: File.join(exported_dir, file_basename),
+            exported_file_content: "#{file_search_string} from #{exported_dir}",
+            export_sec: opts[:nfs_sec],
+            export_insecure: opts[:export_insecure],
+            server_custom: opts[:server_custom],
+            mount_dir: mount_dir,
+            mount_server_ip: internal_network_info(host)[:ip],
+            mount_remote_dir: exported_dir,
+            mount_nfs_version: (opts[:nfsv3] ? 3 : 4),
+            mount_sec: opts[:nfs_sec],
+            mount_autodetect_remote: autodetect_remote,
+            client_custom: <<~EOM,
+              #{opts[:client_custom]}
 
-           Nfs::Server::Export['#{exported_dir}'] -> Nfs::Client::Mount['#{mount_dir}']
-           Service['nfs-server.service'] -> Nfs::Client::Mount['#{mount_dir}']
-          EOM
+              Nfs::Server::Export['#{exported_dir}'] -> Nfs::Client::Mount['#{mount_dir}']
+              Service['nfs-server.service'] -> Nfs::Client::Mount['#{mount_dir}']
+            EOM
           }
         end
 

@@ -8,7 +8,7 @@ describe 'nfs' do
         let(:facts) do
           # to workaround service provider issues related to masking haveged
           # when tests are run on GitLab runners which are docker containers
-          os_facts.merge({ haveged__rngd_enabled: false })
+          os_facts.merge(haveged__rngd_enabled: false)
         end
 
         context 'NFSv3' do
@@ -19,10 +19,10 @@ describe 'nfs' do
             it { is_expected.to create_class('nfs::base::service') }
             it { is_expected.to create_service('rpc-statd.service').with_ensure('stopped') }
             it {
-              is_expected.to create_exec('mask_rpc-statd.service').with({
-                                                                          command: '/usr/bin/systemctl mask rpc-statd.service',
-              unless: '/usr/bin/systemctl status rpc-statd.service | /usr/bin/grep -qw masked',
-                                                                        })
+              is_expected.to create_exec('mask_rpc-statd.service').with(
+                command: '/usr/bin/systemctl mask rpc-statd.service',
+                unless: '/usr/bin/systemctl status rpc-statd.service | /usr/bin/grep -qw masked',
+              )
             }
           end
 
@@ -32,26 +32,26 @@ describe 'nfs' do
             it { is_expected.to compile.with_all_deps }
             it { is_expected.to create_class('nfs::base::service') }
             it {
-              is_expected.to create_service('rpcbind.service').with({
-                                                                      ensure: 'running',
-              enable: true,
-              hasrestart: true,
-                                                                    })
+              is_expected.to create_service('rpcbind.service').with(
+                ensure: 'running',
+                enable: true,
+                hasrestart: true,
+              )
             }
 
             it {
-              is_expected.to create_service('rpc-statd.service').with({
-                                                                        ensure: 'running',
-              hasrestart: true,
-                                                                      })
+              is_expected.to create_service('rpc-statd.service').with(
+                ensure: 'running',
+                hasrestart: true,
+              )
             }
 
             it { is_expected.to create_svckill__ignore('rpc-statd-notify') }
             it {
-              is_expected.to create_exec('unmask_rpc-statd.service').with({
-                                                                            command: '/usr/bin/systemctl unmask rpc-statd.service',
-              onlyif: '/usr/bin/systemctl status rpc-statd.service | /usr/bin/grep -qw masked',
-                                                                          })
+              is_expected.to create_exec('unmask_rpc-statd.service').with(
+                command: '/usr/bin/systemctl unmask rpc-statd.service',
+                onlyif: '/usr/bin/systemctl status rpc-statd.service | /usr/bin/grep -qw masked',
+              )
             }
           end
         end
@@ -63,10 +63,10 @@ describe 'nfs' do
             it { is_expected.to create_class('nfs::base::service') }
             it { is_expected.to create_service('rpc-gssd.service').with_ensure('stopped') }
             it {
-              is_expected.to create_exec('mask_rpc-gssd.service').with({
-                                                                         command: '/usr/bin/systemctl mask rpc-gssd.service',
-              unless: '/usr/bin/systemctl status rpc-gssd.service | /usr/bin/grep -qw masked',
-                                                                       })
+              is_expected.to create_exec('mask_rpc-gssd.service').with(
+                command: '/usr/bin/systemctl mask rpc-gssd.service',
+                unless: '/usr/bin/systemctl status rpc-gssd.service | /usr/bin/grep -qw masked',
+              )
             }
           end
 
@@ -81,17 +81,17 @@ describe 'nfs' do
 
               it { is_expected.to create_class('nfs::base::service') }
               it {
-                is_expected.to create_service('rpc-gssd.service').with({
-                                                                         ensure: 'running',
-                hasrestart: true,
-                                                                       })
+                is_expected.to create_service('rpc-gssd.service').with(
+                  ensure: 'running',
+                  hasrestart: true,
+                )
               }
 
               it {
-                is_expected.to create_exec('unmask_rpc-gssd.service').with({
-                                                                             command: '/usr/bin/systemctl unmask rpc-gssd.service',
-                onlyif: '/usr/bin/systemctl status rpc-gssd.service | /usr/bin/grep -qw masked',
-                                                                           })
+                is_expected.to create_exec('unmask_rpc-gssd.service').with(
+                  command: '/usr/bin/systemctl unmask rpc-gssd.service',
+                  onlyif: '/usr/bin/systemctl status rpc-gssd.service | /usr/bin/grep -qw masked',
+                )
               }
             end
 
@@ -107,11 +107,11 @@ describe 'nfs' do
               it { is_expected.to create_service('rpc-gssd.service') }
               it { is_expected.to create_exec('unmask_rpc-gssd.service') }
               it {
-                is_expected.to create_service('gssproxy.service').with({
-                                                                         ensure: 'running',
-                enable: true,
-                hasrestart: true,
-                                                                       })
+                is_expected.to create_service('gssproxy.service').with(
+                  ensure: 'running',
+                  enable: true,
+                  hasrestart: true,
+                )
               }
             end
           end

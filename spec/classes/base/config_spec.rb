@@ -8,18 +8,18 @@ describe 'nfs' do
         let(:facts) do
           # to workaround service provider issues related to masking haveged
           # when tests are run on GitLab runners which are docker containers
-          os_facts.merge({ haveged__rngd_enabled: false })
+          os_facts.merge(haveged__rngd_enabled: false)
         end
 
         context 'with default nfs parameters' do
           it { is_expected.to compile.with_all_deps }
           it { is_expected.to create_class('nfs::base::config') }
           it {
-            is_expected.to create_concat('/etc/nfs.conf').with({
-                                                                 owner: 'root',
-            group: 'root',
-            mode: '0644',
-                                                               })
+            is_expected.to create_concat('/etc/nfs.conf').with(
+              owner: 'root',
+              group: 'root',
+              mode: '0644',
+            )
           }
 
           it { is_expected.not_to create_concat__fragment('nfs_conf_general') }
@@ -30,11 +30,11 @@ describe 'nfs' do
 
           if os_facts[:os][:release][:major].to_i < 8
             it {
-              is_expected.to create_concat('/etc/sysconfig/nfs').with({
-                                                                        owner: 'root',
-              group: 'root',
-              mode: '0644',
-                                                                      })
+              is_expected.to create_concat('/etc/sysconfig/nfs').with(
+                owner: 'root',
+                group: 'root',
+                mode: '0644',
+              )
             }
 
             it { is_expected.not_to create_concat__fragment('nfs_gss_use_proxy') }
@@ -47,17 +47,17 @@ describe 'nfs' do
 
           it { is_expected.not_to create_systemd__dropin_file('simp_unit.conf') }
           it {
-            is_expected.to create_file('/etc/modprobe.d/sunrpc.conf').with({
-                                                                             owner: 'root',
-            group: 'root',
-            mode: '0640',
-            content: <<~EOM,
-              # This file is managed by Puppet (simp-nfs module).  Changes will be overwritten
-              # at the next puppet run.
-              #
-              options sunrpc tcp_slot_table_entries=128 udp_slot_table_entries=128
-            EOM
-                                                                           })
+            is_expected.to create_file('/etc/modprobe.d/sunrpc.conf').with(
+              owner: 'root',
+              group: 'root',
+              mode: '0640',
+              content: <<~EOM,
+                # This file is managed by Puppet (simp-nfs module).  Changes will be overwritten
+                # at the next puppet run.
+                #
+                options sunrpc tcp_slot_table_entries=128 udp_slot_table_entries=128
+              EOM
+            )
           }
 
           it { is_expected.not_to create_class('nfs::idmapd::config') }
@@ -78,14 +78,14 @@ describe 'nfs' do
           it { is_expected.to compile.with_all_deps }
           it { is_expected.to create_class('nfs::base::config') }
           it {
-            is_expected.to create_concat__fragment('nfs_conf_general').with({
-                                                                              target: '/etc/nfs.conf',
-            content: <<~EOM,
+            is_expected.to create_concat__fragment('nfs_conf_general').with(
+              target: '/etc/nfs.conf',
+              content: <<~EOM,
 
-              [general]
-                pipefs-directory = /some/dir
+                [general]
+                  pipefs-directory = /some/dir
               EOM
-                                                                            })
+            )
           }
         end
 
@@ -94,23 +94,23 @@ describe 'nfs' do
             let(:params) do
               {
                 secure_nfs: true,
-             gssd_use_gss_proxy: false,
+                gssd_use_gss_proxy: false,
               }
             end
 
             it { is_expected.to compile.with_all_deps }
             it { is_expected.to create_class('nfs::base::config') }
             it {
-              is_expected.to create_concat__fragment('nfs_conf_gssd').with({
-                                                                             target: '/etc/nfs.conf',
-              content: <<~EOM,
+              is_expected.to create_concat__fragment('nfs_conf_gssd').with(
+                target: '/etc/nfs.conf',
+                content: <<~EOM,
 
-                [gssd]
-                  avoid-dns = true
-                  limit-to-legacy-enctypes = false
-                  use-gss-proxy = false
+                  [gssd]
+                    avoid-dns = true
+                    limit-to-legacy-enctypes = false
+                    use-gss-proxy = false
                 EOM
-                                                                           })
+              )
             }
 
             if os_facts[:os][:release][:major].to_i < 8
@@ -132,41 +132,41 @@ describe 'nfs' do
             it { is_expected.to compile.with_all_deps }
             it { is_expected.to create_class('nfs::base::config') }
             it {
-              is_expected.to create_concat__fragment('nfs_conf_gssd').with({
-                                                                             target: '/etc/nfs.conf',
-              content: <<~EOM,
+              is_expected.to create_concat__fragment('nfs_conf_gssd').with(
+                target: '/etc/nfs.conf',
+                content: <<~EOM,
 
-                [gssd]
-                  avoid-dns = true
-                  limit-to-legacy-enctypes = false
-                  use-gss-proxy = true
+                  [gssd]
+                    avoid-dns = true
+                    limit-to-legacy-enctypes = false
+                    use-gss-proxy = true
                 EOM
-                                                                           })
+              )
             }
 
             if os_facts[:os][:release][:major].to_i < 8
               it {
-                is_expected.to create_concat__fragment('nfs_gss_use_proxy').with({
-                                                                                   target: '/etc/sysconfig/nfs',
-                content: 'GSS_USE_PROXY=yes',
-                                                                                 })
+                is_expected.to create_concat__fragment('nfs_gss_use_proxy').with(
+                  target: '/etc/sysconfig/nfs',
+                  content: 'GSS_USE_PROXY=yes',
+                )
               }
 
               it { is_expected.not_to create_concat__fragment('nfs_GSSDARGS') }
             end
 
             it {
-              is_expected.to create_systemd__dropin_file('simp_unit.conf').with({
-                                                                                  unit: 'gssproxy.service',
-              content: <<~EOM,
-                # This file is managed by Puppet (simp-nfs module).  Changes will be overwritten
-                # at the next puppet run.
+              is_expected.to create_systemd__dropin_file('simp_unit.conf').with(
+                unit: 'gssproxy.service',
+                content: <<~EOM,
+                  # This file is managed by Puppet (simp-nfs module).  Changes will be overwritten
+                  # at the next puppet run.
 
-                [Unit]
+                  [Unit]
 
-                PartOf=nfs-utils.service
+                  PartOf=nfs-utils.service
                 EOM
-                                                                                })
+              )
             }
           end
 
@@ -174,28 +174,28 @@ describe 'nfs' do
             let(:params) do
               {
                 secure_nfs: true,
-             custom_nfs_conf_opts: {
-               'gssd' => {
-                 'use-memcache' => true,
-               },
-             },
+                custom_nfs_conf_opts: {
+                  'gssd' => {
+                    'use-memcache' => true,
+                  },
+                },
               }
             end
 
             it { is_expected.to compile.with_all_deps }
             it { is_expected.to create_class('nfs::base::config') }
             it {
-              is_expected.to create_concat__fragment('nfs_conf_gssd').with({
-                                                                             target: '/etc/nfs.conf',
-              content: <<~EOM,
+              is_expected.to create_concat__fragment('nfs_conf_gssd').with(
+                target: '/etc/nfs.conf',
+                content: <<~EOM,
 
-                [gssd]
-                  avoid-dns = true
-                  limit-to-legacy-enctypes = false
-                  use-gss-proxy = true
-                  use-memcache = true
+                  [gssd]
+                    avoid-dns = true
+                    limit-to-legacy-enctypes = false
+                    use-gss-proxy = true
+                    use-memcache = true
                 EOM
-                                                                           })
+              )
             }
           end
 
@@ -204,17 +204,17 @@ describe 'nfs' do
               let(:params) do
                 {
                   secure_nfs: true,
-               custom_daemon_args: { 'GSSDARGS' => '-v' },
+                  custom_daemon_args: { 'GSSDARGS' => '-v' },
                 }
               end
 
               it { is_expected.to compile.with_all_deps }
               it { is_expected.to create_class('nfs::base::config') }
               it {
-                is_expected.to create_concat__fragment('nfs_GSSDARGS').with({
-                                                                              target: '/etc/sysconfig/nfs',
-                content: 'GSSDARGS="-v"',
-                                                                            })
+                is_expected.to create_concat__fragment('nfs_GSSDARGS').with(
+                  target: '/etc/sysconfig/nfs',
+                  content: 'GSSDARGS="-v"',
+                )
               }
             end
           end
@@ -227,58 +227,58 @@ describe 'nfs' do
             it { is_expected.to compile.with_all_deps }
             it { is_expected.to create_class('nfs::base::config') }
             it {
-              is_expected.to create_concat__fragment('nfs_conf_lockd').with({
-                                                                              target: '/etc/nfs.conf',
-              content: <<~EOM,
+              is_expected.to create_concat__fragment('nfs_conf_lockd').with(
+                target: '/etc/nfs.conf',
+                content: <<~EOM,
 
-                [lockd]
-                  port = 32803
-                  udp-port = 32769
+                  [lockd]
+                    port = 32803
+                    udp-port = 32769
                 EOM
-                                                                            })
+              )
             }
 
             it {
-              is_expected.to create_concat__fragment('nfs_conf_sm_notify').with({
-                                                                                  target: '/etc/nfs.conf',
-              content: <<~EOM,
+              is_expected.to create_concat__fragment('nfs_conf_sm_notify').with(
+                target: '/etc/nfs.conf',
+                content: <<~EOM,
 
-                [sm-notify]
-                  outgoing-port = 2021
+                  [sm-notify]
+                    outgoing-port = 2021
                 EOM
-                                                                                })
+              )
             }
 
             it {
-              is_expected.to create_concat__fragment('nfs_conf_statd').with({
-                                                                              target: '/etc/nfs.conf',
-              content: <<~EOM,
+              is_expected.to create_concat__fragment('nfs_conf_statd').with(
+                target: '/etc/nfs.conf',
+                content: <<~EOM,
 
-                [statd]
-                  outgoing-port = 2020
-                  port = 662
+                  [statd]
+                    outgoing-port = 2020
+                    port = 662
                 EOM
-                                                                            })
+              )
             }
 
             it {
-              is_expected.to create_file('/etc/modprobe.d/lockd.conf').with({
-                                                                              owner: 'root',
-              group: 'root',
-              mode: '0640',
-              content: <<~EOM,
-                # This file is managed by Puppet (simp-nfs module).  Changes will be overwritten
-                # at the next puppet run.
-                #
-                # Set the TCP port that the NFS lock manager should use.
-                # port must be a valid TCP port value (1-65535).
-                options lockd nlm_tcpport=32803
+              is_expected.to create_file('/etc/modprobe.d/lockd.conf').with(
+                owner: 'root',
+                group: 'root',
+                mode: '0640',
+                content: <<~EOM,
+                  # This file is managed by Puppet (simp-nfs module).  Changes will be overwritten
+                  # at the next puppet run.
+                  #
+                  # Set the TCP port that the NFS lock manager should use.
+                  # port must be a valid TCP port value (1-65535).
+                  options lockd nlm_tcpport=32803
 
-                # Set the UDP port that the NFS lock manager should use.
-                # port must be a valid UDP port value (1-65535).
-                options lockd nlm_udpport=32769
+                  # Set the UDP port that the NFS lock manager should use.
+                  # port must be a valid UDP port value (1-65535).
+                  options lockd nlm_udpport=32769
                 EOM
-                                                                            })
+              )
             }
           end
 
@@ -286,29 +286,29 @@ describe 'nfs' do
             let(:params) do
               {
                 nfsv3: true,
-             custom_nfs_conf_opts: {
-               'lockd' => {
-                 # this isn't a real option yet, but currently only
-                 # two options available are being set
-                 'debug' => 'all',
-               },
-             },
+                custom_nfs_conf_opts: {
+                  'lockd' => {
+                    # this isn't a real option yet, but currently only
+                    # two options available are being set
+                    'debug' => 'all',
+                  },
+                },
               }
             end
 
             it { is_expected.to compile.with_all_deps }
             it { is_expected.to create_class('nfs::base::config') }
             it {
-              is_expected.to create_concat__fragment('nfs_conf_lockd').with({
-                                                                              target: '/etc/nfs.conf',
-              content: <<~EOM,
+              is_expected.to create_concat__fragment('nfs_conf_lockd').with(
+                target: '/etc/nfs.conf',
+                content: <<~EOM,
 
-                [lockd]
-                  debug = all
-                  port = 32803
-                  udp-port = 32769
+                  [lockd]
+                    debug = all
+                    port = 32803
+                    udp-port = 32769
                 EOM
-                                                                            })
+              )
             }
           end
 
@@ -316,24 +316,24 @@ describe 'nfs' do
             let(:params) do
               {
                 nfsv3: true,
-             custom_nfs_conf_opts: {
-               'sm-notify' => {
-                 'retry-time' => 10,
-               },
-             },
+                custom_nfs_conf_opts: {
+                  'sm-notify' => {
+                    'retry-time' => 10,
+                  },
+                },
               }
             end
 
             it {
-              is_expected.to create_concat__fragment('nfs_conf_sm_notify').with({
-                                                                                  target: '/etc/nfs.conf',
-              content: <<~EOM,
+              is_expected.to create_concat__fragment('nfs_conf_sm_notify').with(
+                target: '/etc/nfs.conf',
+                content: <<~EOM,
 
-                [sm-notify]
-                  outgoing-port = 2021
-                  retry-time = 10
+                  [sm-notify]
+                    outgoing-port = 2021
+                    retry-time = 10
                 EOM
-                                                                                })
+              )
             }
           end
 
@@ -341,25 +341,25 @@ describe 'nfs' do
             let(:params) do
               {
                 nfsv3: true,
-             custom_nfs_conf_opts: {
-               'statd' => {
-                 'state-directory-path' => '/some/path',
-               },
-             },
+                custom_nfs_conf_opts: {
+                  'statd' => {
+                    'state-directory-path' => '/some/path',
+                  },
+                },
               }
             end
 
             it {
-              is_expected.to create_concat__fragment('nfs_conf_statd').with({
-                                                                              target: '/etc/nfs.conf',
-              content: <<~EOM,
+              is_expected.to create_concat__fragment('nfs_conf_statd').with(
+                target: '/etc/nfs.conf',
+                content: <<~EOM,
 
-                [statd]
-                  outgoing-port = 2020
-                  port = 662
-                  state-directory-path = /some/path
+                  [statd]
+                    outgoing-port = 2020
+                    port = 662
+                    state-directory-path = /some/path
                 EOM
-                                                                            })
+              )
             }
           end
 
@@ -368,17 +368,17 @@ describe 'nfs' do
               let(:params) do
                 {
                   nfsv3: true,
-               custom_daemon_args: { 'SMNOTIFYARGS' => '-f' },
+                  custom_daemon_args: { 'SMNOTIFYARGS' => '-f' },
                 }
               end
 
               it { is_expected.to compile.with_all_deps }
               it { is_expected.to create_class('nfs::base::config') }
               it {
-                is_expected.to create_concat__fragment('nfs_SMNOTIFYARGS').with({
-                                                                                  target: '/etc/sysconfig/nfs',
-                content: 'SMNOTIFYARGS="-f"',
-                                                                                })
+                is_expected.to create_concat__fragment('nfs_SMNOTIFYARGS').with(
+                  target: '/etc/sysconfig/nfs',
+                  content: 'SMNOTIFYARGS="-f"',
+                )
               }
             end
 
@@ -386,17 +386,17 @@ describe 'nfs' do
               let(:params) do
                 {
                   nfsv3: true,
-               custom_daemon_args: { 'STATDARG' => '--no-syslog' },
+                  custom_daemon_args: { 'STATDARG' => '--no-syslog' },
                 }
               end
 
               it { is_expected.to compile.with_all_deps }
               it { is_expected.to create_class('nfs::base::config') }
               it {
-                is_expected.to create_concat__fragment('nfs_STATDARG').with({
-                                                                              target: '/etc/sysconfig/nfs',
-                content: 'STATDARG="--no-syslog"',
-                                                                            })
+                is_expected.to create_concat__fragment('nfs_STATDARG').with(
+                  target: '/etc/sysconfig/nfs',
+                  content: 'STATDARG="--no-syslog"',
+                )
               }
             end
           end

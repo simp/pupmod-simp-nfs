@@ -8,15 +8,15 @@ describe 'nfs' do
         let(:facts) do
           # to workaround service provider issues related to masking haveged
           # when tests are run on GitLab runners which are docker containers
-          os_facts.merge({ haveged__rngd_enabled: false })
+          os_facts.merge(haveged__rngd_enabled: false)
         end
 
         context 'when tcpwrappers and nfsv3 enabled' do
           let(:params) do
             {
               nfsv3: true,
-           tcpwrappers: true,
-           trusted_nets: [ '1.2.3.0/24' ],
+              tcpwrappers: true,
+              trusted_nets: [ '1.2.3.0/24' ],
             }
           end
 
@@ -47,8 +47,8 @@ describe 'nfs' do
           let(:params) do
             {
               nfsv3: false,
-           tcpwrappers: true,
-           trusted_nets: [ '1.2.3.0/24' ],
+              tcpwrappers: true,
+              trusted_nets: [ '1.2.3.0/24' ],
             }
           end
 
