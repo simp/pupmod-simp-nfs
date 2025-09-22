@@ -29,16 +29,14 @@ test_name 'nfs stunnel'
 # mount will fail.
 ################################################################################
 
-
 # Tests stunneling between individual NFS client and NFS server pairs
 describe 'nfs stunnel' do
+  servers = hosts_with_role(hosts, 'nfs_server')
+  servers_with_client = hosts_with_role(hosts, 'nfs_server_and_client')
+  servers_tcpwrappers = servers.select { |server| server.name.include?('el7') }
 
-  servers = hosts_with_role( hosts, 'nfs_server' )
-  servers_with_client = hosts_with_role( hosts, 'nfs_server_and_client' )
-  servers_tcpwrappers = servers.select { |server| server.name.match(/el7/) }
-
-  clients = hosts_with_role( hosts, 'nfs_client' )
-  clients_tcpwrappers = clients.select { |client| client.name.match(/el7/) }
+  clients = hosts_with_role(hosts, 'nfs_client')
+  clients_tcpwrappers = clients.select { |client| client.name.include?('el7') }
 
   base_hiera = {
     # Set us up for a basic stunneled NFS (firewall-only)
@@ -61,17 +59,17 @@ describe 'nfs stunnel' do
 
     # make sure we are using iptables and not nftables because nftables
     # core dumps with rules from the nfs module
-    'firewalld::firewall_backend'           => 'iptables'
+    'firewalld::firewall_backend'           => 'iptables',
   }
 
   context 'with NFSv4 stunnel and firewall' do
     opts = {
-      :base_hiera              => base_hiera,
-      :export_insecure         => true,
-      :nfs_sec                 => 'sys',
-      :nfsv3                   => false,
-      :mount_autodetect_remote => [ false ], # this is immaterial when using stunnel
-      :verify_reboot           => true
+      base_hiera: base_hiera,
+      export_insecure: true,
+      nfs_sec: 'sys',
+      nfsv3: false,
+      mount_autodetect_remote: [ false ], # this is immaterial when using stunnel
+      verify_reboot: true,
     }
 
     it_behaves_like 'a NFS share using static mounts with distinct client/server roles', servers, clients, opts
@@ -80,7 +78,7 @@ describe 'nfs stunnel' do
   end
 
   context 'long running test' do
-    it 'should ensure vagrant connectivity' do
+    it 'ensures vagrant connectivity' do
       on(hosts, 'date')
     end
   end
@@ -93,17 +91,17 @@ describe 'nfs stunnel' do
       'nfs::custom_nfs_conf_opts' => {
         'nfsd' => {
           'tcp' => true,
-          'udp' => false
-        }
-      }
+          'udp' => false,
+        },
+      },
     }
 
     opts = {
-      :base_hiera      => base_hiera.merge(tcpwrappers_hiera),
-      :export_insecure => true,
-      :nfs_sec         => 'sys',
-      :nfsv3           => false,
-      :verify_reboot   => false
+      base_hiera: base_hiera.merge(tcpwrappers_hiera),
+      export_insecure: true,
+      nfs_sec: 'sys',
+      nfsv3: false,
+      verify_reboot: false,
     }
 
     it_behaves_like 'a NFS share using static mounts with distinct client/server roles',
@@ -115,7 +113,7 @@ describe 'nfs stunnel' do
 
   context 'clean up for next test' do
     (servers_tcpwrappers + clients_tcpwrappers).each do |host|
-      it 'should disable tcpwrappers by removing hosts.allow and hosts.deny files' do
+      it 'disables tcpwrappers by removing hosts.allow and hosts.deny files' do
         on(host, 'rm -f /etc/hosts.allow /etc/hosts.deny')
       end
     end

@@ -4,8 +4,9 @@ describe 'nfs::idmapd::config' do
   context 'with default parameters' do
     it { is_expected.to compile.with_all_deps }
     it { is_expected.to create_class('nfs::idmapd::config') }
-    it { is_expected.to create_file('/etc/idmapd.conf').with_content(
-      <<~EOM
+    it {
+      is_expected.to create_file('/etc/idmapd.conf').with_content(
+      <<~EOM,
         # This file is managed by Puppet (simp-nfs module). Changes will be overwritten
         # at the next Puppet run.
         [General]
@@ -26,25 +27,28 @@ describe 'nfs::idmapd::config' do
 
         # This is not yet supported by the SIMP configuration.
       EOM
-    )}
+    )
+    }
   end
 
   context 'with optional parameters set and multiple methods' do
-    let(:params) {{
-      :verbosity          => 2,
-      :domain             => 'mydomain',
-      :no_strip           => 'both',
-      :reformat_group     => false,
-      :local_realms       => ['realm1', 'realm2'],
-      :trans_method       => ['nsswitch', 'static'],
-      :gss_methods        => ['nsswitch', 'static'],
-      :static_translation => { 'key1' => 'value1', 'key2' => 'value2' }
-    }}
+    let(:params) do
+      {
+        verbosity: 2,
+        domain: 'mydomain',
+        no_strip: 'both',
+        reformat_group: false,
+        local_realms: ['realm1', 'realm2'],
+        trans_method: ['nsswitch', 'static'],
+        gss_methods: ['nsswitch', 'static'],
+        static_translation: { 'key1' => 'value1', 'key2' => 'value2' },
+      }
+    end
 
     it { is_expected.to compile.with_all_deps }
     it { is_expected.to create_class('nfs::idmapd::config') }
-    it { is_expected.to create_file('/etc/idmapd.conf').with_content(
-      <<~EOM
+    it {
+      is_expected.to create_file('/etc/idmapd.conf').with_content(<<~EOM)
         # This file is managed by Puppet (simp-nfs module). Changes will be overwritten
         # at the next Puppet run.
         [General]
@@ -73,6 +77,6 @@ describe 'nfs::idmapd::config' do
 
         # This is not yet supported by the SIMP configuration.
       EOM
-    )}
+    }
   end
 end
