@@ -205,6 +205,37 @@
 #   * Stunnel verify for just the NFS server on this host can be controlled
 #     by the `stunnel_verify` parameter in the `nfs::server` class.
 #
+# @param manage_tcpwrappers
+#   Whether tcpwrappers configuration should be managed for NFS services
+#
+#   * Automatically set based on OS version via Hiera (false for EL8+)
+#   * TCP wrappers was dropped in EL8
+#
+# @param install_quota_rpc
+#   Whether to install the quota-rpc package on NFS servers
+#
+#   * Automatically set based on OS version via Hiera (true for EL8+)
+#   * In EL7, rpc.rquotad files were in the quota package
+#   * In EL8+, quota-rpc is a separate package
+#
+# @param manage_sysconfig_nfs
+#   Whether to manage /etc/sysconfig/nfs configuration
+#
+#   * Automatically set based on OS version via Hiera (true for EL7, false for EL8+)
+#   * In EL7, /etc/sysconfig/nfs is still needed for some daemon options
+#   * In EL8+, all configuration is in /etc/nfs.conf
+#
+# @param apply_selinux_hotfix
+#   Whether to apply SELinux hotfix for Kerberos support
+#
+#   * Automatically set based on OS version via Hiera (true for EL7, false for EL8+)
+#   * Only needed in EL7 with Kerberos due to selinux-policy bugs
+#
+# @param minimum_os_version
+#   Minimum supported OS version (used for warnings)
+#
+#   * Automatically set via Hiera
+#
 # @param tcpwrappers
 #   Use the SIMP `tcpwrappers` module to manage TCP wrappers
 #
@@ -243,11 +274,16 @@ class nfs (
   Array[String]         $stunnel_socket_options        = ['l:TCP_NODELAY=1','r:TCP_NODELAY=1'],
   Integer               $stunnel_verify                = 2,
   Boolean               $tcpwrappers                   = simplib::lookup('simp_options::tcpwrappers', { 'default_value' => false }),
-  Simplib::Netlist      $trusted_nets                  = simplib::lookup('simp_options::trusted_nets', { 'default_value' => ['127.0.0.1'] })
+  Simplib::Netlist      $trusted_nets                  = simplib::lookup('simp_options::trusted_nets', { 'default_value' => ['127.0.0.1'] }),
+  Boolean               $manage_tcpwrappers            = true,
+  Boolean               $install_quota_rpc             = false,
+  Boolean               $manage_sysconfig_nfs          = false,
+  Boolean               $apply_selinux_hotfix          = false,
+  String                $minimum_os_version            = '7.4',
 ) {
 
   simplib::assert_metadata($module_name)
-  if (versioncmp($facts['os']['release']['full'], '7.4') < 0) {
+  if (versioncmp($facts['os']['release']['full'], $minimum_os_version) < 0) {
     warning("This version of simp-nfs may not work with ${facts['os']['name']} ${facts['os']['release']['full']}. Use simp-nfs module version < 7.0.0 instead")
   }
 
@@ -259,13 +295,13 @@ class nfs (
     simplib::assert_optional_dependency($module_name, 'simp/krb5')
   }
 
-  if $tcpwrappers and (versioncmp($facts['os']['release']['major'], '8') < 0) {
+  if $tcpwrappers and $manage_tcpwrappers {
     simplib::assert_optional_dependency($module_name, 'simp/tcpwrappers')
   }
 
   include 'nfs::install'
 
-  if $kerberos and (versioncmp($facts['os']['release']['major'], '8') < 0) {
+  if $kerberos and $apply_selinux_hotfix {
     # This is here because the SELinux rules for directory includes in krb5
     # are broken in selinux-policy < 3.13.1-229.el7_6.9. It does no harm
     # on an EL7 system with the fixed selinux-policy.
