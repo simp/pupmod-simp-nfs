@@ -89,6 +89,11 @@ The following parameters are available in the `nfs` class:
 * [`stunnel_nfsd_port`](#-nfs--stunnel_nfsd_port)
 * [`stunnel_socket_options`](#-nfs--stunnel_socket_options)
 * [`stunnel_verify`](#-nfs--stunnel_verify)
+* [`manage_tcpwrappers`](#-nfs--manage_tcpwrappers)
+* [`install_quota_rpc`](#-nfs--install_quota_rpc)
+* [`manage_sysconfig_nfs`](#-nfs--manage_sysconfig_nfs)
+* [`apply_selinux_hotfix`](#-nfs--apply_selinux_hotfix)
+* [`minimum_os_version`](#-nfs--minimum_os_version)
 * [`tcpwrappers`](#-nfs--tcpwrappers)
 * [`trusted_nets`](#-nfs--trusted_nets)
 
@@ -431,6 +436,62 @@ The level at which to verify TLS connections
   by the `stunnel_verify` parameter in the `nfs::server` class.
 
 Default value: `2`
+
+##### <a name="-nfs--manage_tcpwrappers"></a>`manage_tcpwrappers`
+
+Data type: `Boolean`
+
+Whether tcpwrappers configuration should be managed for NFS services
+
+* Automatically set based on OS version via Hiera (false for EL8+)
+* TCP wrappers was dropped in EL8
+
+Default value: `true`
+
+##### <a name="-nfs--install_quota_rpc"></a>`install_quota_rpc`
+
+Data type: `Boolean`
+
+Whether to install the quota-rpc package on NFS servers
+
+* Automatically set based on OS version via Hiera (true for EL8+)
+* In EL7, rpc.rquotad files were in the quota package
+* In EL8+, quota-rpc is a separate package
+
+Default value: `false`
+
+##### <a name="-nfs--manage_sysconfig_nfs"></a>`manage_sysconfig_nfs`
+
+Data type: `Boolean`
+
+Whether to manage /etc/sysconfig/nfs configuration
+
+* Automatically set based on OS version via Hiera (true for EL7, false for EL8+)
+* In EL7, /etc/sysconfig/nfs is still needed for some daemon options
+* In EL8+, all configuration is in /etc/nfs.conf
+
+Default value: `false`
+
+##### <a name="-nfs--apply_selinux_hotfix"></a>`apply_selinux_hotfix`
+
+Data type: `Boolean`
+
+Whether to apply SELinux hotfix for Kerberos support
+
+* Automatically set based on OS version via Hiera (true for EL7, false for EL8+)
+* Only needed in EL7 with Kerberos due to selinux-policy bugs
+
+Default value: `false`
+
+##### <a name="-nfs--minimum_os_version"></a>`minimum_os_version`
+
+Data type: `String`
+
+Minimum supported OS version (used for warnings)
+
+* Automatically set via Hiera
+
+Default value: `'7.4'`
 
 ##### <a name="-nfs--tcpwrappers"></a>`tcpwrappers`
 
