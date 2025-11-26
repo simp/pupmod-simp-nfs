@@ -72,7 +72,7 @@ class nfs::server::config
     }
   }
 
-  if (versioncmp($facts['os']['release']['major'], '8') < 0) {
+  if $nfs::manage_sysconfig_nfs {
     # In EL > 7, NFS services must be configured by /etc/nfs.conf. In EL7, however,
     # /etc/sysconfig/nfs is still needed to allow configuration of a handful of NFS
     # daemon command line options that were not yet migrated to /etc/nfs.conf.

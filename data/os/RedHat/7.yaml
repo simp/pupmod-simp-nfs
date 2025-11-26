@@ -1,0 +1,15 @@
+---
+# EL7-specific configuration
+
+# TCP wrappers is supported in EL7
+nfs::manage_tcpwrappers: true
+
+# quota-rpc is not a separate package in EL7
+# (rpc.rquotad files are in the quota package)
+nfs::install_quota_rpc: false
+
+# /etc/sysconfig/nfs is still used in EL7
+nfs::manage_sysconfig_nfs: true
+
+# SELinux hotfix is needed in EL7 when using Kerberos
+nfs::apply_selinux_hotfix: true

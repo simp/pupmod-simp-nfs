@@ -8,7 +8,7 @@ class nfs::server::tcpwrappers
   assert_private()
 
   # TCP wrappers was dropped in EL8
-  if (versioncmp($facts['os']['release']['major'], '8') < 0) {
+  if $nfs::manage_tcpwrappers {
     include 'tcpwrappers'
 
     # On EL7, the following NFS-server-related executables are dynamically

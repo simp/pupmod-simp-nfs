@@ -24,7 +24,7 @@ class nfs::install (
   package { 'nfs-utils': ensure => $ensure }
   package { 'nfs4-acl-tools': ensure => $tools_ensure }
 
-  if $nfs::is_server and (versioncmp($facts['os']['release']['major'], '7') > 0) {
+  if $nfs::is_server and $nfs::install_quota_rpc {
     package { 'quota-rpc': ensure => $quota_rpc_ensure }
   }
 }

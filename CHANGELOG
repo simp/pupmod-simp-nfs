@@ -1,3 +1,7 @@
+* Tue Nov 25 2025 Steven Pritchard <steve@sicura.us> - 7.8.0
+- Move OS-specific values to Hiera
+- Update module dependencies
+
 * Fri Sep 13 2024 Steven Pritchard <steve@sicura.us> - 7.7.0
 - [puppetsync] Update module dependencies to support simp-iptables 7.x
 

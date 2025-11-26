@@ -1,0 +1,15 @@
+---
+# EL9-specific configuration
+
+# TCP wrappers was dropped in EL8
+nfs::manage_tcpwrappers: false
+
+# quota-rpc is a separate package in EL8+
+nfs::install_quota_rpc: true
+
+# /etc/sysconfig/nfs is not used in EL8+
+# All configuration is in /etc/nfs.conf
+nfs::manage_sysconfig_nfs: false
+
+# SELinux hotfix not needed in EL8+
+nfs::apply_selinux_hotfix: false
