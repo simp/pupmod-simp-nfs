@@ -33,7 +33,6 @@ describe 'nfs server with multiple clients' do
     # Will only apply to NFSv4 connections
     'simp_options::stunnel'                 => true,
 
-    'simp_options::tcpwrappers'             => false,
     'ssh::server::conf::permitrootlogin'    => true,
     'ssh::server::conf::authorizedkeysfile' => '.ssh/authorized_keys',
 

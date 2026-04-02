@@ -286,7 +286,6 @@ define nfs::client::mount (
     stunnel_socket_options => $_stunnel_socket_options,
     stunnel_verify         => $_stunnel_verify,
     stunnel_wantedby       => $_stunnel_wantedby,
-    tcpwrappers            => $nfs::tcpwrappers
   }
 
   if $autofs {

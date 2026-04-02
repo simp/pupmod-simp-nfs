@@ -16,7 +16,6 @@ describe 'nfs' do
             is_server: true,
             firewall: true,
             stunnel: true,
-            tcpwrappers: true,
             trusted_nets: ['1.2.3.0/24'],
           }
         end
@@ -34,7 +33,6 @@ describe 'nfs' do
             socket_options: ['l:TCP_NODELAY=1', 'r:TCP_NODELAY=1'],
             systemd_wantedby: ['nfs-server.service'],
             firewall: true,
-            tcpwrappers: true,
             tag: ['nfs'],
           )
         }

@@ -43,9 +43,6 @@
 # @param firewall
 #   Use the SIMP `iptables` module to manage firewall connections
 #
-# @param tcpwrappers
-#   Use the SIMP `tcpwrappers` module to manage TCP wrappers
-#
 # @api private
 # @author https://github.com/simp/pupmod-simp-nfs/graphs/contributors
 #
@@ -57,7 +54,6 @@ define nfs::client::stunnel(
   Integer[0]    $stunnel_verify,
   Array[String] $stunnel_wantedby,
   Boolean       $firewall,
-  Boolean       $tcpwrappers
 ) {
   assert_private()
 
@@ -74,7 +70,6 @@ define nfs::client::stunnel(
       socket_options   => $stunnel_socket_options,
       systemd_wantedby => $stunnel_wantedby,
       firewall         => $firewall,
-      tcpwrappers      => $tcpwrappers,
       tag              => ['nfs']
     }
   }

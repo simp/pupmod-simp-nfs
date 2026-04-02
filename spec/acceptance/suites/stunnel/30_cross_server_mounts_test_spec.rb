@@ -32,7 +32,6 @@ describe 'cross-mounted NFS servers plus clients' do
     'simp_options::pki'                     => true,
     'simp_options::pki::source'             => '/etc/pki/simp-testing/pki',
     'simp_options::stunnel'                 => true,
-    'simp_options::tcpwrappers'             => false,
     'ssh::server::conf::permitrootlogin'    => true,
     'ssh::server::conf::authorizedkeysfile' => '.ssh/authorized_keys',
 

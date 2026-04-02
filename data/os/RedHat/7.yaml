@@ -1,8 +1,6 @@
 ---
 # EL7-specific configuration
 
-# TCP wrappers is supported in EL7
-nfs::manage_tcpwrappers: true
 
 # quota-rpc is not a separate package in EL7
 # (rpc.rquotad files are in the quota package)
