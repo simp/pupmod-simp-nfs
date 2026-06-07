@@ -35,10 +35,12 @@ describe 'nfs::server::export' do
 
       let(:title) { 'nfs_test' }
 
-      base_params = {
-        export_path: '/foo/bar/baz',
-        clients: ['0.0.0.0/0'],
-      }
+      let(:base_params) do
+        {
+          export_path: '/foo/bar/baz',
+          clients: ['0.0.0.0/0'],
+        }
+      end
 
       context 'with default parameters' do
         let(:params) { base_params }
