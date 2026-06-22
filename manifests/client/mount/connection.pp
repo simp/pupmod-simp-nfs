@@ -49,9 +49,6 @@
 #
 #   * Unused when `$stunnel` is `false`
 #
-# @param tcpwrappers
-#   Use the SIMP `tcpwrappers` module to manage TCP wrappers
-#
 # @api private
 # @author https://github.com/simp/pupmod-simp-nfs/graphs/contributors
 #
@@ -65,7 +62,6 @@ define nfs::client::mount::connection (
   Array[String] $stunnel_socket_options,
   Integer       $stunnel_verify,
   Array[String] $stunnel_wantedby,
-  Boolean       $tcpwrappers
 ) {
 
   # This is only meant to be called from inside nfs::client::mount
@@ -73,7 +69,7 @@ define nfs::client::mount::connection (
 
   if $stunnel and ($nfs_version == 4) {
     # It is possible that this is called for multiple mounts on the same server.
-    # stunnel-related firewall and tcpwrappers settings handled by the
+    # stunnel-related firewall settings handled by the
     # stunnel::instance, itself.
     ensure_resource('nfs::client::stunnel',
       "${nfs_server}:${nfsd_port}",
@@ -85,7 +81,6 @@ define nfs::client::mount::connection (
         stunnel_verify         => $stunnel_verify,
         stunnel_wantedby       => $stunnel_wantedby,
         firewall               => $firewall,
-        tcpwrappers            => $tcpwrappers
       }
     )
   } elsif $firewall  {

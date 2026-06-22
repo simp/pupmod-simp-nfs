@@ -32,7 +32,6 @@ describe 'nfs client with multiple servers' do
     'simp_options::pki::source'             => '/etc/pki/simp-testing/pki',
     # will only apply to NFSv4 connections
     'simp_options::stunnel'                 => true,
-    'simp_options::tcpwrappers'             => false,
     'ssh::server::conf::permitrootlogin'    => true,
     'ssh::server::conf::authorizedkeysfile' => '.ssh/authorized_keys',
 

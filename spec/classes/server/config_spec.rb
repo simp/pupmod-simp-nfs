@@ -413,18 +413,6 @@ describe 'nfs' do
           }
         end
 
-        context 'when tcpwrappers enabled' do
-          let(:params) do
-            {
-              is_server: true,
-              tcpwrappers: true,
-            }
-          end
-
-          it { is_expected.to compile.with_all_deps }
-          it { is_expected.to create_class('nfs::server::config') }
-          it { is_expected.to create_class('nfs::server::tcpwrappers') }
-        end
       end
     end
   end

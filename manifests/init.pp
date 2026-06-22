@@ -149,9 +149,6 @@
 # @param firewall
 #   Use the SIMP `iptables` module to manage firewall connections
 #
-# @param tcpwrappers
-#   Use the SIMP `tcpwrappers` module to manage TCP wrappers
-#
 # @param stunnel
 #   Wrap `stunnel` around critical NFSv4 connections
 #
@@ -205,12 +202,6 @@
 #   * Stunnel verify for just the NFS server on this host can be controlled
 #     by the `stunnel_verify` parameter in the `nfs::server` class.
 #
-# @param manage_tcpwrappers
-#   Whether tcpwrappers configuration should be managed for NFS services
-#
-#   * Automatically set based on OS version via Hiera (false for EL8+)
-#   * TCP wrappers was dropped in EL8
-#
 # @param install_quota_rpc
 #   Whether to install the quota-rpc package on NFS servers
 #
@@ -235,9 +226,6 @@
 #   Minimum supported OS version (used for warnings)
 #
 #   * Automatically set via Hiera
-#
-# @param tcpwrappers
-#   Use the SIMP `tcpwrappers` module to manage TCP wrappers
 #
 # @param trusted_nets
 #   The systems that are allowed to connect to this service
@@ -273,9 +261,7 @@ class nfs (
   Simplib::Port         $stunnel_nfsd_port             = 20490,
   Array[String]         $stunnel_socket_options        = ['l:TCP_NODELAY=1','r:TCP_NODELAY=1'],
   Integer               $stunnel_verify                = 2,
-  Boolean               $tcpwrappers                   = simplib::lookup('simp_options::tcpwrappers', { 'default_value' => false }),
   Simplib::Netlist      $trusted_nets                  = simplib::lookup('simp_options::trusted_nets', { 'default_value' => ['127.0.0.1'] }),
-  Boolean               $manage_tcpwrappers            = true,
   Boolean               $install_quota_rpc             = false,
   Boolean               $manage_sysconfig_nfs          = false,
   Boolean               $apply_selinux_hotfix          = false,
@@ -293,10 +279,6 @@ class nfs (
 
   if $kerberos {
     simplib::assert_optional_dependency($module_name, 'simp/krb5')
-  }
-
-  if $tcpwrappers and $manage_tcpwrappers {
-    simplib::assert_optional_dependency($module_name, 'simp/tcpwrappers')
   }
 
   include 'nfs::install'

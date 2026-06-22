@@ -15,7 +15,6 @@ describe 'nfs krb5' do
     'simp_options::firewall'                   => true,
     'simp_options::kerberos'                   => true,
     'simp_options::stunnel'                    => false,
-    'simp_options::tcpwrappers'                => true,
     'ssh::server::conf::permitrootlogin'       => true,
     'ssh::server::conf::authorizedkeysfile'    => '.ssh/authorized_keys',
     'simp_options::pki'                        => true,
@@ -120,7 +119,7 @@ describe 'nfs krb5' do
         end
       end
 
-      context 'Secure NFSv4 with firewall and tcpwrappers' do
+      context 'Secure NFSv4 with firewall' do
         server_krb5_manifest_extras = <<~EOM
           # Keep KRB5 (kadmin & krb5kdc) ports open in firewall so clients can
           # talk to KDC

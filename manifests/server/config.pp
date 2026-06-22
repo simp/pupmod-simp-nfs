@@ -178,7 +178,4 @@ class nfs::server::config
     content => $_simp_etc_exports_service
   }
 
-  if $nfs::tcpwrappers {
-    include 'nfs::server::tcpwrappers'
-  }
 }

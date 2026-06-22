@@ -42,7 +42,6 @@ class nfs::server::stunnel {
     socket_options   => $nfs::server::stunnel_socket_options,
     systemd_wantedby => $nfs::server::stunnel_wantedby,
     firewall         => $nfs::firewall,
-    tcpwrappers      => $nfs::tcpwrappers,
     tag              => ['nfs']
   }
 }

@@ -1,8 +1,6 @@
 ---
 # EL9-specific configuration
 
-# TCP wrappers was dropped in EL8
-nfs::manage_tcpwrappers: false
 
 # quota-rpc is a separate package in EL8+
 nfs::install_quota_rpc: true

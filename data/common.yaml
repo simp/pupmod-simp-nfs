@@ -2,10 +2,6 @@
 # Common defaults for all operating systems
 # These values will be used unless overridden by OS-specific data
 
-# Controls whether to manage tcpwrappers configuration
-# TCP wrappers was dropped in EL8+
-nfs::manage_tcpwrappers: true
-
 # Controls whether to install quota-rpc package
 # In EL7, rpc.rquotad files were in the quota package
 # In EL8+, quota-rpc package is needed for NFS servers

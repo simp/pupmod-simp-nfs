@@ -22,7 +22,6 @@ describe 'cross-mounted NFS servers plus clients' do
     'simp_options::firewall'                => true,
     'simp_options::kerberos'                => false,
     'simp_options::stunnel'                 => false,
-    'simp_options::tcpwrappers'             => false,
     'ssh::server::conf::permitrootlogin'    => true,
     'ssh::server::conf::authorizedkeysfile' => '.ssh/authorized_keys',
 
