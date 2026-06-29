@@ -119,12 +119,13 @@ jobs:
     strategy:
       matrix:
         node:
+          - almalinux8
           - almalinux9
           - almalinux10
       fail-fast: false
     steps:
       - name: checkout repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: setup ruby
         uses: ruby/setup-ruby@v1
         with:

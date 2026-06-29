@@ -1,10 +1,35 @@
 ---
 HOSTS:
-  almalinux8:
+  alma8-server:
     roles:
     - default
     - master
     - server
+    - nfs_server
+    - nfs_server_and_client
+    - el8
+    platform: el-8-x86_64
+    box: almalinux/8
+    hypervisor: "<%= ENV.fetch('BEAKER_HYPERVISOR', 'vagrant') %>"
+    vagrant_memsize: 2048
+    vagrant_cpus: 2
+    family: almalinux-cloud/almalinux-8
+    gce_machine_type: n1-standard-2
+  alma8-server2:
+    roles:
+    - nfs_server
+    - nfs_server_and_client
+    - el8
+    platform: el-8-x86_64
+    box: almalinux/8
+    hypervisor: "<%= ENV.fetch('BEAKER_HYPERVISOR', 'vagrant') %>"
+    vagrant_memsize: 2048
+    vagrant_cpus: 2
+    family: almalinux-cloud/almalinux-8
+    gce_machine_type: n1-standard-2
+  alma8-client:
+    roles:
+    - nfs_client
     - el8
     platform: el-8-x86_64
     box: almalinux/8
@@ -16,4 +41,8 @@ HOSTS:
 CONFIG:
   log_level: verbose
   type: aio
+  ssh:
+    keepalive: true
+    keepalive_interval: 10
+    keepalive_maxcount: 60
   puppet_collection: "<%= ENV.fetch('BEAKER_PUPPET_COLLECTION', 'openvox8') %>"
