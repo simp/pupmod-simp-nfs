@@ -207,10 +207,11 @@ define nfs::client::mount (
 
   include 'nfs::client'
 
+  # lint:ignore:version_comparison ($nfs_version is Integer[3,4], not a version string)
   if ($nfs_version == 3) and !$nfs::nfsv3 {
+    # lint:endignore
     fail('Cannot mount NFSv3 when NFSv3 is not enabled on client.  Set nfs::nfsv3 to true to fix.')
   }
-
 
   #############################################################
   # Pull in defaults from nfs and nfs::client classes as needed
@@ -221,7 +222,9 @@ define nfs::client::mount (
     $_nfsd_port = $nfs::nfsd_port
   }
 
+  # lint:ignore:version_comparison ($nfs_version is Integer[3,4], not a version string)
   if $nfs_version == 3 {
+    # lint:endignore
     $_stunnel = false
   } elsif $stunnel !~ Undef {
     $_stunnel = $stunnel
@@ -257,7 +260,9 @@ define nfs::client::mount (
   # Configure connection and mount
   #################################
 
+  # lint:ignore:version_comparison ($nfs_version is Integer[3,4], not a version string)
   if ($nfs_version  == 4) {
+    # lint:endignore
     $_nfs_base_options = "_netdev,nfsvers=4,port=${_nfsd_port},${options},sec=${sec}"
   } else {
     $_nfs_base_options = "_netdev,nfsvers=3,port=${_nfsd_port},${options}"
@@ -303,11 +308,11 @@ define nfs::client::mount (
 
     if $autofs_indirect_map_key {
       $_mount_point = $name
-      $_mappings = [ {
+      $_mappings = [{
         'key'      => $autofs_indirect_map_key,
         'options'  => "-${_nfs_options}",
         'location' => $_location
-      } ]
+      }]
     } else {
       $_mount_point = '/-'
       $_mappings = {
@@ -329,7 +334,6 @@ define nfs::client::mount (
       # instances are refreshed
       Stunnel::Instance <| tag == 'nfs' |> ~> Exec['autofs_reload']
     }
-
   } else {
     ensure_resource('service', 'remote-fs.target', { 'enable' => true })
 

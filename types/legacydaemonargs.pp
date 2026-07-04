@@ -10,4 +10,3 @@ type Nfs::LegacyDaemonArgs = Struct[{
   # This is converted to STATDARGS
   Optional['STATDARG']      => String
 }]
-

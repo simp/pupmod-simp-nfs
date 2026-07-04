@@ -4,7 +4,6 @@
 # @author https://github.com/simp/pupmod-simp-nfs/graphs/contributors
 #
 class nfs::client::config {
-
   assert_private()
 
   # We need to configure the NFSv4.0 client delegation callback port for the
@@ -23,7 +22,7 @@ class nfs::client::config {
   exec { 'modprobe_nfsv4':
     command => '/sbin/modprobe nfsv4',
     unless  => '/sbin/lsmod | /usr/bin/grep -qw nfsv4',
-    require =>  File['/etc/modprobe.d/nfs.conf'],
+    require => File['/etc/modprobe.d/nfs.conf'],
     notify  => Sysctl['fs.nfs.nfs_callback_tcpport']
   }
 

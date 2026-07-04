@@ -3,8 +3,7 @@
 # @api private
 # @author https://github.com/simp/pupmod-simp-nfs/graphs/contributors
 #
-class nfs::server::firewall::nfsv4
-{
+class nfs::server::firewall::nfsv4 {
   assert_private()
 
   $_ports = [
@@ -22,5 +21,4 @@ class nfs::server::firewall::nfsv4
     trusted_nets => $nfs::server::trusted_nets,
     dports       => $_ports
   }
-
 }

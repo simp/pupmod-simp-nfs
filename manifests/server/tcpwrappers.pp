@@ -3,8 +3,7 @@
 # @api private
 # @author https://github.com/simp/pupmod-simp-nfs/graphs/contributors
 #
-class nfs::server::tcpwrappers
-{
+class nfs::server::tcpwrappers {
   assert_private()
 
   # TCP wrappers was dropped in EL8
@@ -32,7 +31,7 @@ class nfs::server::tcpwrappers
       # Resource in common with nfs::client, which may be on this node.
       ensure_resource('tcpwrappers::allow', 'statd', $_allow_options)
 
-      $_allow = [ 'mountd', 'rquotad' ]
+      $_allow = ['mountd', 'rquotad']
     } else {
       $_allow = ['rquotad']
     }

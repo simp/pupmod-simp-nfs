@@ -144,7 +144,6 @@ define nfs::server::export (
   Simplib::Port                                   $anongid        = 65534,
   Optional[String]                                $custom         = undef
 ) {
-
   include 'nfs::server'
 
   $_name = inline_template('<%= @name.gsub("/","|") -%>')

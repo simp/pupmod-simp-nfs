@@ -4,7 +4,6 @@
 # @author https://github.com/simp/pupmod-simp-nfs/graphs/contributors
 #
 class nfs::server::stunnel {
-
   assert_private()
 
   # Only NFS > 4.0 can operate fully within one stunnel of the main nfsd

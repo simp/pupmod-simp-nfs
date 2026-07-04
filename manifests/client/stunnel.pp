@@ -49,7 +49,7 @@
 # @api private
 # @author https://github.com/simp/pupmod-simp-nfs/graphs/contributors
 #
-define nfs::client::stunnel(
+define nfs::client::stunnel (
   Simplib::Ip   $nfs_server,
   Simplib::Port $nfsd_accept_port,
   Simplib::Port $nfsd_connect_port,

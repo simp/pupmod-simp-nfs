@@ -3,8 +3,7 @@
 # @api private
 # @author https://github.com/simp/pupmod-simp-nfs/graphs/contributors
 #
-class nfs::server::config
-{
+class nfs::server::config {
   assert_private()
 
   # Required config options for all possible NFS server services.
@@ -36,14 +35,14 @@ class nfs::server::config
   }
 
   $_merged_opts = deep_merge($nfs::custom_nfs_conf_opts,
-    $_required_nfs_conf_opts, $_stunnel_opts)
+  $_required_nfs_conf_opts, $_stunnel_opts)
 
   if 'exportfs' in $_merged_opts {
     concat::fragment { 'nfs_conf_exportfs':
       order   => 2,
       target  => '/etc/nfs.conf',
       content => epp("${module_name}/etc/nfs_conf_section.epp",
-        { section => 'exportfs', opts => $_merged_opts['exportfs']})
+      { section => 'exportfs', opts => $_merged_opts['exportfs'] })
     }
   }
 
@@ -52,7 +51,7 @@ class nfs::server::config
       order   => 5,
       target  => '/etc/nfs.conf',
       content => epp("${module_name}/etc/nfs_conf_section.epp",
-        { section => 'mountd', opts => $_merged_opts['mountd']})
+      { section => 'mountd', opts => $_merged_opts['mountd'] })
     }
   }
 
@@ -60,7 +59,7 @@ class nfs::server::config
     order   => 6,
     target  => '/etc/nfs.conf',
     content => epp("${module_name}/etc/nfs_conf_section.epp",
-      { section => 'nfsd', opts => $_merged_opts['nfsd']})
+    { section => 'nfsd', opts => $_merged_opts['nfsd'] })
   }
 
   if 'nfsdcltrack' in $_merged_opts {
@@ -68,7 +67,7 @@ class nfs::server::config
       order   => 7,
       target  => '/etc/nfs.conf',
       content => epp("${module_name}/etc/nfs_conf_section.epp",
-        { section => 'nfsdcltrack', opts => $_merged_opts['nfsdcltrack']})
+      { section => 'nfsdcltrack', opts => $_merged_opts['nfsdcltrack'] })
     }
   }
 
