@@ -236,9 +236,6 @@
 #
 #   * Automatically set via Hiera
 #
-# @param tcpwrappers
-#   Use the SIMP `tcpwrappers` module to manage TCP wrappers
-#
 # @param trusted_nets
 #   The systems that are allowed to connect to this service
 #

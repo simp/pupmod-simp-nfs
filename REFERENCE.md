@@ -94,7 +94,6 @@ The following parameters are available in the `nfs` class:
 * [`manage_sysconfig_nfs`](#-nfs--manage_sysconfig_nfs)
 * [`apply_selinux_hotfix`](#-nfs--apply_selinux_hotfix)
 * [`minimum_os_version`](#-nfs--minimum_os_version)
-* [`tcpwrappers`](#-nfs--tcpwrappers)
 * [`trusted_nets`](#-nfs--trusted_nets)
 
 ##### <a name="-nfs--is_server"></a>`is_server`
@@ -346,7 +345,7 @@ Whether the NFS server will pull its keytab directly from the Puppet server
   and cached credentials are destroyed (e.g., gssproxy cache), when the keytab
   is changed.
 
-Default value: `simplib::lookup('simp_options::kerberos', { 'default_value' => true})`
+Default value: `simplib::lookup('simp_options::kerberos', { 'default_value' => true })`
 
 ##### <a name="-nfs--firewall"></a>`firewall`
 
@@ -354,7 +353,7 @@ Data type: `Boolean`
 
 Use the SIMP `iptables` module to manage firewall connections
 
-Default value: `simplib::lookup('simp_options::firewall', { 'default_value' => false})`
+Default value: `simplib::lookup('simp_options::firewall', { 'default_value' => false })`
 
 ##### <a name="-nfs--tcpwrappers"></a>`tcpwrappers`
 
@@ -492,12 +491,6 @@ Minimum supported OS version (used for warnings)
 * Automatically set via Hiera
 
 Default value: `'7.4'`
-
-##### <a name="-nfs--tcpwrappers"></a>`tcpwrappers`
-
-Use the SIMP `tcpwrappers` module to manage TCP wrappers
-
-Default value: `simplib::lookup('simp_options::tcpwrappers', { 'default_value' => false })`
 
 ##### <a name="-nfs--trusted_nets"></a>`trusted_nets`
 
