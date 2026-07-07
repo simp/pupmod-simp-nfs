@@ -4,7 +4,6 @@
 # @author https://github.com/simp/pupmod-simp-nfs/graphs/contributors
 #
 class nfs::client::tcpwrappers {
-
   assert_private()
 
   # TCP wrappers was dropped in EL8

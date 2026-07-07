@@ -5,8 +5,7 @@
 # @api private
 # @author https://github.com/simp/pupmod-simp-nfs/graphs/contributors
 #
-class nfs::idmapd::server
-{
+class nfs::idmapd::server {
   assert_private()
 
   if $nfs::idmapd {

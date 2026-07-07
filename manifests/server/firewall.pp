@@ -3,8 +3,7 @@
 # @api private
 # @author https://github.com/simp/pupmod-simp-nfs/graphs/contributors
 #
-class nfs::server::firewall
-{
+class nfs::server::firewall {
   assert_private()
 
   if $nfs::server::stunnel {

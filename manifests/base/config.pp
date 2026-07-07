@@ -3,8 +3,7 @@
 # @api private
 # @author https://github.com/simp/pupmod-simp-nfs/graphs/contributors
 #
-class nfs::base::config
-{
+class nfs::base::config {
   assert_private()
 
   # Required /etc/nfs.conf options for all possible NFS base services shared
@@ -33,7 +32,7 @@ class nfs::base::config
   }
 
   $_merged_opts = deep_merge($nfs::custom_nfs_conf_opts,
-    $_required_nfs_conf_opts)
+  $_required_nfs_conf_opts)
 
   # Use concat so users can add new sections on their own, in the event NFS
   # configuration changes and this module has not yet been updated.
@@ -54,7 +53,7 @@ class nfs::base::config
       order   => 1,
       target  => '/etc/nfs.conf',
       content => epp("${module_name}/etc/nfs_conf_section.epp",
-        { section => 'general', opts => $_merged_opts['general']})
+      { section => 'general', opts => $_merged_opts['general'] })
     }
   }
 
@@ -63,7 +62,7 @@ class nfs::base::config
       order   => 3,
       target  => '/etc/nfs.conf',
       content => epp("${module_name}/etc/nfs_conf_section.epp",
-        { section => 'gssd', opts => $_merged_opts['gssd']})
+      { section => 'gssd', opts => $_merged_opts['gssd'] })
     }
   }
 
@@ -72,14 +71,14 @@ class nfs::base::config
       order   => 4,
       target  => '/etc/nfs.conf',
       content => epp("${module_name}/etc/nfs_conf_section.epp",
-        { section => 'lockd', opts => $_merged_opts['lockd']})
+      { section => 'lockd', opts => $_merged_opts['lockd'] })
     }
 
     concat::fragment { 'nfs_conf_sm_notify':
       order   => 8,
       target  => '/etc/nfs.conf',
       content => epp("${module_name}/etc/nfs_conf_section.epp",
-        { section => 'sm-notify', opts => $_merged_opts['sm-notify']})
+      { section => 'sm-notify', opts => $_merged_opts['sm-notify'] })
     }
 
     if 'statd' in $_merged_opts {
@@ -87,7 +86,7 @@ class nfs::base::config
         order   => 9,
         target  => '/etc/nfs.conf',
         content => epp("${module_name}/etc/nfs_conf_section.epp",
-          { section => 'statd', opts => $_merged_opts['statd']})
+        { section => 'statd', opts => $_merged_opts['statd'] })
       }
     }
   }
@@ -111,7 +110,7 @@ class nfs::base::config
     }
 
     if $nfs::secure_nfs {
-      if $nfs::gssd_use_gss_proxy  {
+      if $nfs::gssd_use_gss_proxy {
         # The 'use-gss-proxy' option in /etc/nfs.conf is not used in EL7.
         # Need to set GSS_USE_PROXY service env variable instead.
         concat::fragment { 'nfs_gss_use_proxy':
@@ -163,7 +162,7 @@ class nfs::base::config
 
   # Make sure gssproxy gets restarted in the correct order along with
   # all the other NFS services
-  if $nfs::secure_nfs and $nfs::gssd_use_gss_proxy  {
+  if $nfs::secure_nfs and $nfs::gssd_use_gss_proxy {
     $_override = @(OVERRIDE)
       # This file is managed by Puppet (simp-nfs module).  Changes will be overwritten
       # at the next puppet run.

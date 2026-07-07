@@ -236,9 +236,6 @@
 #
 #   * Automatically set via Hiera
 #
-# @param tcpwrappers
-#   Use the SIMP `tcpwrappers` module to manage TCP wrappers
-#
 # @param trusted_nets
 #   The systems that are allowed to connect to this service
 #
@@ -267,8 +264,8 @@ class nfs (
   Integer[1]            $sunrpc_tcp_slot_table_entries = 128,
   Boolean               $ensure_latest_lvm2            = true,
   Boolean               $kerberos                      = simplib::lookup('simp_options::kerberos', { 'default_value' => false }),
-  Boolean               $keytab_on_puppet              = simplib::lookup('simp_options::kerberos', { 'default_value' => true}),
-  Boolean               $firewall                      = simplib::lookup('simp_options::firewall', { 'default_value' => false}),
+  Boolean               $keytab_on_puppet              = simplib::lookup('simp_options::kerberos', { 'default_value' => true }),
+  Boolean               $firewall                      = simplib::lookup('simp_options::firewall', { 'default_value' => false }),
   Boolean               $stunnel                       = simplib::lookup('simp_options::stunnel', { 'default_value' => false }),
   Simplib::Port         $stunnel_nfsd_port             = 20490,
   Array[String]         $stunnel_socket_options        = ['l:TCP_NODELAY=1','r:TCP_NODELAY=1'],
@@ -281,7 +278,6 @@ class nfs (
   Boolean               $apply_selinux_hotfix          = false,
   String                $minimum_os_version            = '7.4',
 ) {
-
   simplib::assert_metadata($module_name)
   if (versioncmp($facts['os']['release']['full'], $minimum_os_version) < 0) {
     warning("This version of simp-nfs may not work with ${facts['os']['name']} ${facts['os']['release']['full']}. Use simp-nfs module version < 7.0.0 instead")

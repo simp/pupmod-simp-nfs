@@ -67,11 +67,12 @@ define nfs::client::mount::connection (
   Array[String] $stunnel_wantedby,
   Boolean       $tcpwrappers
 ) {
-
   # This is only meant to be called from inside nfs::client::mount
   assert_private()
 
+  # lint:ignore:version_comparison ($nfs_version is Integer[3,4], not a version string)
   if $stunnel and ($nfs_version == 4) {
+    # lint:endignore
     # It is possible that this is called for multiple mounts on the same server.
     # stunnel-related firewall and tcpwrappers settings handled by the
     # stunnel::instance, itself.
@@ -88,10 +89,12 @@ define nfs::client::mount::connection (
         tcpwrappers            => $tcpwrappers
       }
     )
-  } elsif $firewall  {
+  } elsif $firewall {
     # Open up the firewall for incoming, side-band NFS channels.
 
+    # lint:ignore:version_comparison ($nfs_version is Integer[3,4], not a version string)
     if ($nfs_version == 4) {
+      # lint:endignore
       # Set up the NFSv4.0 delegation callback port IPTables opening.  This is
       # only needed for NFSv4.0, because, beginning with NFSv4.1, delegation
       # does not require a side channel. However, unless the mount specifies
