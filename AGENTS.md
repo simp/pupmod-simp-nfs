@@ -12,9 +12,9 @@ client** on Enterprise Linux, including the optional PKI/`stunnel` and Kerberos
 unavailable — can wrap critical NFSv4 connections in `stunnel`.
 
 A single host can be a **server, a client, or both**. The entry class `nfs`
-defaults to `is_client => true`, `is_server => false` (`manifests/init.pp:250-251`);
+defaults to `is_client => true`, `is_server => false` (`manifests/init.pp`);
 it always pulls in `nfs::install` and then conditionally includes `nfs::client`
-and/or `nfs::server` (`init.pp:302-326`). The client and server branches share a
+and/or `nfs::server` (`init.pp`). The client and server branches share a
 common base (`nfs::base::config` / `nfs::base::service`) but layer their own
 config/service classes on top.
 
@@ -27,148 +27,148 @@ orchestration class, so you can use them without explicitly declaring `nfs`.
 
 #### Entry point (shared)
 
-- **`nfs` (`manifests/init.pp:249-327`)** — Public entry class. **Not**
+- **`nfs` (`manifests/init.pp`)** — Public entry class. **Not**
   `assert_private()`'d. Selects roles via `$is_server` / `$is_client`
-  (`init.pp:250-251`), NFS version policy via `$nfsv3` (default `false`, i.e.
-  NFSv4-only, `init.pp:252`), and the optional integrations `$kerberos`,
+  (`init.pp`), NFS version policy via `$nfsv3` (default `false`, i.e.
+  NFSv4-only, `init.pp`), and the optional integrations `$kerberos`,
   `$firewall`, `$stunnel`, `$tcpwrappers` (each defaulted off the
-  `simp_options::*` seam, `init.pp:269-277`). It runs
-  `simplib::assert_metadata($module_name)` (`init.pp:285`), warns when the OS
-  release is below `$minimum_os_version` (default `'7.4'`, `init.pp:286-288`),
+  `simp_options::*` seam, `init.pp`). It runs
+  `simplib::assert_metadata($module_name)` (`init.pp`), warns when the OS
+  release is below `$minimum_os_version` (default `'7.4'`, `init.pp`),
   and guards each optional integration with
   `simplib::assert_optional_dependency` before use — `simp/iptables` when
-  `$firewall` (`init.pp:290-292`), `simp/krb5` when `$kerberos`
-  (`init.pp:294-296`), `simp/tcpwrappers` when `$tcpwrappers and
-  $manage_tcpwrappers` (`init.pp:298-300`). Ordering: `nfs::selinux_hotfix` and
+  `$firewall` (`init.pp`), `simp/krb5` when `$kerberos`
+  (`init.pp`), `simp/tcpwrappers` when `$tcpwrappers and
+  $manage_tcpwrappers` (`init.pp`). Ordering: `nfs::selinux_hotfix` and
   `nfs::lvm2` (both optional) run **before** `nfs::install`, which runs before
-  `nfs::client` / `nfs::server` (`init.pp:304-326`).
-- **`nfs::install` (`manifests/install.pp:17-30`)** — private (`assert_private()`,
-  `install.pp:22`). Installs `nfs-utils` and `nfs4-acl-tools`; installs
+  `nfs::client` / `nfs::server` (`init.pp`).
+- **`nfs::install` (`manifests/install.pp`)** — private (`assert_private()`,
+  `install.pp`). Installs `nfs-utils` and `nfs4-acl-tools`; installs
   `quota-rpc` only when `$nfs::is_server and $nfs::install_quota_rpc`
-  (`install.pp:24-29`) — the latter flag is OS-data-driven (EL8+ only).
+  (`install.pp`) — the latter flag is OS-data-driven (EL8+ only).
 - **`nfs::base::config` / `nfs::base::service`** — private; the shared
   `/etc/nfs.conf` options and services common to client and server. `base::config`
   builds `$_required_nfs_conf_opts` and **deliberately overrides**
   `$nfs::custom_nfs_conf_opts` for those keys "because the firewall will not
-  work otherwise" (`manifests/base/config.pp:12-15`).
+  work otherwise" (`manifests/base/config.pp`).
 - **`nfs::lvm2` (`manifests/lvm2.pp`)**, **`nfs::selinux_hotfix`
   (`manifests/selinux_hotfix.pp`)** — internal helper classes declared only by
-  `nfs` (`init.pp:304-310`). `selinux_hotfix` is `assert_private()`'d
-  (`selinux_hotfix.pp:11`); **`nfs::lvm2` is not** — it carries no
+  `nfs` (`init.pp`). `selinux_hotfix` is `assert_private()`'d
+  (`selinux_hotfix.pp`); **`nfs::lvm2` is not** — it carries no
   `assert_private()`, so it is internal by convention only. The SELinux hotfix
   is an EL7+Kerberos-only workaround for a broken `selinux-policy`.
 
 #### Client side
 
-- **`nfs::client` (`manifests/client.pp:53-84`)** — private (`assert_private()`,
-  `client.pp:62`), `inherits ::nfs`. Includes `nfs::base::config/service` and
+- **`nfs::client` (`manifests/client.pp`)** — private (`assert_private()`,
+  `client.pp`), `inherits ::nfs`. Includes `nfs::base::config/service` and
   `nfs::client::config/service`, wiring notify (`~>`) ordering between them
-  (`client.pp:64-71`). When `$nfs::kerberos`, includes `krb5` (and
+  (`client.pp`). When `$nfs::kerberos`, includes `krb5` (and
   `krb5::keytab` when `$nfs::keytab_on_puppet`) ahead of the client service
-  (`client.pp:73-83`).
-- **`nfs::client::mount` (`manifests/client/mount.pp:185-346`)** — **PUBLIC
+  (`client.pp`).
+- **`nfs::client::mount` (`manifests/client/mount.pp`)** — **PUBLIC
   define**; the main client-facing API. Title is the local mount path
-  (validated as `Stdlib::Absolutepath`, `mount.pp:204-206`). `include`s
-  `nfs::client` (`mount.pp:208`). Fails if `$nfs_version == 3` but
-  `nfs::nfsv3` is false (`mount.pp:210-212`). Resolves per-mount overrides
-  against the class defaults (`mount.pp:218-254`), builds the mount option
-  string (`mount.pp:260-271`), and either creates an `autofs::map` (default,
+  (validated as `Stdlib::Absolutepath`, `mount.pp`). `include`s
+  `nfs::client` (`mount.pp`). Fails if `$nfs_version == 3` but
+  `nfs::nfsv3` is false (`mount.pp`). Resolves per-mount overrides
+  against the class defaults (`mount.pp`), builds the mount option
+  string (`mount.pp`), and either creates an `autofs::map` (default,
   `$autofs => true`, guarded by `assert_optional_dependency($module_name,
-  'simp/autofs')`, `mount.pp:292-331`) or a native `mount` resource
-  (`mount.pp:333-345`). Always declares a
-  `nfs::client::mount::connection` (`mount.pp:279-290`). Note: for NFSv3,
-  stunnel is forced off (`mount.pp:224-225`); with stunnel or a
-  self-mount it rewrites the remote to `127.0.0.1` (`mount.pp:273-277`).
+  'simp/autofs')`, `mount.pp`) or a native `mount` resource
+  (`mount.pp`). Always declares a
+  `nfs::client::mount::connection` (`mount.pp`). Note: for NFSv3,
+  stunnel is forced off (`mount.pp`); with stunnel or a
+  self-mount it rewrites the remote to `127.0.0.1` (`mount.pp`).
 - **`nfs::client::mount::connection`, `nfs::client::config`,
   `nfs::client::service`, `nfs::client::stunnel`, `nfs::client::tcpwrappers`** —
   all private. `client::stunnel` guards `simp/stunnel`
-  (`manifests/client/stunnel.pp:68`).
+  (`manifests/client/stunnel.pp`).
 
 #### Server side
 
-- **`nfs::server` (`manifests/server.pp:117-173`)** — private (`assert_private()`,
-  `server.pp:136`), `inherits ::nfs`. NFS-version policy lives here:
+- **`nfs::server` (`manifests/server.pp`)** — private (`assert_private()`,
+  `server.pp`), `inherits ::nfs`. NFS-version policy lives here:
   `$nfsd_vers3` (defaults to `$nfs::nfsv3`), `$nfsd_vers4`, `$nfsd_vers4_0`
-  (default `false`), `$nfsd_vers4_1`, `$nfsd_vers4_2` (`server.pp:118-122`).
+  (default `false`), `$nfsd_vers4_1`, `$nfsd_vers4_2` (`server.pp`).
   **Hard fail** when `$stunnel and $nfsd_vers4_0` — NFSv4.0 within stunnel is
-  unsupported (`server.pp:138-140`). Includes base + server config/service +
+  unsupported (`server.pp`). Includes base + server config/service +
   `nfs::idmapd::server`, and conditionally `nfs::server::stunnel` (when
   `$stunnel`), `nfs::server::firewall` (when `$nfs::firewall`), and `krb5` /
-  `krb5::keytab` (when `$nfs::kerberos`) (`server.pp:142-172`).
-- **`nfs::server::export` (`manifests/server/export.pp:121-168`)** — **PUBLIC
+  `krb5::keytab` (when `$nfs::kerberos`) (`server.pp`).
+- **`nfs::server::export` (`manifests/server/export.pp`)** — **PUBLIC
   define**; the main server-facing API. `include`s `nfs::server`
-  (`export.pp:148`), emits a `concat::fragment` into `/etc/exports` from
-  `templates/etc/export.erb` (`export.pp:150-155`), and — for `sec=sys` exports
+  (`export.pp`), emits a `concat::fragment` into `/etc/exports` from
+  `templates/etc/export.erb` (`export.pp`), and — for `sec=sys` exports
   on SELinux-enabled hosts — sets the `nfsd_anon_write` selboolean
-  (`export.pp:157-167`).
+  (`export.pp`).
 - **`nfs::server::config`, `nfs::server::service`, `nfs::server::stunnel`,
   `nfs::server::tcpwrappers`, `nfs::server::firewall`,
   `nfs::server::firewall::nfsv4`, `nfs::server::firewall::nfsv3and4`,
   `nfs::idmapd::server`** — all `assert_private()`'d. `server::stunnel` guards
-  `simp/stunnel` (`manifests/server/stunnel.pp:33`).
+  `simp/stunnel` (`manifests/server/stunnel.pp`).
 - **`nfs::idmapd::client`, `nfs::idmapd::config` (`manifests/idmapd/`)** — the
   NFSv4 name-mapping helpers, declared only from within the module
-  (`idmapd::client` from `nfs::client::config`, `client/config.pp:59`;
-  `idmapd::config` from `nfs::base::config`, `base/config.pp:197`, and
-  `nfs::idmapd::server`, `idmapd/server.pp:13`). Note these two carry **no**
+  (`idmapd::client` from `nfs::client::config`, `client/config.pp`;
+  `idmapd::config` from `nfs::base::config`, `base/config.pp`, and
+  `nfs::idmapd::server`, `idmapd/server.pp`). Note these two carry **no**
   `assert_private()` (unlike `idmapd::server`), so they are private by
   convention only.
 
 ### Gotchas / non-obvious details
 
 - **NFSv3 is off by default.** `nfs::nfsv3` defaults to `false`
-  (`init.pp:252`), so only NFSv4 is allowed. A `nfs::client::mount` with
+  (`init.pp`), so only NFSv4 is allowed. A `nfs::client::mount` with
   `nfs_version => 3` **fails compilation** unless `nfs::nfsv3` is set true
-  (`mount.pp:210-212`).
+  (`mount.pp`).
 - **stunnel is incompatible with NFSv4.0.** `nfs::server` hard-`fail`s if
-  `$stunnel and $nfsd_vers4_0` (`server.pp:138-140`); on the client side stunnel
-  is silently disabled for NFSv3 mounts (`mount.pp:224-225`). stunnel only
+  `$stunnel and $nfsd_vers4_0` (`server.pp`); on the client side stunnel
+  is silently disabled for NFSv3 mounts (`mount.pp`). stunnel only
   carries TCP and cannot wrap the NFSv4.0 delegation side channel.
 - **`nfs::base::config` overrides your `custom_nfs_conf_opts`** for the keys it
   manages, on purpose — otherwise the firewall port openings do not line up
-  (`base/config.pp:12-15`). Custom values for those sections/keys are lost.
+  (`base/config.pp`). Custom values for those sections/keys are lost.
 - **OS-version behavior is driven by Hiera module data, not conditionals in the
   manifest.** `manage_tcpwrappers`, `install_quota_rpc`, `manage_sysconfig_nfs`,
   and `apply_selinux_hotfix` all default in `data/os/RedHat/<major>.yaml`:
   EL7 gets tcpwrappers + `sysconfig/nfs` + the SELinux hotfix; EL8+ drops
   tcpwrappers and `sysconfig/nfs` and instead installs `quota-rpc`
   (`data/os/RedHat/7.yaml`, `data/os/RedHat/8.yaml`, `data/os/RedHat/9.yaml`).
-  The class defaults for these params in `init.pp:278-282` are conservative
+  The class defaults for these params in `init.pp` are conservative
   fallbacks that the data overrides.
 - **Kerberos and stunnel are meant to be alternatives.** stunnel "is intended
   for environments without a working Kerberos setup and may cause issues when
-  used with Kerberos" (`init.pp:156-160`). Prefer Kerberos.
+  used with Kerberos" (`init.pp`). Prefer Kerberos.
 - **Duplicate `/etc/exports` entries are allowed and the last one wins.** The
   `nfs::server::export` title must be unique but mountpoint+client is the only
   truly unique combination, so overlapping exports silently resolve to the last
-  fragment (`export.pp:5-11`).
+  fragment (`export.pp`).
 - **`insecure => true` is required for stunneled NFSv4 exports** due to a kernel
-  export-rule-selection bug (`export.pp:24-34`,
+  export-rule-selection bug (`export.pp`,
   https://bugzilla.redhat.com/show_bug.cgi?id=1804912).
 - **Optional integrations are guarded at runtime, not declared as hard deps.**
   `simp/iptables`, `simp/krb5`, `simp/tcpwrappers`, `simp/stunnel`, `simp/autofs`
   live in `metadata.json` `simp.optional_dependencies` and are asserted with
   `simplib::assert_optional_dependency` only on the code path that uses them
-  (`init.pp:290-300`, `mount.pp:293`, `client/stunnel.pp:68`,
-  `server/stunnel.pp:33`) — never hard-`include`d unconditionally.
+  (`init.pp`, `mount.pp`, `client/stunnel.pp`,
+  `server/stunnel.pp`) — never hard-`include`d unconditionally.
 
 ## The `simp_options` / `simplib::lookup` seam
 
 The SIMP feature-toggle seam is entirely in the class parameter defaults (the
 two public defines have **no** `simplib::lookup` calls of their own). All calls:
 
-| Line | Key | `default_value` |
+| File | Key | `default_value` |
 |------|-----|-----------------|
-| `init.pp:269` | `simp_options::kerberos` | `false` |
-| `init.pp:270` | `simp_options::kerberos` | `true` |
-| `init.pp:271` | `simp_options::firewall` | `false` |
-| `init.pp:272` | `simp_options::stunnel` | `false` |
-| `init.pp:276` | `simp_options::tcpwrappers` | `false` |
-| `init.pp:277` | `simp_options::trusted_nets` | `['127.0.0.1']` |
-| `install.pp:18` | `simp_options::package_ensure` | `'installed'` |
-| `install.pp:19` | `simp_options::package_ensure` | `'installed'` |
-| `install.pp:20` | `simp_options::package_ensure` | `'installed'` |
-| `lvm2.pp:12` | `simp_options::package_ensure` | `'latest'` |
+| `init.pp` | `simp_options::kerberos` | `false` |
+| `init.pp` | `simp_options::kerberos` | `true` |
+| `init.pp` | `simp_options::firewall` | `false` |
+| `init.pp` | `simp_options::stunnel` | `false` |
+| `init.pp` | `simp_options::tcpwrappers` | `false` |
+| `init.pp` | `simp_options::trusted_nets` | `['127.0.0.1']` |
+| `install.pp` | `simp_options::package_ensure` | `'installed'` |
+| `install.pp` | `simp_options::package_ensure` | `'installed'` |
+| `install.pp` | `simp_options::package_ensure` | `'installed'` |
+| `lvm2.pp` | `simp_options::package_ensure` | `'latest'` |
 
 Keep routing SIMP feature toggles through `simplib::lookup('simp_options::*', {
 'default_value' => ... })` with an explicit default rather than assuming
