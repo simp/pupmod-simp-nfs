@@ -1,6 +1,6 @@
 {
   "name": "simp-nfs",
-  "version": "8.0.0",
+  "version": "8.0.1",
   "author": "SIMP Team",
   "summary": "manages NFS server and client, also PKI and stunnelling",
   "license": "Apache-2.0",
@@ -16,7 +16,7 @@
   "dependencies": [
     {
       "name": "puppet/systemd",
-      "version_requirement": ">= 4.0.2 < 10.0.0"
+      "version_requirement": ">= 4.0.2 < 11.0.0"
     },
     {
       "name": "puppet/augeasproviders_sysctl",
@@ -24,30 +24,30 @@
     },
     {
       "name": "puppetlabs/concat",
-      "version_requirement": ">= 6.4.0 < 10.0.0"
+      "version_requirement": ">= 6.4.0 < 11.0.0"
     },
     {
       "name": "puppetlabs/stdlib",
-      "version_requirement": ">= 8.0.0 < 10.0.0"
+      "version_requirement": ">= 8.0.0 < 11.0.0"
     },
     {
       "name": "simp/simplib",
-      "version_requirement": ">= 4.9.0 < 6.0.0"
+      "version_requirement": ">= 4.9.0 < 8.0.0"
     },
     {
       "name": "simp/svckill",
-      "version_requirement": ">= 3.6.1 < 5.0.0"
+      "version_requirement": ">= 3.6.1 < 6.0.0"
     },
     {
       "name": "simp/vox_selinux",
-      "version_requirement": ">= 3.1.0 < 4.0.0"
+      "version_requirement": ">= 3.1.0 < 7.0.0"
     }
   ],
   "simp": {
     "optional_dependencies": [
       {
         "name": "simp/autofs",
-        "version_requirement": ">= 6.2.1 < 8.0.0"
+        "version_requirement": ">= 6.2.1 < 9.0.0"
       },
       {
         "name": "simp/krb5",
@@ -59,7 +59,7 @@
       },
       {
         "name": "simp/stunnel",
-        "version_requirement": ">= 6.6.0 < 9.0.0"
+        "version_requirement": ">= 6.6.0 < 10.0.0"
       },
       {
         "name": "simp/tcpwrappers",
