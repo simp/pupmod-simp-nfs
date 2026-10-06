@@ -4,12 +4,11 @@
 # unless `Acceptance` and `Acceptance::Helpers` already exist. The nested
 # definition here is required for that load order, so the compact-style cop
 # is disabled for this block.
-# rubocop:disable Style/ClassAndModuleChildren
+# rubocop:disable-next Style/ClassAndModuleChildren
 module Acceptance
   module Helpers
   end
 end
-# rubocop:enable Style/ClassAndModuleChildren
 
 rb_files = File.expand_path('helpers/**/*.rb', __dir__)
 Dir.glob(rb_files).sort_by(&:to_s).each { |file| require file }
