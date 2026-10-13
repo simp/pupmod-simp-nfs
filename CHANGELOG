@@ -1,3 +1,7 @@
+* Thu Oct 08 2026 Steven Pritchard <steve@sicura.us> - 8.1.0
+- Add support for OpenVox 9
+- Update metadata.json dependency ranges from the Forge
+
 * Wed Sep 09 2026 Steven Pritchard <steve@sicura.us> - 8.0.2
 - Allow simp/iptables 9.x as an optional dependency. Its breaking changes
   (explicit `iptables::backend` selection, removal of the deprecated
