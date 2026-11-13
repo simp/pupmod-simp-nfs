@@ -7,6 +7,20 @@
 - BREAKING: Remove the `nfs::minimum_os_version` parameter. It only
   warned on EL7 releases older than 7.4; `simplib::assert_metadata` already
   rejects unsupported releases. Remove any Hiera setting for it.
+- BREAKING: Remove the remaining EL7-only support. Remove any Hiera settings
+  for these parameters:
+  - `nfs::apply_selinux_hotfix` and the `nfs::selinux_hotfix` class, a
+    workaround for an EL7 `selinux-policy` bug
+  - `nfs::manage_sysconfig_nfs` and `nfs::custom_daemon_args` (and the
+    `Nfs::LegacyDaemonArgs` type). They wrote daemon arguments and
+    `GSS_USE_PROXY` to `/etc/sysconfig/nfs`, which EL8+ daemons do not
+    read. Use `nfs::custom_nfs_conf_opts` to set daemon options in
+    `/etc/nfs.conf`.
+  `/etc/sysconfig/nfs` is still removed so that EL8's `nfs-convert.service`
+  does not regenerate `/etc/nfs.conf` from it.
+- `nfs::install_quota_rpc` now defaults to `true` in the class (it was
+  already `true` on every supported release through module data)
+- Remove the `simp/vox_selinux` dependency, which only the SELinux hotfix used
 - Remove the `simp/tcpwrappers` optional dependency
 - Allow simp/stunnel 10.x as an optional dependency
 

@@ -1,15 +1,4 @@
 ---
-# Common defaults for all operating systems
-# These values will be used unless overridden by OS-specific data
-
-# Controls whether to install the quota-rpc package, which provides
-# rpc.rquotad for NFS servers (set to true in the EL8+ data)
-nfs::install_quota_rpc: false
-
-# Controls whether to manage /etc/sysconfig/nfs
-# All NFS configuration is in /etc/nfs.conf on EL8+
-nfs::manage_sysconfig_nfs: false
-
-# Controls whether to apply the SELinux hotfix for Kerberos
-# Not needed on any supported release
-nfs::apply_selinux_hotfix: false
+# Common defaults for all operating systems. OS-specific values go in
+# data/os/<family>/<major>.yaml.
+{}

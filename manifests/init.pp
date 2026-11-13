@@ -29,10 +29,6 @@
 #   perform GSSAPI operations on behalf of NFS.
 #
 #   * Sets the `use-gss-proxy` option in the `gssd` section of `/etc/nfs.conf`
-#     This is not yet documented in the rpc.gssd man page for EL8, but is
-#     available in the example `/etc/nsf.conf file` packaged with `nfs-utils`.
-#   * Sets GSS_USE_PROXY in `/etc/sysconfig/nfs` in EL7, because the
-#     `use-gss-proxy` option in `/etc/nfs.conf` is not yet used in EL7.
 #
 # @param lockd_port
 #   The TCP port upon which `lockd` should listen on both the NFS server and
@@ -88,28 +84,6 @@
 #       nfsd:
 #         grace-time: 60
 #         lease-time: 60
-#
-# @param custom_daemon_args
-#   Hash that allows other configuration options to be set as daemon
-#   arguments in `/etc/sysconfig/nfs` in EL7
-#
-#   * Necessary to address `/etc/nfs.conf` limitations - Not all configuration
-#     options in EL7 can be specified in `/etc/nfs.conf`
-#   * Each key is the name of the shell variables processed by
-#     `/usr/lib/systemd/scripts/nfs-utils_env.sh`
-#
-#     * `nfs-utils_env.sh` generates `/run/sysconfig/nfs-utils` which contains
-#       the NFS daemon command line shell variables used by NFS services
-#     * Unfortunately, not all shell variable names in `/etc/sysconfig/nfs`
-#       match the generated variable names in `/run/sysconfig/nfs-utils`.
-#       For example, `STATDARG` gets transformed into `STATDARGS`.
-#
-#   * Each value is the argument string which will be wrapped in double
-#     quotes in `/etc/sysconfig/nfs`.
-#
-#   @example Disable syslog messages from the NFSv3 `rpc.statd` daemon in Hiera
-#     nfs::custom_daemon_args:
-#       STATDARG: "--no-syslog"
 #
 # @param idmapd
 #   Whether to use `idmapd` for NFSv4 ID to name mapping
@@ -205,18 +179,6 @@
 # @param install_quota_rpc
 #   Whether to install the quota-rpc package (rpc.rquotad) on NFS servers
 #
-#   * Set to true via Hiera on EL8+, where quota-rpc is a separate package
-#
-# @param manage_sysconfig_nfs
-#   Whether to manage /etc/sysconfig/nfs configuration
-#
-#   * Set to false via Hiera; on EL8+ all configuration is in /etc/nfs.conf
-#
-# @param apply_selinux_hotfix
-#   Whether to apply SELinux hotfix for Kerberos support
-#
-#   * Set to false via Hiera; not needed on any supported release
-#
 # @param trusted_nets
 #   The systems that are allowed to connect to this service
 #
@@ -238,7 +200,6 @@ class nfs (
   Simplib::Port         $statd_port                    = 662,
   Simplib::Port         $statd_outgoing_port           = 2020,
   Nfs::NfsConfHash      $custom_nfs_conf_opts          = {},
-  Nfs::LegacyDaemonArgs $custom_daemon_args            = {},
   Boolean               $idmapd                        = false,
   Boolean               $secure_nfs                    = false,
   Integer[1]            $sunrpc_udp_slot_table_entries = 128,
@@ -252,9 +213,7 @@ class nfs (
   Array[String]         $stunnel_socket_options        = ['l:TCP_NODELAY=1','r:TCP_NODELAY=1'],
   Integer               $stunnel_verify                = 2,
   Simplib::Netlist      $trusted_nets                  = simplib::lookup('simp_options::trusted_nets', { 'default_value' => ['127.0.0.1'] }),
-  Boolean               $install_quota_rpc             = false,
-  Boolean               $manage_sysconfig_nfs          = false,
-  Boolean               $apply_selinux_hotfix          = false,
+  Boolean               $install_quota_rpc             = true,
 ) {
   simplib::assert_metadata($module_name)
 
@@ -267,14 +226,6 @@ class nfs (
   }
 
   include 'nfs::install'
-
-  if $kerberos and $apply_selinux_hotfix {
-    # This is here because the SELinux rules for directory includes in krb5
-    # are broken in selinux-policy < 3.13.1-229.el7_6.9. It does no harm
-    # on an EL7 system with the fixed selinux-policy.
-    include 'nfs::selinux_hotfix'
-    Class['nfs::selinux_hotfix'] -> Class['nfs::install']
-  }
 
   if $ensure_latest_lvm2 {
     # TODO Figure out if this is still needed.

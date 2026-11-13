@@ -6,8 +6,9 @@ This file provides guidance to AI agents when working with code in this reposito
 
 `simp-nfs` is a SIMP Puppet module that manages an **NFS server and/or NFS
 client** on Enterprise Linux, including the optional PKI/`stunnel` and Kerberos
-(`krb5`) integrations. It configures `/etc/nfs.conf` (and, when
-`manage_sysconfig_nfs` is set, the legacy `/etc/sysconfig/nfs`), installs the NFS packages, manages the NFS services,
+(`krb5`) integrations. It configures `/etc/nfs.conf` (and removes
+the legacy `/etc/sysconfig/nfs`, which EL8's `nfs-convert.service` would turn
+into a generated `/etc/nfs.conf`), installs the NFS packages, manages the NFS services,
 `idmapd` name mapping, firewall openings, and — when Kerberos is
 unavailable — can wrap critical NFSv4 connections in `stunnel`.
 
@@ -36,24 +37,20 @@ orchestration class, so you can use them without explicitly declaring `nfs`.
   `simplib::assert_metadata($module_name)` (`init.pp`) and guards each optional integration with
   `simplib::assert_optional_dependency` before use — `simp/iptables` when
   `$firewall` (`init.pp`), `simp/krb5` when `$kerberos`
-  (`init.pp`). Ordering: `nfs::selinux_hotfix` and
-  `nfs::lvm2` (both optional) run **before** `nfs::install`, which runs before
+  (`init.pp`). Ordering: `nfs::lvm2` (optional) runs **before** `nfs::install`, which runs before
   `nfs::client` / `nfs::server` (`init.pp`).
 - **`nfs::install` (`manifests/install.pp`)** — private (`assert_private()`,
   `install.pp`). Installs `nfs-utils` and `nfs4-acl-tools`; installs
   `quota-rpc` only when `$nfs::is_server and $nfs::install_quota_rpc`
-  (`install.pp`) — the latter flag is OS-data-driven (EL8+ only).
+  (`install.pp`); `install_quota_rpc` defaults to `true`.
 - **`nfs::base::config` / `nfs::base::service`** — private; the shared
   `/etc/nfs.conf` options and services common to client and server. `base::config`
   builds `$_required_nfs_conf_opts` and **deliberately overrides**
   `$nfs::custom_nfs_conf_opts` for those keys "because the firewall will not
   work otherwise" (`manifests/base/config.pp`).
-- **`nfs::lvm2` (`manifests/lvm2.pp`)**, **`nfs::selinux_hotfix`
-  (`manifests/selinux_hotfix.pp`)** — internal helper classes declared only by
-  `nfs` (`init.pp`). `selinux_hotfix` is `assert_private()`'d
-  (`selinux_hotfix.pp`); **`nfs::lvm2` is not** — it carries no
-  `assert_private()`, so it is internal by convention only. The SELinux hotfix
-  is an EL7+Kerberos-only workaround for a broken `selinux-policy`.
+- **`nfs::lvm2` (`manifests/lvm2.pp`)** — internal helper class declared only by
+  `nfs` (`init.pp`). It is **not** `assert_private()`'d, so it is internal by
+  convention only.
 
 #### Client side
 
@@ -124,13 +121,9 @@ orchestration class, so you can use them without explicitly declaring `nfs`.
 - **`nfs::base::config` overrides your `custom_nfs_conf_opts`** for the keys it
   manages, on purpose — otherwise the firewall port openings do not line up
   (`base/config.pp`). Custom values for those sections/keys are lost.
-- **OS-version behavior is driven by Hiera module data, not conditionals in the
-  manifest.** `install_quota_rpc`, `manage_sysconfig_nfs`,
-  and `apply_selinux_hotfix` all default in `data/os/RedHat/<major>.yaml`:
-  EL8+ drops `sysconfig/nfs` and the SELinux hotfix and installs `quota-rpc`
-  (`data/os/RedHat/8.yaml`, `data/os/RedHat/9.yaml`, `data/os/RedHat/10.yaml`).
-  The class defaults for these params in `init.pp` are conservative
-  fallbacks that the data overrides.
+- **OS-version behavior belongs in Hiera module data, not conditionals in the
+  manifest.** All supported releases (EL8+) currently behave the same, so
+  `data/common.yaml` is empty and there are no `data/os/` files.
 - **Kerberos and stunnel are meant to be alternatives.** stunnel "is intended
   for environments without a working Kerberos setup and may cause issues when
   used with Kerberos" (`init.pp`). Prefer Kerberos.
@@ -184,7 +177,6 @@ Module dependencies (from `metadata.json`):
   `simplib::host_is_me`, and the `Simplib::Port` / `Simplib::IP` /
   `Simplib::Netlist` types)
 - `simp/svckill` `>= 3.6.1 < 6.0.0` (service reaping)
-- `simp/vox_selinux` `>= 3.1.0 < 7.0.0` (SELinux management)
 
 Optional dependencies (from `metadata.json` `simp.optional_dependencies`) —
 asserted at runtime only on the code path that uses them:
@@ -197,7 +189,7 @@ asserted at runtime only on the code path that uses them:
 Fixture-only dependencies (from `.fixtures.yml`, present for test compilation,
 not runtime deps): `augeas_core`, `augeasproviders_core`, `augeasproviders_grub`,
 `augeasproviders_ssh`, `firewalld`, `haveged`, `mount_core`, `pki`,
-`selinux_core`, `simp_firewalld`, `ssh` (plus the runtime and optional deps
+`selinux_core`, `simp_firewalld`, `ssh`, `vox_selinux` (plus the runtime and optional deps
 above are also checked out as fixtures).
 
 Runtime requirement (from `metadata.json` `requirements`): `puppet
@@ -210,7 +202,7 @@ Supported OS matrix (from `metadata.json`): CentOS 9/10; RedHat 8/9/10; OracleLi
 
 - `manifests/init.pp` — the public `nfs` entry class (roles, options, optional
   integration guards, orchestration ordering).
-- `manifests/install.pp`, `manifests/lvm2.pp`, `manifests/selinux_hotfix.pp` —
+- `manifests/install.pp`, `manifests/lvm2.pp` —
   shared install/helper classes.
 - `manifests/base/{config,service}.pp` — config/services common to client &
   server.
@@ -222,14 +214,12 @@ Supported OS matrix (from `metadata.json`): CentOS 9/10; RedHat 8/9/10; OracleLi
   `config.pp`, `service.pp`, `stunnel.pp`, `firewall.pp`,
   `firewall/nfsv4.pp`, `firewall/nfsv3and4.pp`.
 - `manifests/idmapd/{client,config,server}.pp` — NFSv4 idmapd name mapping.
-- `types/` — four custom data types: `Nfs::LegacyDaemonArgs`,
+- `types/` — three custom data types:
   `Nfs::MountEnsure`, `Nfs::NfsConfHash`, `Nfs::SecurityFlavor`.
 - `templates/` — `etc/export.erb` (ERB), `etc/idmapd.conf.epp`,
   `etc/nfs_conf_section.epp` (EPP).
-- `data/common.yaml`, `data/os/RedHat/{8,9,10}.yaml` — OS-version-driven defaults
-  (`install_quota_rpc`, `manage_sysconfig_nfs`,
-  `apply_selinux_hotfix`); `hiera.yaml` is a v5 hierarchy
-  keyed on `os.family`/`os.release.major`.
+- `data/common.yaml` (currently empty) — module data; `hiera.yaml` is a v5
+  hierarchy keyed on `os.family`/`os.release.major`.
 - `metadata.json` — deps, optional deps, OS matrix, Puppet requirement.
 - `spec/` — rspec-puppet unit tests + beaker acceptance suites.
 - `REFERENCE.md` — generated Puppet Strings reference.
@@ -286,8 +276,7 @@ suites under `spec/acceptance/` are run locally/manually only.
   exceptions `nfs::lvm2`, `nfs::idmapd::client`, and `nfs::idmapd::config` omit
   `assert_private()` but are still internal-only; treat them as private too.)
 - Keep OS-version differences in `data/os/RedHat/<major>.yaml`, not in manifest
-  conditionals (that is how quota-rpc/sysconfig differences are
-  handled today).
+  conditionals.
 - Guard every optional integration (`autofs`, `krb5`, `iptables`, `stunnel`)
   with `simplib::assert_optional_dependency` and a parameter/fact
   check on the using code path — never hard-`include` an optional module.

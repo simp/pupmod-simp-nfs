@@ -71,50 +71,6 @@ class nfs::server::config {
     }
   }
 
-  if $nfs::manage_sysconfig_nfs {
-    # In EL > 7, NFS services must be configured by /etc/nfs.conf. In EL7, however,
-    # /etc/sysconfig/nfs is still needed to allow configuration of a handful of NFS
-    # daemon command line options that were not yet migrated to /etc/nfs.conf.
-
-    if 'RPCIDMAPDARGS' in $nfs::custom_daemon_args {
-      concat::fragment { 'nfs_RPCIDMAPDARGS':
-        order   => 3,
-        target  => '/etc/sysconfig/nfs',
-        content => "RPCIDMAPDARGS=\"${nfs::custom_daemon_args['RPCIDMAPDARGS']}\""
-      }
-    }
-
-    if 'RPCMOUNTDARGS' in $nfs::custom_daemon_args {
-      concat::fragment { 'nfs_RPCMOUNTDARGS':
-        order   => 4,
-        target  => '/etc/sysconfig/nfs',
-        content => "RPCMOUNTDARGS=\"${nfs::custom_daemon_args['RPCMOUNTDARGS']}\""
-      }
-    }
-
-    # Work around problem when using '/etc/nfs.conf' and '/etc/sysconfig/nfs'.
-    # The config conversion script will set the number of threads on the
-    # rpc.nfsd command line based on a RPCNFSDCOUNT environment variable or
-    # a default value of 8.  Since command line arguments take precedence over
-    # nfs.conf settings, this causes the threads nfsd setting in nfs.conf
-    # to be ignored.
-    if 'threads' in $_merged_opts['nfsd'] {
-      concat::fragment { 'nfs_RPCNFSDCOUNT':
-        order   => 5,
-        target  => '/etc/sysconfig/nfs',
-        content => "RPCNFSDCOUNT=\"${_merged_opts['nfsd']['threads']}\""
-      }
-    }
-
-    if 'RPCNFSDARGS' in $nfs::custom_daemon_args {
-      concat::fragment { 'nfs_RPCNFSDARGS':
-        order   => 5,
-        target  => '/etc/sysconfig/nfs',
-        content => "RPCNFSDARGS=\"${nfs::custom_daemon_args['RPCNFSDARGS']}\""
-      }
-    }
-  }
-
   if $nfs::server::custom_rpcrquotad_opts {
     $_rpcrquotadopts = "${nfs::server::custom_rpcrquotad_opts} -p ${nfs::server::rquotad_port}"
   } else {

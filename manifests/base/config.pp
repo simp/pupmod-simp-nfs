@@ -91,73 +91,14 @@ class nfs::base::config {
     }
   }
 
-  if $nfs::manage_sysconfig_nfs {
-    # In EL > 7, NFS services must be configured by /etc/nfs.conf. In EL7, however,
-    # /etc/sysconfig/nfs is still needed to enable use of gssproxy and to allow
-    # configuration of a handful of NFS daemon command line options that were not
-    # yet migrated to /etc/nfs.conf.
-    #
-    # NFS services actually use /run/sysconfig/nfs-utils, not /etc/sysconfig/nfs.
-    # However, that file is (re-)generated from /etc/sysconfig/nfs every time
-    # a NFS service that requires it is started.  So, /etc/sysconfig/nfs is
-    # still the correct location for this configuration.
-    concat { '/etc/sysconfig/nfs':
-      owner          => 'root',
-      group          => 'root',
-      mode           => '0644',
-      ensure_newline => true,
-      warn           => true
-    }
-
-    if $nfs::secure_nfs {
-      if $nfs::gssd_use_gss_proxy {
-        # The 'use-gss-proxy' option in /etc/nfs.conf is not used in EL7.
-        # Need to set GSS_USE_PROXY service env variable instead.
-        concat::fragment { 'nfs_gss_use_proxy':
-          order   => 1,
-          target  => '/etc/sysconfig/nfs',
-          content => 'GSS_USE_PROXY=yes'
-        }
-      }
-
-      if 'GSSDARGS' in $nfs::custom_daemon_args {
-        concat::fragment { 'nfs_GSSDARGS':
-          order   => 2,
-          target  => '/etc/sysconfig/nfs',
-          content => "GSSDARGS=\"${nfs::custom_daemon_args['GSSDARGS']}\""
-        }
-      }
-    }
-
-    if $nfs::nfsv3 {
-      if 'SMNOTIFYARGS' in $nfs::custom_daemon_args {
-        concat::fragment { 'nfs_SMNOTIFYARGS':
-          order   => 6,
-          target  => '/etc/sysconfig/nfs',
-          content => "SMNOTIFYARGS=\"${nfs::custom_daemon_args['SMNOTIFYARGS']}\""
-        }
-      }
-
-      # The variable in /etc/sysconfig/nfs is $STATDARG but is written to
-      # /run/sysconfig/nfs-utils as STATDARGS.
-      if 'STATDARG' in $nfs::custom_daemon_args {
-        concat::fragment { 'nfs_STATDARG':
-          order   => 7,
-          target  => '/etc/sysconfig/nfs',
-          content => "STATDARG=\"${nfs::custom_daemon_args['STATDARG']}\""
-        }
-      }
-    }
-  } else {
-    # To support upgrades to EL8, the nfs-utils RPM provides and enables
-    # the nfs-convert.service which is run when NFS services are started.
-    # It generates /etc/nfs.conf from /etc/sysconfig/nfs and then moves
-    # /etc/sysconfig/nfs to a backup file.  We don't want this generated
-    # /etc/nfs.conf!
-    file { '/etc/sysconfig/nfs':
-      ensure => 'absent',
-      before => Concat['/etc/nfs.conf']
-    }
+  # The EL8 nfs-utils package provides and enables nfs-convert.service, which
+  # runs when NFS services are started. If /etc/sysconfig/nfs exists, it
+  # generates /etc/nfs.conf from it and then moves /etc/sysconfig/nfs to a
+  # backup file. We don't want this generated /etc/nfs.conf! Nothing reads
+  # /etc/sysconfig/nfs on EL9+.
+  file { '/etc/sysconfig/nfs':
+    ensure => 'absent',
+    before => Concat['/etc/nfs.conf']
   }
 
   # Make sure gssproxy gets restarted in the correct order along with
