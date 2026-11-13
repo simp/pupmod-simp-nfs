@@ -4,6 +4,9 @@
   `simp_options::tcpwrappers` is no longer read. Remove any Hiera settings
   for them. TCP wrappers does not exist on EL8+ and `simp/tcpwrappers` is
   archived.
+- BREAKING: Remove the `nfs::minimum_os_version` parameter. It only
+  warned on EL7 releases older than 7.4; `simplib::assert_metadata` already
+  rejects unsupported releases. Remove any Hiera setting for it.
 - Remove the `simp/tcpwrappers` optional dependency
 - Allow simp/stunnel 10.x as an optional dependency
 

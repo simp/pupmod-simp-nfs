@@ -6,8 +6,8 @@ This file provides guidance to AI agents when working with code in this reposito
 
 `simp-nfs` is a SIMP Puppet module that manages an **NFS server and/or NFS
 client** on Enterprise Linux, including the optional PKI/`stunnel` and Kerberos
-(`krb5`) integrations. It configures `/etc/nfs.conf` (and, on EL7, the legacy
-`/etc/sysconfig/nfs`), installs the NFS packages, manages the NFS services,
+(`krb5`) integrations. It configures `/etc/nfs.conf` (and, when
+`manage_sysconfig_nfs` is set, the legacy `/etc/sysconfig/nfs`), installs the NFS packages, manages the NFS services,
 `idmapd` name mapping, firewall openings, and — when Kerberos is
 unavailable — can wrap critical NFSv4 connections in `stunnel`.
 
@@ -33,9 +33,7 @@ orchestration class, so you can use them without explicitly declaring `nfs`.
   NFSv4-only, `init.pp`), and the optional integrations `$kerberos`,
   `$firewall`, `$stunnel` (each defaulted off the
   `simp_options::*` seam, `init.pp`). It runs
-  `simplib::assert_metadata($module_name)` (`init.pp`), warns when the OS
-  release is below `$minimum_os_version` (default `'7.4'`, `init.pp`),
-  and guards each optional integration with
+  `simplib::assert_metadata($module_name)` (`init.pp`) and guards each optional integration with
   `simplib::assert_optional_dependency` before use — `simp/iptables` when
   `$firewall` (`init.pp`), `simp/krb5` when `$kerberos`
   (`init.pp`). Ordering: `nfs::selinux_hotfix` and
@@ -206,8 +204,7 @@ Runtime requirement (from `metadata.json` `requirements`): `puppet
 >= 7.0.0 < 9.0.0`. (SIMP is migrating Puppet → OpenVox; when
 `metadata.json` switches this to `openvox`, update this line to match.)
 
-Supported OS matrix (from `metadata.json`): CentOS 7/8/9; RedHat 7/8/9;
-OracleLinux 7/8/9; Rocky 8/9; AlmaLinux 8/9.
+Supported OS matrix (from `metadata.json`): CentOS 9/10; RedHat 8/9/10; OracleLinux 8/9/10; Rocky 8/9/10; AlmaLinux 8/9/10.
 
 ## Repository layout
 
@@ -231,7 +228,7 @@ OracleLinux 7/8/9; Rocky 8/9; AlmaLinux 8/9.
   `etc/nfs_conf_section.epp` (EPP).
 - `data/common.yaml`, `data/os/RedHat/{8,9,10}.yaml` — OS-version-driven defaults
   (`install_quota_rpc`, `manage_sysconfig_nfs`,
-  `apply_selinux_hotfix`, `minimum_os_version`); `hiera.yaml` is a v5 hierarchy
+  `apply_selinux_hotfix`); `hiera.yaml` is a v5 hierarchy
   keyed on `os.family`/`os.release.major`.
 - `metadata.json` — deps, optional deps, OS matrix, Puppet requirement.
 - `spec/` — rspec-puppet unit tests + beaker acceptance suites.

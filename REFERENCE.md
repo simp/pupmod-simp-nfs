@@ -89,7 +89,6 @@ The following parameters are available in the `nfs` class:
 * [`install_quota_rpc`](#-nfs--install_quota_rpc)
 * [`manage_sysconfig_nfs`](#-nfs--manage_sysconfig_nfs)
 * [`apply_selinux_hotfix`](#-nfs--apply_selinux_hotfix)
-* [`minimum_os_version`](#-nfs--minimum_os_version)
 * [`trusted_nets`](#-nfs--trusted_nets)
 
 ##### <a name="-nfs--is_server"></a>`is_server`
@@ -428,11 +427,9 @@ Default value: `2`
 
 Data type: `Boolean`
 
-Whether to install the quota-rpc package on NFS servers
+Whether to install the quota-rpc package (rpc.rquotad) on NFS servers
 
-* Automatically set based on OS version via Hiera (true for EL8+)
-* In EL7, rpc.rquotad files were in the quota package
-* In EL8+, quota-rpc is a separate package
+* Set to true via Hiera on EL8+, where quota-rpc is a separate package
 
 Default value: `false`
 
@@ -442,9 +439,7 @@ Data type: `Boolean`
 
 Whether to manage /etc/sysconfig/nfs configuration
 
-* Automatically set based on OS version via Hiera (true for EL7, false for EL8+)
-* In EL7, /etc/sysconfig/nfs is still needed for some daemon options
-* In EL8+, all configuration is in /etc/nfs.conf
+* Set to false via Hiera; on EL8+ all configuration is in /etc/nfs.conf
 
 Default value: `false`
 
@@ -454,20 +449,9 @@ Data type: `Boolean`
 
 Whether to apply SELinux hotfix for Kerberos support
 
-* Automatically set based on OS version via Hiera (true for EL7, false for EL8+)
-* Only needed in EL7 with Kerberos due to selinux-policy bugs
+* Set to false via Hiera; not needed on any supported release
 
 Default value: `false`
-
-##### <a name="-nfs--minimum_os_version"></a>`minimum_os_version`
-
-Data type: `String`
-
-Minimum supported OS version (used for warnings)
-
-* Automatically set via Hiera
-
-Default value: `'7.4'`
 
 ##### <a name="-nfs--trusted_nets"></a>`trusted_nets`
 

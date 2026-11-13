@@ -513,6 +513,8 @@ simp_options::firewall: true
   `nfs::tcpwrappers` and `nfs::manage_tcpwrappers` parameters are gone;
   remove any Hiera settings for them. `simp_options::tcpwrappers` is no
   longer read.
+* The `nfs::minimum_os_version` parameter has been removed. It only warned
+  on EL7 releases older than 7.4; remove any Hiera setting for it.
 
 ## Reference
 

@@ -203,29 +203,19 @@
 #     by the `stunnel_verify` parameter in the `nfs::server` class.
 #
 # @param install_quota_rpc
-#   Whether to install the quota-rpc package on NFS servers
+#   Whether to install the quota-rpc package (rpc.rquotad) on NFS servers
 #
-#   * Automatically set based on OS version via Hiera (true for EL8+)
-#   * In EL7, rpc.rquotad files were in the quota package
-#   * In EL8+, quota-rpc is a separate package
+#   * Set to true via Hiera on EL8+, where quota-rpc is a separate package
 #
 # @param manage_sysconfig_nfs
 #   Whether to manage /etc/sysconfig/nfs configuration
 #
-#   * Automatically set based on OS version via Hiera (true for EL7, false for EL8+)
-#   * In EL7, /etc/sysconfig/nfs is still needed for some daemon options
-#   * In EL8+, all configuration is in /etc/nfs.conf
+#   * Set to false via Hiera; on EL8+ all configuration is in /etc/nfs.conf
 #
 # @param apply_selinux_hotfix
 #   Whether to apply SELinux hotfix for Kerberos support
 #
-#   * Automatically set based on OS version via Hiera (true for EL7, false for EL8+)
-#   * Only needed in EL7 with Kerberos due to selinux-policy bugs
-#
-# @param minimum_os_version
-#   Minimum supported OS version (used for warnings)
-#
-#   * Automatically set via Hiera
+#   * Set to false via Hiera; not needed on any supported release
 #
 # @param trusted_nets
 #   The systems that are allowed to connect to this service
@@ -265,12 +255,8 @@ class nfs (
   Boolean               $install_quota_rpc             = false,
   Boolean               $manage_sysconfig_nfs          = false,
   Boolean               $apply_selinux_hotfix          = false,
-  String                $minimum_os_version            = '7.4',
 ) {
   simplib::assert_metadata($module_name)
-  if (versioncmp($facts['os']['release']['full'], $minimum_os_version) < 0) {
-    warning("This version of simp-nfs may not work with ${facts['os']['name']} ${facts['os']['release']['full']}. Use simp-nfs module version < 7.0.0 instead")
-  }
 
   if $firewall {
     simplib::assert_optional_dependency($module_name, 'simp/iptables')
