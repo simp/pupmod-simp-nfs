@@ -9,10 +9,9 @@
 #
 # @author https://github.com/simp/pupmod-simp-nfs/graphs/contributors
 #
-class nfs::idmapd::client(
+class nfs::idmapd::client (
   Integer[0] $timeout = 600
 ) {
-
   include 'nfs::idmapd::config'
 
   # TODO write an augeas lens

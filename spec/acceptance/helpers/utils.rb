@@ -24,6 +24,13 @@ module Acceptance::Helpers::Utils
   # +host+: Host (object)
   #
   def internal_network_info(host)
+    # On EL10 under Vagrant the private-network static IP (host[:ip]) is not
+    # applied to the interface by default, so the match below would find no
+    # interface and return nil. This helper is sometimes evaluated at spec-load
+    # time (building shared-example options), before the before(:all) hook runs
+    # ensure_beaker_ip_on, so apply it here too. Idempotent / no-op on EL8/9.
+    ensure_beaker_ip_on(host)
+
     networking = JSON.parse(on(host, 'facter --json networking').stdout)
 
     # this is the IP address beaker puts into /etc/hosts

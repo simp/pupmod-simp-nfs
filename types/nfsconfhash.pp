@@ -11,4 +11,3 @@ type Nfs::NfsConfHash = Struct[{
   Optional['sm-notify']   => Hash[String,Variant[Boolean,Integer,Float,String]],
   Optional['statd']       => Hash[String,Variant[Boolean,Integer,Float,String]]
 }]
-

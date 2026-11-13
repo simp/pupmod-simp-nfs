@@ -3,8 +3,7 @@
 # @api private
 # @author https://github.com/simp/pupmod-simp-nfs/graphs/contributors
 #
-class nfs::server::service
-{
+class nfs::server::service {
   assert_private()
 
   service { 'nfs-server.service':
@@ -33,7 +32,7 @@ class nfs::server::service
     # when the sysctl values were cached by the sysctl resource.
     silent  => true,
     comment => 'Managed by simp-nfs Puppet module'
-  } )
+  })
 
   ensure_resource('sysctl', 'sunrpc.udp_slot_table_entries', {
     ensure  => 'present',
@@ -42,7 +41,7 @@ class nfs::server::service
     # when the sysctl values were cached by the sysctl resource.
     silent  => true,
     comment => 'Managed by simp-nfs Puppet module'
-  } )
+  })
 
   # nfs-mountd is required for both NFSv3 and NFSv4, is started when needed,
   # and only has over-the-wire operation in NFSv3

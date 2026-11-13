@@ -1,3 +1,41 @@
+* Fri Nov 13 2026 Steven Pritchard <steve@sicura.us> - 9.0.0
+- BREAKING: Remove TCP wrappers support. The `nfs::tcpwrappers` and
+  `nfs::manage_tcpwrappers` parameters have been removed, and
+  `simp_options::tcpwrappers` is no longer read. Remove any Hiera settings
+  for them. TCP wrappers does not exist on EL8+ and `simp/tcpwrappers` is
+  archived.
+- Remove the `simp/tcpwrappers` optional dependency
+- Allow simp/stunnel 10.x as an optional dependency
+
+* Thu Oct 08 2026 Steven Pritchard <steve@sicura.us> - 8.1.0
+- Add support for OpenVox 9
+- Update metadata.json dependency ranges from the Forge
+
+* Wed Sep 09 2026 Steven Pritchard <steve@sicura.us> - 8.0.2
+- Allow simp/iptables 9.x as an optional dependency. Its breaking changes
+  (explicit `iptables::backend` selection, removal of the deprecated
+  `iptables::use_firewalld` function) do not affect this module, which only
+  uses `iptables::listen::tcp_stateful` and `iptables::listen::udp`. The old
+  `< 9.0.0` bound made every catalog compile log an
+  `assert_optional_dependency()` error once iptables 9.0.0 was released.
+- Fix the acceptance tests for simp/ssh 9.0.0 and simp/iptables 9.0.0. The
+  ssh module no longer opens its port based on `simp_options::firewall`, and
+  the iptables module now enforces firewalld instead of silently disabling
+  it, so after the client/server reboots in the test suites nothing allowed
+  SSH back in and beaker hung until the six-hour job timeout. The suites now
+  set `ssh::server::conf::firewall: true`.
+
+* Mon Aug 24 2026 Steven Pritchard <steve@sicura.us> - 8.0.1
+- [puppetsync] Update metadata.json dependency ranges from the Forge
+
+* Mon Jun 08 2026 Steven Pritchard <steven.pritchard@gmail.com> - 8.0.0
+- Switch `requirements` from `puppet` to `openvox` (>= 8 < 9)
+- Point `issues_url` at GitHub Issues
+- Drop end-of-life OS support (CentOS 8, EL7); list EL10 across all supported distros
+- Allow newer SIMP module dependencies (see metadata.json diff)
+- Sync Gemfile with current puppetsync baseline (adds OpenVox to test gems)
+- Drop Puppet 7 / Ruby 2.7 from GitHub Actions; use Ruby 3.2.11 with OpenVox 8 and 3.4.9 elsewhere
+
 * Tue Nov 25 2025 Steven Pritchard <steve@sicura.us> - 7.8.0
 - Move OS-specific values to Hiera
 - Update module dependencies

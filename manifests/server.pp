@@ -129,10 +129,9 @@ class nfs::server (
   Simplib::Port    $stunnel_nfsd_accept_port      = $nfs::stunnel_nfsd_port,
   Array[String]    $stunnel_socket_options        = $nfs::stunnel_socket_options,
   Integer          $stunnel_verify                = $nfs::stunnel_verify,
-  Array[String]    $stunnel_wantedby              = [ 'nfs-server.service' ],
+  Array[String]    $stunnel_wantedby              = ['nfs-server.service'],
   Simplib::Netlist $trusted_nets                  = $nfs::trusted_nets
-) inherits ::nfs {
-
+) inherits nfs {
   assert_private()
 
   if $stunnel and $nfsd_vers4_0 {

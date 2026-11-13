@@ -3,9 +3,7 @@
 # @api private
 # @author https://github.com/simp/pupmod-simp-nfs/graphs/contributors
 #
-class nfs::client::service
-{
-
+class nfs::client::service {
   assert_private()
 
   service { 'nfs-client.target':
@@ -35,7 +33,7 @@ class nfs::client::service
     # when the sysctl values were cached by the sysctl resource.
     silent  => true,
     comment => 'Managed by simp-nfs Puppet module'
-  } )
+  })
 
   ensure_resource('sysctl', 'sunrpc.udp_slot_table_entries', {
     ensure  => 'present',
@@ -44,7 +42,7 @@ class nfs::client::service
     # when the sysctl values were cached by the sysctl resource.
     silent  => true,
     comment => 'Managed by simp-nfs Puppet module'
-  } )
+  })
 
   # Dynamically tune the client callback port.
   # Although this parameter will be loaded on boot because of an entry in

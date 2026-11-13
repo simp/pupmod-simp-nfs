@@ -209,7 +209,7 @@ shared_examples 'a NFS share using autofs with distinct client/server roles' do 
         end
 
         it "checks server IP for #{server}" do
-          expect(info[:ip]).not_to be_nil
+          expect(server_ip).not_to be_nil
         end
 
         it "applies client manifest to mount dir from #{server}" do

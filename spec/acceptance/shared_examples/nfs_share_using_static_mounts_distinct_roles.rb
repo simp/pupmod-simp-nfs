@@ -94,11 +94,10 @@ shared_examples 'a NFS share using static mounts with distinct client/server rol
           apply_manifest_on(client, client_manifest, catch_changes: true)
         end
 
-        # rubocop:disable RSpec/RepeatedExample
+        # rubocop:disable-next RSpec/RepeatedExample
         it 'mounts NFS share' do
           on(client, %(grep -q '#{file_search_string}' #{client_opts[:mount_dir]}/#{file_basename}))
         end
-        # rubocop:enable RSpec/RepeatedExample
 
         if opts[:nfsv3]
           # Want to verify the NLM ports are correctly configured.  According

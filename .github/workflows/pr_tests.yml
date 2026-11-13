@@ -8,37 +8,24 @@
 #
 # ==============================================================================
 #
-# The testing matrix considers ruby/puppet versions supported by SIMP and PE:
-# ------------------------------------------------------------------------------
-# Release       Puppet   Ruby    EOL
-# PE 2019.8     6.22     2.5     2022-12 (LTS)
-# PE 2021.Y     7.x      2.7     Quarterly updates
-#
-# https://puppet.com/docs/pe/latest/component_versions_in_recent_pe_releases.html
-# https://puppet.com/misc/puppet-enterprise-lifecycle
-# ==============================================================================
-#
 # https://docs.github.com/en/actions/reference/events-that-trigger-workflows
 #
-
+---
 name: PR Tests
-on:
+'on':
   pull_request:
     types: [opened, reopened, synchronize]
-
-env:
-  PUPPET_VERSION: '~> 7'
 
 jobs:
   puppet-syntax:
     name: 'Puppet Syntax'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - name: "Install Ruby 2.7"
+      - uses: actions/checkout@v7
+      - name: 'Install Ruby'
         uses: ruby/setup-ruby@v1  # ruby/setup-ruby@ec106b438a1ff6ff109590de34ddc62c540232e0
         with:
-          ruby-version: 2.7.8
+          ruby-version: '4.0.9'
           bundler-cache: true
       - run: "bundle exec rake syntax"
 
@@ -46,11 +33,11 @@ jobs:
     name: 'Puppet Style'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - name: "Install Ruby 2.7"
+      - uses: actions/checkout@v7
+      - name: 'Install Ruby'
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.7.8
+          ruby-version: '4.0.9'
           bundler-cache: true
       - run: "bundle exec rake lint"
       - run: "bundle exec rake metadata_lint"
@@ -58,13 +45,12 @@ jobs:
   ruby-style:
     name: 'Ruby Style'
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
-      - uses: actions/checkout@v6
-      - name: "Install Ruby 2.7"
+      - uses: actions/checkout@v7
+      - name: 'Install Ruby'
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.7.8
+          ruby-version: '4.0.9'
           bundler-cache: true
       - run: |
           bundle show
@@ -74,24 +60,37 @@ jobs:
     name: 'File checks'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - name: 'Install Ruby 2.7'
+      - uses: actions/checkout@v7
+      - name: 'Install Ruby'
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.7.8
+          ruby-version: '4.0.9'
           bundler-cache: true
       - run: bundle exec rake check:dot_underscore
       - run: bundle exec rake check:test_file
+
+  reference:
+    name: 'REFERENCE.md freshness'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: 'Install Ruby'
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '4.0.9'
+          bundler-cache: true
+      - name: 'Check REFERENCE.md freshness'
+        run: bundle exec rake validate:strings
 
   releng-checks:
     name: 'RELENG checks'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - name: 'Install Ruby 2.7'
+      - uses: actions/checkout@v7
+      - name: 'Install Ruby'
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.7.8
+          ruby-version: '4.0.9'
           bundler-cache: true
       - name: 'Tags and changelogs'
         run: |
@@ -99,7 +98,7 @@ jobs:
           bundle exec rake pkg:compare_latest_tag[,true]
           bundle exec rake pkg:create_tag_changelog
       - name: 'Test-build the Puppet module'
-        run: 'bundle exec pdk build --force'
+        run: 'bundle exec rake pupmod:build'
 
   spec-tests:
     name: 'Puppet Spec'
@@ -108,34 +107,84 @@ jobs:
     strategy:
       matrix:
         puppet:
-          - label: 'Puppet 7.x [SIMP 6.6/PE 2021.7]'
-            puppet_version: '~> 7.0'
-            ruby_version: '2.7'
-            experimental: false
-          - label: 'Puppet 8.x'
+          # openvox 8 accepts openfact 6, but no OpenVox 8 AIO package ships
+          # it, so pin the openfact the agent actually ships
+          - label: 'OpenVox 8.x (Ruby 3.2)'
             puppet_version: '~> 8.0'
-            ruby_version: '3.2'
+            openfact_version: '~> 5.0'
+            ruby_version: '3.2.11'  # renovate: datasource=ruby-version depName=ruby
+            experimental: false
+          - label: 'OpenVox 9.x (Ruby 4.0)'
+            puppet_version: '~> 9.0'
+            openfact_version: '~> 6.0'
+            ruby_version: '4.0.9'  # renovate: datasource=ruby-version depName=ruby
             experimental: false
       fail-fast: false
     env:
       PUPPET_VERSION: ${{matrix.puppet.puppet_version}}
+      OPENFACT_VERSION: ${{matrix.puppet.openfact_version}}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: 'Install Ruby ${{matrix.puppet.ruby_version}}'
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{matrix.puppet.ruby_version}}
           bundler-cache: true
       - run: 'command -v rpm || if command -v apt-get; then sudo apt-get update; sudo apt-get install -y rpm; fi ||:'
-      - run: 'bundle exec rake spec'
+      - run: 'bundle exec rake parallel_spec'
         continue-on-error: ${{matrix.puppet.experimental}}
 
-#  dump_contexts:
-#    name: 'Examine Context contents'
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Dump contexts
-#        env:
-#          GITHUB_CONTEXT: ${{ toJson(github) }}
-#        run: echo "$GITHUB_CONTEXT"
-#
+  # The one check for branch protection to require: GitHub only blocks a
+  # merge on checks listed by name, and this job fails unless every job it
+  # needs succeeded, so the required list never has to track job or matrix
+  # names. Add new jobs to `needs:`; puppetsync drops a job a repo doesn't
+  # have (e.g. acceptance) from the list.
+  all-checks:
+    name: 'All checks'
+    if: always()
+    needs:
+      - puppet-syntax
+      - puppet-style
+      - ruby-style
+      - file-checks
+      - reference
+      - releng-checks
+      - spec-tests
+      - acceptance
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Fail unless every needed job succeeded'
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: |
+          jq -r 'to_entries[] | "\(.key): \(.value.result)"' <<< "$NEEDS"
+          jq -e 'all(.[]; .result == "success")' <<< "$NEEDS" > /dev/null
+
+  acceptance:
+    runs-on:
+      - ubuntu-latest
+    strategy:
+      matrix:
+        node:
+          - almalinux8
+          - almalinux9
+          - almalinux10
+      fail-fast: false
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v7
+      - name: setup ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.4.12
+      - name: bundle install
+        run: |
+          bundle install
+      - name: Setup libvirt for Vagrant
+        uses: simp/gha-workflows/.github/actions/setup-vagrant-libvirt@v1.1.0
+      - name: beaker
+        env:
+          BEAKER_HYPERVISOR: 'vagrant_libvirt'
+          VAGRANT_DEFAULT_PROVIDER: 'libvirt'
+        run: |
+          bundle exec rake beaker:suites[default,${{ matrix.node }}]

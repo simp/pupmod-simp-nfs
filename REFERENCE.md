@@ -20,7 +20,6 @@
 * `nfs::client`: Manage configuration and services for a NFS client
 * `nfs::client::config`: Manage NFS client-specific configuration
 * `nfs::client::service`: Manage NFS client-specific services
-* `nfs::client::tcpwrappers`: Configure TCP wrappers for NFS client services
 * `nfs::idmapd::server`: Manage the `idmapd` server configuration and service
 * `nfs::install`: Manage the required NFS packages
 * `nfs::selinux_hotfix`: Provides hotfix for broken SElinux policy
@@ -31,7 +30,6 @@
 * `nfs::server::firewall::nfsv4`: NFS server firewall configuration for NFSv4 only
 * `nfs::server::service`: Manage NFS server-specific services
 * `nfs::server::stunnel`: Configures a server for NFSv4 over stunnel
-* `nfs::server::tcpwrappers`: Configure TCP wrappers for NFS server services
 
 ### Defined types
 
@@ -84,17 +82,14 @@ The following parameters are available in the `nfs` class:
 * [`kerberos`](#-nfs--kerberos)
 * [`keytab_on_puppet`](#-nfs--keytab_on_puppet)
 * [`firewall`](#-nfs--firewall)
-* [`tcpwrappers`](#-nfs--tcpwrappers)
 * [`stunnel`](#-nfs--stunnel)
 * [`stunnel_nfsd_port`](#-nfs--stunnel_nfsd_port)
 * [`stunnel_socket_options`](#-nfs--stunnel_socket_options)
 * [`stunnel_verify`](#-nfs--stunnel_verify)
-* [`manage_tcpwrappers`](#-nfs--manage_tcpwrappers)
 * [`install_quota_rpc`](#-nfs--install_quota_rpc)
 * [`manage_sysconfig_nfs`](#-nfs--manage_sysconfig_nfs)
 * [`apply_selinux_hotfix`](#-nfs--apply_selinux_hotfix)
 * [`minimum_os_version`](#-nfs--minimum_os_version)
-* [`tcpwrappers`](#-nfs--tcpwrappers)
 * [`trusted_nets`](#-nfs--trusted_nets)
 
 ##### <a name="-nfs--is_server"></a>`is_server`
@@ -346,7 +341,7 @@ Whether the NFS server will pull its keytab directly from the Puppet server
   and cached credentials are destroyed (e.g., gssproxy cache), when the keytab
   is changed.
 
-Default value: `simplib::lookup('simp_options::kerberos', { 'default_value' => true})`
+Default value: `simplib::lookup('simp_options::kerberos', { 'default_value' => true })`
 
 ##### <a name="-nfs--firewall"></a>`firewall`
 
@@ -354,15 +349,7 @@ Data type: `Boolean`
 
 Use the SIMP `iptables` module to manage firewall connections
 
-Default value: `simplib::lookup('simp_options::firewall', { 'default_value' => false})`
-
-##### <a name="-nfs--tcpwrappers"></a>`tcpwrappers`
-
-Data type: `Boolean`
-
-Use the SIMP `tcpwrappers` module to manage TCP wrappers
-
-Default value: `simplib::lookup('simp_options::tcpwrappers', { 'default_value' => false })`
+Default value: `simplib::lookup('simp_options::firewall', { 'default_value' => false })`
 
 ##### <a name="-nfs--stunnel"></a>`stunnel`
 
@@ -437,17 +424,6 @@ The level at which to verify TLS connections
 
 Default value: `2`
 
-##### <a name="-nfs--manage_tcpwrappers"></a>`manage_tcpwrappers`
-
-Data type: `Boolean`
-
-Whether tcpwrappers configuration should be managed for NFS services
-
-* Automatically set based on OS version via Hiera (false for EL8+)
-* TCP wrappers was dropped in EL8
-
-Default value: `true`
-
 ##### <a name="-nfs--install_quota_rpc"></a>`install_quota_rpc`
 
 Data type: `Boolean`
@@ -492,12 +468,6 @@ Minimum supported OS version (used for warnings)
 * Automatically set via Hiera
 
 Default value: `'7.4'`
-
-##### <a name="-nfs--tcpwrappers"></a>`tcpwrappers`
-
-Use the SIMP `tcpwrappers` module to manage TCP wrappers
-
-Default value: `simplib::lookup('simp_options::tcpwrappers', { 'default_value' => false })`
 
 ##### <a name="-nfs--trusted_nets"></a>`trusted_nets`
 
@@ -1290,4 +1260,3 @@ Struct[{
 NFS security flavor
 
 Alias of `Enum['none', 'sys', 'krb5', 'krb5i', 'krb5p']`
-

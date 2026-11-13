@@ -42,7 +42,6 @@ class nfs::idmapd::config (
   Optional[Hash[String[1],String[1]]]          $static_translation = undef,
   Optional[String]                             $content            = undef
 ) {
-
   file { '/etc/idmapd.conf':
     owner   => 'root',
     group   => 'root',

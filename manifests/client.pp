@@ -57,8 +57,7 @@ class nfs::client (
   Array[String]    $stunnel_socket_options = $nfs::stunnel_socket_options,
   Integer[0]       $stunnel_verify         = $nfs::stunnel_verify,
   Array[String]    $stunnel_wantedby       = ['remote-fs-pre.target']
-) inherits ::nfs {
-
+) inherits nfs {
   assert_private()
 
   include 'nfs::base::config'

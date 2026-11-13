@@ -5,8 +5,7 @@
 # @api private
 # @author https://github.com/simp/pupmod-simp-nfs/graphs/contributors
 #
-class nfs::base::service
-{
+class nfs::base::service {
   assert_private()
 
   if $nfs::nfsv3 {
@@ -38,7 +37,7 @@ class nfs::base::service
     # and then exits.  Doesn't make sense to ensure running, but in
     # the extremely unlikely chance svckill is running when the
     # service runs, make sure svckill leaves it alone.
-    svckill::ignore{ 'rpc-statd-notify': }
+    svckill::ignore { 'rpc-statd-notify': }
 
     # Service will be masked if previous config had disallowed NFSv3.
     exec { 'unmask_rpc-statd.service':
@@ -46,7 +45,6 @@ class nfs::base::service
       onlyif  => '/usr/bin/systemctl status rpc-statd.service | /usr/bin/grep -qw masked',
       notify  => Service['rpc-statd.service']
     }
-
   } else {
     # 'service { NAME: enable => mask }' does not seem to work in puppet.
     # So, we will enforce masking of the service here.
@@ -85,7 +83,6 @@ class nfs::base::service
       }
       ensure_resource('service', 'gssproxy.service', $_gssproxy_params)
     }
-
   } else {
     # 'service { NAME: enable => mask }' does not seem to work in puppet.
     # So, we will enforce masking of the service here.

@@ -11,6 +11,10 @@ describe 'nfs basic idmapd' do
     'simp_options::firewall'                => true,
     'simp_options::kerberos'                => false,
     'simp_options::stunnel'                 => false,
+    # simp/ssh >= 9.0.0 no longer reads simp_options::firewall, so it must be
+    # told to open its port; otherwise beaker is locked out after the reboots
+    # these tests perform (simp/iptables >= 9.0.0 enforces firewalld by default).
+    'ssh::server::conf::firewall'           => true,
     'ssh::server::conf::permitrootlogin'    => true,
     'ssh::server::conf::authorizedkeysfile' => '.ssh/authorized_keys',
 
