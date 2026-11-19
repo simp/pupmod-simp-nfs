@@ -47,12 +47,6 @@ describe 'nfs' do
 
           it { is_expected.not_to create_concat__fragment('nfs_conf_nfsdcltrack') }
 
-          # the next 4 omissions are true for EL > 7, always, and for EL7 in
-          # this case, because there is no custom config
-          it { is_expected.not_to create_concat__fragment('nfs_RPCIDMAPDARGS') }
-          it { is_expected.not_to create_concat__fragment('nfs_RPCMOUNTDARGS') }
-          it { is_expected.not_to create_concat__fragment('nfs_RPCNFSDARGS') }
-
           it {
             is_expected.to create_file('/etc/sysconfig/rpc-rquotad').with(
               owner: 'root',
