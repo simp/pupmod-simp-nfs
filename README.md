@@ -495,19 +495,32 @@ with stunneled NFSv4.
 
 ### Other security features
 
-This module can be configured to automatically add firewall rules and allow
-NFS services in TCP wrappers using the
-[SIMP `iptables` module](https://github.com/simp/pupmod-simp-iptables) and the
-[SIMP `tcpwrappers` module](https://github.com/simp/pupmod-simp-tcpwrappers),
-respectively.
+This module can be configured to automatically add firewall rules for the NFS
+services using the
+[SIMP `iptables` module](https://github.com/simp/pupmod-simp-iptables).
 
-To enable these features on the NFS server and NFS client nodes, add the
-following to their hieradata:
+To enable this on the NFS server and NFS client nodes, add the following to
+their hieradata:
 
 ``` yaml
 simp_options::firewall: true
-simp_options::tcpwrappers: true
 ```
+
+### Breaking changes in 9.0.0
+
+* TCP wrappers support has been removed. TCP wrappers does not exist on EL8
+  and later, and the `simp/tcpwrappers` module is archived. The
+  `nfs::tcpwrappers` and `nfs::manage_tcpwrappers` parameters are gone;
+  remove any Hiera settings for them. `simp_options::tcpwrappers` is no
+  longer read.
+* The `nfs::minimum_os_version` parameter has been removed. It only warned
+  on EL7 releases older than 7.4; remove any Hiera setting for it.
+* The remaining EL7-only support has been removed, along with the
+  `nfs::apply_selinux_hotfix`, `nfs::manage_sysconfig_nfs` and
+  `nfs::custom_daemon_args` parameters, the `nfs::selinux_hotfix` class and
+  the `Nfs::LegacyDaemonArgs` type. Remove any Hiera settings for these
+  parameters, and set daemon options in `/etc/nfs.conf` with
+  `nfs::custom_nfs_conf_opts` instead.
 
 ## Reference
 

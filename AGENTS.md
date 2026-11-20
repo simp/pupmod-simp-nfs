@@ -6,9 +6,10 @@ This file provides guidance to AI agents when working with code in this reposito
 
 `simp-nfs` is a SIMP Puppet module that manages an **NFS server and/or NFS
 client** on Enterprise Linux, including the optional PKI/`stunnel` and Kerberos
-(`krb5`) integrations. It configures `/etc/nfs.conf` (and, on EL7, the legacy
-`/etc/sysconfig/nfs`), installs the NFS packages, manages the NFS services,
-`idmapd` name mapping, firewall openings, TCP wrappers, and — when Kerberos is
+(`krb5`) integrations. It configures `/etc/nfs.conf` (and removes
+the legacy `/etc/sysconfig/nfs`, which EL8's `nfs-convert.service` would turn
+into a generated `/etc/nfs.conf`), installs the NFS packages, manages the NFS services,
+`idmapd` name mapping, firewall openings, and — when Kerberos is
 unavailable — can wrap critical NFSv4 connections in `stunnel`.
 
 A single host can be a **server, a client, or both**. The entry class `nfs`
@@ -31,32 +32,25 @@ orchestration class, so you can use them without explicitly declaring `nfs`.
   `assert_private()`'d. Selects roles via `$is_server` / `$is_client`
   (`init.pp`), NFS version policy via `$nfsv3` (default `false`, i.e.
   NFSv4-only, `init.pp`), and the optional integrations `$kerberos`,
-  `$firewall`, `$stunnel`, `$tcpwrappers` (each defaulted off the
+  `$firewall`, `$stunnel` (each defaulted off the
   `simp_options::*` seam, `init.pp`). It runs
-  `simplib::assert_metadata($module_name)` (`init.pp`), warns when the OS
-  release is below `$minimum_os_version` (default `'7.4'`, `init.pp`),
-  and guards each optional integration with
+  `simplib::assert_metadata($module_name)` (`init.pp`) and guards each optional integration with
   `simplib::assert_optional_dependency` before use — `simp/iptables` when
   `$firewall` (`init.pp`), `simp/krb5` when `$kerberos`
-  (`init.pp`), `simp/tcpwrappers` when `$tcpwrappers and
-  $manage_tcpwrappers` (`init.pp`). Ordering: `nfs::selinux_hotfix` and
-  `nfs::lvm2` (both optional) run **before** `nfs::install`, which runs before
+  (`init.pp`). Ordering: `nfs::lvm2` (optional) runs **before** `nfs::install`, which runs before
   `nfs::client` / `nfs::server` (`init.pp`).
 - **`nfs::install` (`manifests/install.pp`)** — private (`assert_private()`,
   `install.pp`). Installs `nfs-utils` and `nfs4-acl-tools`; installs
   `quota-rpc` only when `$nfs::is_server and $nfs::install_quota_rpc`
-  (`install.pp`) — the latter flag is OS-data-driven (EL8+ only).
+  (`install.pp`); `install_quota_rpc` defaults to `true`.
 - **`nfs::base::config` / `nfs::base::service`** — private; the shared
   `/etc/nfs.conf` options and services common to client and server. `base::config`
   builds `$_required_nfs_conf_opts` and **deliberately overrides**
   `$nfs::custom_nfs_conf_opts` for those keys "because the firewall will not
   work otherwise" (`manifests/base/config.pp`).
-- **`nfs::lvm2` (`manifests/lvm2.pp`)**, **`nfs::selinux_hotfix`
-  (`manifests/selinux_hotfix.pp`)** — internal helper classes declared only by
-  `nfs` (`init.pp`). `selinux_hotfix` is `assert_private()`'d
-  (`selinux_hotfix.pp`); **`nfs::lvm2` is not** — it carries no
-  `assert_private()`, so it is internal by convention only. The SELinux hotfix
-  is an EL7+Kerberos-only workaround for a broken `selinux-policy`.
+- **`nfs::lvm2` (`manifests/lvm2.pp`)** — internal helper class declared only by
+  `nfs` (`init.pp`). It is **not** `assert_private()`'d, so it is internal by
+  convention only.
 
 #### Client side
 
@@ -80,7 +74,7 @@ orchestration class, so you can use them without explicitly declaring `nfs`.
   stunnel is forced off (`mount.pp`); with stunnel or a
   self-mount it rewrites the remote to `127.0.0.1` (`mount.pp`).
 - **`nfs::client::mount::connection`, `nfs::client::config`,
-  `nfs::client::service`, `nfs::client::stunnel`, `nfs::client::tcpwrappers`** —
+  `nfs::client::service`, `nfs::client::stunnel`** —
   all private. `client::stunnel` guards `simp/stunnel`
   (`manifests/client/stunnel.pp`).
 
@@ -102,7 +96,7 @@ orchestration class, so you can use them without explicitly declaring `nfs`.
   on SELinux-enabled hosts — sets the `nfsd_anon_write` selboolean
   (`export.pp`).
 - **`nfs::server::config`, `nfs::server::service`, `nfs::server::stunnel`,
-  `nfs::server::tcpwrappers`, `nfs::server::firewall`,
+  `nfs::server::firewall`,
   `nfs::server::firewall::nfsv4`, `nfs::server::firewall::nfsv3and4`,
   `nfs::idmapd::server`** — all `assert_private()`'d. `server::stunnel` guards
   `simp/stunnel` (`manifests/server/stunnel.pp`).
@@ -127,14 +121,9 @@ orchestration class, so you can use them without explicitly declaring `nfs`.
 - **`nfs::base::config` overrides your `custom_nfs_conf_opts`** for the keys it
   manages, on purpose — otherwise the firewall port openings do not line up
   (`base/config.pp`). Custom values for those sections/keys are lost.
-- **OS-version behavior is driven by Hiera module data, not conditionals in the
-  manifest.** `manage_tcpwrappers`, `install_quota_rpc`, `manage_sysconfig_nfs`,
-  and `apply_selinux_hotfix` all default in `data/os/RedHat/<major>.yaml`:
-  EL7 gets tcpwrappers + `sysconfig/nfs` + the SELinux hotfix; EL8+ drops
-  tcpwrappers and `sysconfig/nfs` and instead installs `quota-rpc`
-  (`data/os/RedHat/7.yaml`, `data/os/RedHat/8.yaml`, `data/os/RedHat/9.yaml`).
-  The class defaults for these params in `init.pp` are conservative
-  fallbacks that the data overrides.
+- **OS-version behavior belongs in Hiera module data, not conditionals in the
+  manifest.** All supported releases (EL8+) currently behave the same, so
+  `data/common.yaml` is empty and there are no `data/os/` files.
 - **Kerberos and stunnel are meant to be alternatives.** stunnel "is intended
   for environments without a working Kerberos setup and may cause issues when
   used with Kerberos" (`init.pp`). Prefer Kerberos.
@@ -146,7 +135,7 @@ orchestration class, so you can use them without explicitly declaring `nfs`.
   export-rule-selection bug (`export.pp`,
   https://bugzilla.redhat.com/show_bug.cgi?id=1804912).
 - **Optional integrations are guarded at runtime, not declared as hard deps.**
-  `simp/iptables`, `simp/krb5`, `simp/tcpwrappers`, `simp/stunnel`, `simp/autofs`
+  `simp/iptables`, `simp/krb5`, `simp/stunnel`, `simp/autofs`
   live in `metadata.json` `simp.optional_dependencies` and are asserted with
   `simplib::assert_optional_dependency` only on the code path that uses them
   (`init.pp`, `mount.pp`, `client/stunnel.pp`,
@@ -163,7 +152,6 @@ two public defines have **no** `simplib::lookup` calls of their own). All calls:
 | `init.pp` | `simp_options::kerberos` | `true` |
 | `init.pp` | `simp_options::firewall` | `false` |
 | `init.pp` | `simp_options::stunnel` | `false` |
-| `init.pp` | `simp_options::tcpwrappers` | `false` |
 | `init.pp` | `simp_options::trusted_nets` | `['127.0.0.1']` |
 | `install.pp` | `simp_options::package_ensure` | `'installed'` |
 | `install.pp` | `simp_options::package_ensure` | `'installed'` |
@@ -178,66 +166,60 @@ Keep routing SIMP feature toggles through `simplib::lookup('simp_options::*', {
 
 Module dependencies (from `metadata.json`):
 
-- `puppet/systemd` `>= 4.0.2 < 10.0.0` (systemd unit/service management)
-- `puppet/augeasproviders_sysctl` `>= 2.4.0 < 4.0.0` (the `sysctl` type, for the
+- `puppet/systemd` `>= 4.0.2 < 11.0.0` (systemd unit/service management)
+- `puppet/augeasproviders_sysctl` `>= 2.4.0 < 7.0.0` (the `sysctl` type, for the
   sunrpc slot-table entries)
-- `puppetlabs/concat` `>= 6.4.0 < 10.0.0` (builds `/etc/exports` and
+- `puppetlabs/concat` `>= 6.4.0 < 11.0.0` (builds `/etc/exports` and
   `/etc/nfs.conf` from fragments)
-- `puppetlabs/stdlib` `>= 8.0.0 < 10.0.0` (stdlib types/functions)
-- `simp/simplib` `>= 4.9.0 < 5.0.0` (provides `simplib::lookup`,
+- `puppetlabs/stdlib` `>= 8.0.0 < 11.0.0` (stdlib types/functions)
+- `simp/simplib` `>= 4.9.0 < 8.0.0` (provides `simplib::lookup`,
   `simplib::assert_metadata`, `simplib::assert_optional_dependency`,
   `simplib::host_is_me`, and the `Simplib::Port` / `Simplib::IP` /
   `Simplib::Netlist` types)
-- `simp/svckill` `>= 3.6.1 < 4.0.0` (service reaping)
-- `simp/vox_selinux` `>= 3.1.0 < 4.0.0` (SELinux management)
+- `simp/svckill` `>= 3.6.1 < 6.0.0` (service reaping)
 
 Optional dependencies (from `metadata.json` `simp.optional_dependencies`) —
 asserted at runtime only on the code path that uses them:
 
-- `simp/autofs` `>= 6.2.1 < 8.0.0` — `nfs::client::mount` with `autofs => true`.
-- `simp/krb5` `>= 7.1.0 < 8.0.0` — Kerberos support.
-- `simp/iptables` `>= 6.5.3 < 8.0.0` — firewall openings.
-- `simp/stunnel` `>= 6.6.0 < 7.0.0` — stunnel-wrapped NFSv4.
-- `simp/tcpwrappers` `>= 6.2.0 < 7.0.0` — TCP wrappers (EL7).
+- `simp/autofs` `>= 6.2.1 < 9.0.0` — `nfs::client::mount` with `autofs => true`.
+- `simp/krb5` `>= 7.1.0 < 9.0.0` — Kerberos support.
+- `simp/iptables` `>= 6.5.3 < 10.0.0` — firewall openings.
+- `simp/stunnel` `>= 6.6.0 < 11.0.0` — stunnel-wrapped NFSv4.
 
 Fixture-only dependencies (from `.fixtures.yml`, present for test compilation,
 not runtime deps): `augeas_core`, `augeasproviders_core`, `augeasproviders_grub`,
 `augeasproviders_ssh`, `firewalld`, `haveged`, `mount_core`, `pki`,
-`selinux_core`, `simp_firewalld`, `ssh` (plus the runtime and optional deps
+`selinux_core`, `simp_firewalld`, `ssh`, `vox_selinux` (plus the runtime and optional deps
 above are also checked out as fixtures).
 
 Runtime requirement (from `metadata.json` `requirements`): `puppet
 >= 7.0.0 < 9.0.0`. (SIMP is migrating Puppet → OpenVox; when
 `metadata.json` switches this to `openvox`, update this line to match.)
 
-Supported OS matrix (from `metadata.json`): CentOS 7/8/9; RedHat 7/8/9;
-OracleLinux 7/8/9; Rocky 8/9; AlmaLinux 8/9.
+Supported OS matrix (from `metadata.json`): CentOS 9/10; RedHat 8/9/10; OracleLinux 8/9/10; Rocky 8/9/10; AlmaLinux 8/9/10.
 
 ## Repository layout
 
 - `manifests/init.pp` — the public `nfs` entry class (roles, options, optional
   integration guards, orchestration ordering).
-- `manifests/install.pp`, `manifests/lvm2.pp`, `manifests/selinux_hotfix.pp` —
+- `manifests/install.pp`, `manifests/lvm2.pp` —
   shared install/helper classes.
 - `manifests/base/{config,service}.pp` — config/services common to client &
   server.
 - `manifests/client.pp` + `manifests/client/*` — client orchestration; public
   define `nfs::client::mount` (`manifests/client/mount.pp`); private
-  `mount/connection.pp`, `config.pp`, `service.pp`, `stunnel.pp`,
-  `tcpwrappers.pp`.
+  `mount/connection.pp`, `config.pp`, `service.pp`, `stunnel.pp`.
 - `manifests/server.pp` + `manifests/server/*` — server orchestration; public
   define `nfs::server::export` (`manifests/server/export.pp`); private
-  `config.pp`, `service.pp`, `stunnel.pp`, `tcpwrappers.pp`, `firewall.pp`,
+  `config.pp`, `service.pp`, `stunnel.pp`, `firewall.pp`,
   `firewall/nfsv4.pp`, `firewall/nfsv3and4.pp`.
 - `manifests/idmapd/{client,config,server}.pp` — NFSv4 idmapd name mapping.
-- `types/` — four custom data types: `Nfs::LegacyDaemonArgs`,
+- `types/` — three custom data types:
   `Nfs::MountEnsure`, `Nfs::NfsConfHash`, `Nfs::SecurityFlavor`.
 - `templates/` — `etc/export.erb` (ERB), `etc/idmapd.conf.epp`,
   `etc/nfs_conf_section.epp` (EPP).
-- `data/common.yaml`, `data/os/RedHat/{7,8,9}.yaml` — OS-version-driven defaults
-  (`manage_tcpwrappers`, `install_quota_rpc`, `manage_sysconfig_nfs`,
-  `apply_selinux_hotfix`, `minimum_os_version`); `hiera.yaml` is a v5 hierarchy
-  keyed on `os.family`/`os.release.major`.
+- `data/common.yaml` (currently empty) — module data; `hiera.yaml` is a v5
+  hierarchy keyed on `os.family`/`os.release.major`.
 - `metadata.json` — deps, optional deps, OS matrix, Puppet requirement.
 - `spec/` — rspec-puppet unit tests + beaker acceptance suites.
 - `REFERENCE.md` — generated Puppet Strings reference.
@@ -294,10 +276,9 @@ suites under `spec/acceptance/` are run locally/manually only.
   exceptions `nfs::lvm2`, `nfs::idmapd::client`, and `nfs::idmapd::config` omit
   `assert_private()` but are still internal-only; treat them as private too.)
 - Keep OS-version differences in `data/os/RedHat/<major>.yaml`, not in manifest
-  conditionals (that is how tcpwrappers/quota-rpc/sysconfig differences are
-  handled today).
-- Guard every optional integration (`autofs`, `krb5`, `iptables`, `stunnel`,
-  `tcpwrappers`) with `simplib::assert_optional_dependency` and a parameter/fact
+  conditionals.
+- Guard every optional integration (`autofs`, `krb5`, `iptables`, `stunnel`)
+  with `simplib::assert_optional_dependency` and a parameter/fact
   check on the using code path — never hard-`include` an optional module.
 - Continue routing SIMP feature toggles through
   `simplib::lookup('simp_options::*', { 'default_value' => ... })` rather than

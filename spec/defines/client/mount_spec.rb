@@ -45,7 +45,6 @@ describe 'nfs::client::mount' do
               stunnel_socket_options: ['l:TCP_NODELAY=1', 'r:TCP_NODELAY=1'], # from nfs::client
               stunnel_verify: 2, # from nfs::client
               stunnel_wantedby: ['remote-fs-pre.target'], # from nfs::client
-              tcpwrappers: false, # from nfs
             )
           end
 
@@ -77,7 +76,6 @@ describe 'nfs::client::mount' do
               stunnel_socket_options: ['l:TCP_NODELAY=2', 'r:TCP_NODELAY=2'], # from nfs::client
               stunnel_verify: 1, # from nfs::client
               stunnel_wantedby: ['remote-fs-pre.target', 'some-other.service'], # from nfs::client
-              tcpwrappers: true, # from nfs
             )
           end
         end

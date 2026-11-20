@@ -17,7 +17,6 @@ describe 'nfs' do
 
       context 'with default parameters' do
         it_behaves_like 'a NFS base installer'
-        it { is_expected.not_to create_class('nfs::selinux_hotfix') }
         it { is_expected.to create_class('nfs::lvm2') }
         it { is_expected.to create_class('nfs::client') }
         it { is_expected.not_to create_class('nfs::server') }
@@ -27,11 +26,6 @@ describe 'nfs' do
         let(:params) { { kerberos: true } }
 
         it_behaves_like 'a NFS base installer'
-        if os_facts[:os][:release][:major].to_i < 8
-          it { is_expected.to create_class('nfs::selinux_hotfix') }
-        else
-          it { is_expected.not_to create_class('nfs::selinux_hotfix') }
-        end
       end
 
       context 'ensure_latest_lvm=false' do

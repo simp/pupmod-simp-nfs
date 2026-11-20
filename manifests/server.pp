@@ -35,8 +35,6 @@
 #   Allow use of NFSv4.2
 #
 #   * Sets the `vers4.2` option in the `nfsd` section of `/etc/nfs.conf`
-#   * NFSv4.2 is available beginning with EL8, so this setting will be
-#     ignored in EL7.
 #
 # @param mountd_port
 #   The port upon which `mountd` should listen on the server (NFSv3)

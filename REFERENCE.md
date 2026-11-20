@@ -20,10 +20,8 @@
 * `nfs::client`: Manage configuration and services for a NFS client
 * `nfs::client::config`: Manage NFS client-specific configuration
 * `nfs::client::service`: Manage NFS client-specific services
-* `nfs::client::tcpwrappers`: Configure TCP wrappers for NFS client services
 * `nfs::idmapd::server`: Manage the `idmapd` server configuration and service
 * `nfs::install`: Manage the required NFS packages
-* `nfs::selinux_hotfix`: Provides hotfix for broken SElinux policy
 * `nfs::server`: Manage configuration and services for a NFS server
 * `nfs::server::config`: Manage NFS server-specific configuration
 * `nfs::server::firewall`: NFS server firewall configuration
@@ -31,7 +29,6 @@
 * `nfs::server::firewall::nfsv4`: NFS server firewall configuration for NFSv4 only
 * `nfs::server::service`: Manage NFS server-specific services
 * `nfs::server::stunnel`: Configures a server for NFSv4 over stunnel
-* `nfs::server::tcpwrappers`: Configure TCP wrappers for NFS server services
 
 ### Defined types
 
@@ -47,7 +44,6 @@
 
 ### Data types
 
-* [`Nfs::LegacyDaemonArgs`](#Nfs--LegacyDaemonArgs): Legacy NFS daemon *ARGS environment variables set in /etc/sysconfig/nfs and automatically converted to the environment variables needed by th
 * [`Nfs::MountEnsure`](#Nfs--MountEnsure): Ensure for non-autofs mounts
 * [`Nfs::NfsConfHash`](#Nfs--NfsConfHash): Hash representing nfs.conf configuration in which the key is the section name and the value is a Hash of key/value options for that section.
 * [`Nfs::SecurityFlavor`](#Nfs--SecurityFlavor): NFS security flavor
@@ -75,7 +71,6 @@ The following parameters are available in the `nfs` class:
 * [`statd_port`](#-nfs--statd_port)
 * [`statd_outgoing_port`](#-nfs--statd_outgoing_port)
 * [`custom_nfs_conf_opts`](#-nfs--custom_nfs_conf_opts)
-* [`custom_daemon_args`](#-nfs--custom_daemon_args)
 * [`idmapd`](#-nfs--idmapd)
 * [`secure_nfs`](#-nfs--secure_nfs)
 * [`sunrpc_udp_slot_table_entries`](#-nfs--sunrpc_udp_slot_table_entries)
@@ -84,16 +79,11 @@ The following parameters are available in the `nfs` class:
 * [`kerberos`](#-nfs--kerberos)
 * [`keytab_on_puppet`](#-nfs--keytab_on_puppet)
 * [`firewall`](#-nfs--firewall)
-* [`tcpwrappers`](#-nfs--tcpwrappers)
 * [`stunnel`](#-nfs--stunnel)
 * [`stunnel_nfsd_port`](#-nfs--stunnel_nfsd_port)
 * [`stunnel_socket_options`](#-nfs--stunnel_socket_options)
 * [`stunnel_verify`](#-nfs--stunnel_verify)
-* [`manage_tcpwrappers`](#-nfs--manage_tcpwrappers)
 * [`install_quota_rpc`](#-nfs--install_quota_rpc)
-* [`manage_sysconfig_nfs`](#-nfs--manage_sysconfig_nfs)
-* [`apply_selinux_hotfix`](#-nfs--apply_selinux_hotfix)
-* [`minimum_os_version`](#-nfs--minimum_os_version)
 * [`trusted_nets`](#-nfs--trusted_nets)
 
 ##### <a name="-nfs--is_server"></a>`is_server`
@@ -153,10 +143,6 @@ Use the gssproxy daemon to hold the credentials used in secure NFS and
 perform GSSAPI operations on behalf of NFS.
 
 * Sets the `use-gss-proxy` option in the `gssd` section of `/etc/nfs.conf`
-  This is not yet documented in the rpc.gssd man page for EL8, but is
-  available in the example `/etc/nsf.conf file` packaged with `nfs-utils`.
-* Sets GSS_USE_PROXY in `/etc/sysconfig/nfs` in EL7, because the
-  `use-gss-proxy` option in `/etc/nfs.conf` is not yet used in EL7.
 
 Default value: `true`
 
@@ -250,33 +236,6 @@ Hash that allows other configuration options to be set in `/etc/nfs.conf`
 
 Default value: `{}`
 
-##### <a name="-nfs--custom_daemon_args"></a>`custom_daemon_args`
-
-Data type: `Nfs::LegacyDaemonArgs`
-
-Hash that allows other configuration options to be set as daemon
-arguments in `/etc/sysconfig/nfs` in EL7
-
-* Necessary to address `/etc/nfs.conf` limitations - Not all configuration
-  options in EL7 can be specified in `/etc/nfs.conf`
-* Each key is the name of the shell variables processed by
-  `/usr/lib/systemd/scripts/nfs-utils_env.sh`
-
-  * `nfs-utils_env.sh` generates `/run/sysconfig/nfs-utils` which contains
-    the NFS daemon command line shell variables used by NFS services
-  * Unfortunately, not all shell variable names in `/etc/sysconfig/nfs`
-    match the generated variable names in `/run/sysconfig/nfs-utils`.
-    For example, `STATDARG` gets transformed into `STATDARGS`.
-
-* Each value is the argument string which will be wrapped in double
-  quotes in `/etc/sysconfig/nfs`.
-
-@example Disable syslog messages from the NFSv3 `rpc.statd` daemon in Hiera
-  nfs::custom_daemon_args:
-    STATDARG: "--no-syslog"
-
-Default value: `{}`
-
 ##### <a name="-nfs--idmapd"></a>`idmapd`
 
 Data type: `Boolean`
@@ -355,14 +314,6 @@ Use the SIMP `iptables` module to manage firewall connections
 
 Default value: `simplib::lookup('simp_options::firewall', { 'default_value' => false })`
 
-##### <a name="-nfs--tcpwrappers"></a>`tcpwrappers`
-
-Data type: `Boolean`
-
-Use the SIMP `tcpwrappers` module to manage TCP wrappers
-
-Default value: `simplib::lookup('simp_options::tcpwrappers', { 'default_value' => false })`
-
 ##### <a name="-nfs--stunnel"></a>`stunnel`
 
 Data type: `Boolean`
@@ -436,61 +387,13 @@ The level at which to verify TLS connections
 
 Default value: `2`
 
-##### <a name="-nfs--manage_tcpwrappers"></a>`manage_tcpwrappers`
-
-Data type: `Boolean`
-
-Whether tcpwrappers configuration should be managed for NFS services
-
-* Automatically set based on OS version via Hiera (false for EL8+)
-* TCP wrappers was dropped in EL8
-
-Default value: `true`
-
 ##### <a name="-nfs--install_quota_rpc"></a>`install_quota_rpc`
 
 Data type: `Boolean`
 
-Whether to install the quota-rpc package on NFS servers
+Whether to install the quota-rpc package (rpc.rquotad) on NFS servers
 
-* Automatically set based on OS version via Hiera (true for EL8+)
-* In EL7, rpc.rquotad files were in the quota package
-* In EL8+, quota-rpc is a separate package
-
-Default value: `false`
-
-##### <a name="-nfs--manage_sysconfig_nfs"></a>`manage_sysconfig_nfs`
-
-Data type: `Boolean`
-
-Whether to manage /etc/sysconfig/nfs configuration
-
-* Automatically set based on OS version via Hiera (true for EL7, false for EL8+)
-* In EL7, /etc/sysconfig/nfs is still needed for some daemon options
-* In EL8+, all configuration is in /etc/nfs.conf
-
-Default value: `false`
-
-##### <a name="-nfs--apply_selinux_hotfix"></a>`apply_selinux_hotfix`
-
-Data type: `Boolean`
-
-Whether to apply SELinux hotfix for Kerberos support
-
-* Automatically set based on OS version via Hiera (true for EL7, false for EL8+)
-* Only needed in EL7 with Kerberos due to selinux-policy bugs
-
-Default value: `false`
-
-##### <a name="-nfs--minimum_os_version"></a>`minimum_os_version`
-
-Data type: `String`
-
-Minimum supported OS version (used for warnings)
-
-* Automatically set via Hiera
-
-Default value: `'7.4'`
+Default value: `true`
 
 ##### <a name="-nfs--trusted_nets"></a>`trusted_nets`
 
@@ -1230,26 +1133,6 @@ A custom set of options
 Default value: `undef`
 
 ## Data types
-
-### <a name="Nfs--LegacyDaemonArgs"></a>`Nfs::LegacyDaemonArgs`
-
-Legacy NFS daemon *ARGS environment variables set in /etc/sysconfig/nfs and
-automatically converted to the environment variables needed by the daemons
-in their service scripts by /usr/lib/systemd/scripts/nfs-utils_env.sh
-
-Alias of
-
-```puppet
-Struct[{
-  Optional['GSSDARGS']      => String,
-  Optional['RPCIDMAPDARGS'] => String,
-  Optional['RPCMOUNTDARGS'] => String,
-  Optional['RPCNFSDARGS']   => String,
-  Optional['SMNOTIFYARGS']  => String,
-  # This is converted to STATDARGS
-  Optional['STATDARG']      => String
-}]
-```
 
 ### <a name="Nfs--MountEnsure"></a>`Nfs::MountEnsure`
 

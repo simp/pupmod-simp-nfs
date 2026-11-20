@@ -15,7 +15,6 @@ describe 'nfs krb5' do
     'simp_options::firewall'                   => true,
     'simp_options::kerberos'                   => true,
     'simp_options::stunnel'                    => false,
-    'simp_options::tcpwrappers'                => true,
     # simp/ssh >= 9.0.0 no longer reads simp_options::firewall, so it must be
     # told to open its port; otherwise beaker is locked out after the reboots
     # these tests perform (simp/iptables >= 9.0.0 enforces firewalld by default).
@@ -124,7 +123,7 @@ describe 'nfs krb5' do
         end
       end
 
-      context 'Secure NFSv4 with firewall and tcpwrappers' do
+      context 'Secure NFSv4 with firewall' do
         server_krb5_manifest_extras = <<~EOM
           # Keep KRB5 (kadmin & krb5kdc) ports open in firewall so clients can
           # talk to KDC

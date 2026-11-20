@@ -28,22 +28,7 @@ describe 'nfs' do
           it { is_expected.not_to create_concat__fragment('nfs_conf_sm_notify') }
           it { is_expected.not_to create_concat__fragment('nfs_conf_statd') }
 
-          if os_facts[:os][:release][:major].to_i < 8
-            it {
-              is_expected.to create_concat('/etc/sysconfig/nfs').with(
-                owner: 'root',
-                group: 'root',
-                mode: '0644',
-              )
-            }
-
-            it { is_expected.not_to create_concat__fragment('nfs_gss_use_proxy') }
-            it { is_expected.not_to create_concat__fragment('nfs_GSSDARGS') }
-            it { is_expected.not_to create_concat__fragment('nfs_SMNOTIFYARGS') }
-            it { is_expected.not_to create_concat__fragment('nfs_STATDARG') }
-          else
-            it { is_expected.to create_file('/etc/sysconfig/nfs').with_ensure('absent') }
-          end
+          it { is_expected.to create_file('/etc/sysconfig/nfs').with_ensure('absent') }
 
           it { is_expected.not_to create_systemd__dropin_file('simp_unit.conf') }
           it {
@@ -113,11 +98,6 @@ describe 'nfs' do
               )
             }
 
-            if os_facts[:os][:release][:major].to_i < 8
-              it { is_expected.not_to create_concat__fragment('nfs_gss_use_proxy') }
-              it { is_expected.not_to create_concat__fragment('nfs_GSSDARGS') }
-            end
-
             it { is_expected.not_to create_systemd__dropin_file('simp_unit.conf') }
           end
 
@@ -143,17 +123,6 @@ describe 'nfs' do
                 EOM
               )
             }
-
-            if os_facts[:os][:release][:major].to_i < 8
-              it {
-                is_expected.to create_concat__fragment('nfs_gss_use_proxy').with(
-                  target: '/etc/sysconfig/nfs',
-                  content: 'GSS_USE_PROXY=yes',
-                )
-              }
-
-              it { is_expected.not_to create_concat__fragment('nfs_GSSDARGS') }
-            end
 
             it {
               is_expected.to create_systemd__dropin_file('simp_unit.conf').with(
@@ -197,26 +166,6 @@ describe 'nfs' do
                 EOM
               )
             }
-          end
-
-          if os_facts[:os][:release][:major].to_i < 8
-            context "when nfs::custom_daemon_args has 'GSSDARGS' key" do
-              let(:params) do
-                {
-                  secure_nfs: true,
-                  custom_daemon_args: { 'GSSDARGS' => '-v' },
-                }
-              end
-
-              it { is_expected.to compile.with_all_deps }
-              it { is_expected.to create_class('nfs::base::config') }
-              it {
-                is_expected.to create_concat__fragment('nfs_GSSDARGS').with(
-                  target: '/etc/sysconfig/nfs',
-                  content: 'GSSDARGS="-v"',
-                )
-              }
-            end
           end
         end
 
@@ -361,44 +310,6 @@ describe 'nfs' do
                 EOM
               )
             }
-          end
-
-          if os_facts[:os][:release][:major].to_i < 8
-            context "when nfs::custom_daemon_args has 'SMNOTIFYARGS' key" do
-              let(:params) do
-                {
-                  nfsv3: true,
-                  custom_daemon_args: { 'SMNOTIFYARGS' => '-f' },
-                }
-              end
-
-              it { is_expected.to compile.with_all_deps }
-              it { is_expected.to create_class('nfs::base::config') }
-              it {
-                is_expected.to create_concat__fragment('nfs_SMNOTIFYARGS').with(
-                  target: '/etc/sysconfig/nfs',
-                  content: 'SMNOTIFYARGS="-f"',
-                )
-              }
-            end
-
-            context "when nfs::custom_daemon_args has 'STATDARG' key" do
-              let(:params) do
-                {
-                  nfsv3: true,
-                  custom_daemon_args: { 'STATDARG' => '--no-syslog' },
-                }
-              end
-
-              it { is_expected.to compile.with_all_deps }
-              it { is_expected.to create_class('nfs::base::config') }
-              it {
-                is_expected.to create_concat__fragment('nfs_STATDARG').with(
-                  target: '/etc/sysconfig/nfs',
-                  content: 'STATDARG="--no-syslog"',
-                )
-              }
-            end
           end
         end
 

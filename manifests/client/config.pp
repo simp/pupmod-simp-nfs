@@ -50,10 +50,6 @@ class nfs::client::config {
     }
   }
 
-  if $nfs::tcpwrappers {
-    include 'nfs::client::tcpwrappers'
-  }
-
   if $nfs::idmapd {
     include 'nfs::idmapd::client'
   }

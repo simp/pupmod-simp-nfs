@@ -44,7 +44,6 @@ describe 'nfs' do
             )
           }
 
-          it { is_expected.not_to create_class('nfs::client::tcpwrappers') }
           it { is_expected.not_to create_class('nfs::idmapd::client') }
         end
 
@@ -54,14 +53,6 @@ describe 'nfs' do
           it { is_expected.to compile.with_all_deps }
           it { is_expected.to create_class('nfs::client::config') }
           it { is_expected.not_to create_file('/etc/exports') }
-        end
-
-        context 'when nfs::tcpwrappers=true' do
-          let(:params) { { tcpwrappers: true } }
-
-          it { is_expected.to compile.with_all_deps }
-          it { is_expected.to create_class('nfs::client::config') }
-          it { is_expected.to create_class('nfs::client::tcpwrappers') }
         end
 
         context 'when nfs::idmapd=true' do

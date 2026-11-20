@@ -24,7 +24,6 @@ describe 'nfs::client::stunnel' do
           stunnel_verify: 2,
           stunnel_wantedby: ['remote-fs-pre.target'],
           firewall: true,
-          tcpwrappers: true,
         }
       end
 
@@ -43,7 +42,6 @@ describe 'nfs::client::stunnel' do
             socket_options: params[:stunnel_socket_options],
             systemd_wantedby: params[:stunnel_wantedby],
             firewall: params[:firewall],
-            tcpwrappers: params[:tcpwrappers],
             tag: ['nfs'],
           )
         }

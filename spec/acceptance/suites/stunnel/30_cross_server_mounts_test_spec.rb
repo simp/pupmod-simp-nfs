@@ -32,7 +32,6 @@ describe 'cross-mounted NFS servers plus clients' do
     'simp_options::pki'                     => true,
     'simp_options::pki::source'             => '/etc/pki/simp-testing/pki',
     'simp_options::stunnel'                 => true,
-    'simp_options::tcpwrappers'             => false,
     # simp/ssh >= 9.0.0 no longer reads simp_options::firewall, so it must be
     # told to open its port; otherwise beaker is locked out after the reboots
     # these tests perform (simp/iptables >= 9.0.0 enforces firewalld by default).

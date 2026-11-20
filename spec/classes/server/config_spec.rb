@@ -47,13 +47,6 @@ describe 'nfs' do
 
           it { is_expected.not_to create_concat__fragment('nfs_conf_nfsdcltrack') }
 
-          # the next 4 omissions are true for EL > 7, always, and for EL7 in
-          # this case, because there is no custom config
-          it { is_expected.not_to create_concat__fragment('nfs_RPCIDMAPDARGS') }
-          it { is_expected.not_to create_concat__fragment('nfs_RPCMOUNTDARGS') }
-          it { is_expected.not_to create_concat__fragment('nfs_RPCNFSDCOUNT') }
-          it { is_expected.not_to create_concat__fragment('nfs_RPCNFSDARGS') }
-
           it {
             is_expected.to create_file('/etc/sysconfig/rpc-rquotad').with(
               owner: 'root',
@@ -289,30 +282,6 @@ describe 'nfs' do
             }
           end
 
-          if os_facts[:os][:release][:major].to_i < 8
-            context "when nfs::custom_nfs_conf_opts has 'nfsd' key with 'threads' key on EL7" do
-              let(:params) do
-                {
-                  is_server: true,
-                  custom_nfs_conf_opts: {
-                    'nfsd' => {
-                      'threads' => 32,
-                    },
-                  },
-                }
-              end
-
-              it { is_expected.to compile.with_all_deps }
-              it { is_expected.to create_class('nfs::server::config') }
-              it 'alsoes set RPCNFSDCOUNT in /etc/sysconfig/nfs' do
-                is_expected.to create_concat__fragment('nfs_RPCNFSDCOUNT').with(
-                  target: '/etc/sysconfig/nfs',
-                  content: 'RPCNFSDCOUNT="32"',
-                )
-              end
-            end
-          end
-
           context "when nfs::custom_nfs_conf_opts has 'nfsdcltrack' key" do
             let(:params) do
               {
@@ -340,64 +309,6 @@ describe 'nfs' do
           end
         end
 
-        if os_facts[:os][:release][:major].to_i < 8
-          context 'when nfs::custom_daemon_args set' do
-            context "when nfs::custom_daemon_args has 'RCIDMAPDARGS' key" do
-              let(:params) do
-                {
-                  is_server: true,
-                  custom_daemon_args: { 'RPCIDMAPDARGS' => '-C' },
-                }
-              end
-
-              it { is_expected.to compile.with_all_deps }
-              it { is_expected.to create_class('nfs::server::config') }
-              it {
-                is_expected.to create_concat__fragment('nfs_RPCIDMAPDARGS').with(
-                  target: '/etc/sysconfig/nfs',
-                  content: 'RPCIDMAPDARGS="-C"',
-                )
-              }
-            end
-
-            context "when nfs::custom_daemon_args has 'RPCMOUNTDARGS' key" do
-              let(:params) do
-                {
-                  is_server: true,
-                  custom_daemon_args: { 'RPCMOUNTDARGS' => '-f /some/export/file' },
-                }
-              end
-
-              it { is_expected.to compile.with_all_deps }
-              it { is_expected.to create_class('nfs::server::config') }
-              it {
-                is_expected.to create_concat__fragment('nfs_RPCMOUNTDARGS').with(
-                  target: '/etc/sysconfig/nfs',
-                  content: 'RPCMOUNTDARGS="-f /some/export/file"',
-                )
-              }
-            end
-
-            context "when nfs::custom_daemon_args has 'RPCNFSDARGS' key" do
-              let(:params) do
-                {
-                  is_server: true,
-                  custom_daemon_args: { 'RPCNFSDARGS' => '--syslog' },
-                }
-              end
-
-              it { is_expected.to compile.with_all_deps }
-              it { is_expected.to create_class('nfs::server::config') }
-              it {
-                is_expected.to create_concat__fragment('nfs_RPCNFSDARGS').with(
-                  target: '/etc/sysconfig/nfs',
-                  content: 'RPCNFSDARGS="--syslog"',
-                )
-              }
-            end
-          end
-        end
-
         context 'when nfs::server::custom_rpcrquotad_opts set' do
           let(:hieradata) { 'nfs_server_custom_rpcrquotad_opts' }
 
@@ -411,19 +322,6 @@ describe 'nfs' do
               RPCRQUOTADOPTS="--setquota -p 875"
             EOM
           }
-        end
-
-        context 'when tcpwrappers enabled' do
-          let(:params) do
-            {
-              is_server: true,
-              tcpwrappers: true,
-            }
-          end
-
-          it { is_expected.to compile.with_all_deps }
-          it { is_expected.to create_class('nfs::server::config') }
-          it { is_expected.to create_class('nfs::server::tcpwrappers') }
         end
       end
     end
