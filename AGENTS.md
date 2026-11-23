@@ -183,7 +183,7 @@ asserted at runtime only on the code path that uses them:
 
 - `simp/autofs` `>= 6.2.1 < 9.0.0` — `nfs::client::mount` with `autofs => true`.
 - `simp/krb5` `>= 7.1.0 < 9.0.0` — Kerberos support.
-- `simp/iptables` `>= 6.5.3 < 10.0.0` — firewall openings.
+- `simp/iptables` `>= 6.5.3 < 11.0.0` — firewall openings.
 - `simp/stunnel` `>= 6.6.0 < 11.0.0` — stunnel-wrapped NFSv4.
 
 Fixture-only dependencies (from `.fixtures.yml`, present for test compilation,
