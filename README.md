@@ -8,6 +8,7 @@
 
 * [Description](#description)
   * [This is a SIMP module](#this-is-a-simp-module)
+* [Breaking changes in 9.0.0](#breaking-changes-in-900)
 * [Setup](#setup)
     * [What nfs affects](#what-nfs-affects)
     * [Setup requirements](#setup-requirements)
@@ -48,6 +49,26 @@ it can be used independently:
    default and must be explicitly opted into by administrators.  See the
    [SIMP `simp_options` module](https://github.com/simp/pupmod-simp-simp_options)
    for more detail.
+
+## Breaking changes in 9.0.0
+
+* TCP wrappers support has been removed. TCP wrappers does not exist on EL8
+  and later, and the `simp/tcpwrappers` module is archived. The
+  `nfs::tcpwrappers` and `nfs::manage_tcpwrappers` parameters are gone;
+  remove any Hiera settings for them. `simp_options::tcpwrappers` is no
+  longer read.
+* The `nfs::minimum_os_version` parameter has been removed. It only warned
+  on EL7 releases older than 7.4; remove any Hiera setting for it.
+* The remaining EL7-only support has been removed, along with the
+  `nfs::apply_selinux_hotfix`, `nfs::manage_sysconfig_nfs` and
+  `nfs::custom_daemon_args` parameters, the `nfs::selinux_hotfix` class and
+  the `Nfs::LegacyDaemonArgs` type. Remove any Hiera settings for these
+  parameters, and set daemon options in `/etc/nfs.conf` with
+  `nfs::custom_nfs_conf_opts` instead.
+
+`/etc/sysconfig/nfs` is now always removed. If you set
+`nfs::manage_sysconfig_nfs: true` on EL8 to keep settings there, move
+them to `nfs::custom_nfs_conf_opts` before upgrading.
 
 ## Setup
 
@@ -505,22 +526,6 @@ their hieradata:
 ``` yaml
 simp_options::firewall: true
 ```
-
-### Breaking changes in 9.0.0
-
-* TCP wrappers support has been removed. TCP wrappers does not exist on EL8
-  and later, and the `simp/tcpwrappers` module is archived. The
-  `nfs::tcpwrappers` and `nfs::manage_tcpwrappers` parameters are gone;
-  remove any Hiera settings for them. `simp_options::tcpwrappers` is no
-  longer read.
-* The `nfs::minimum_os_version` parameter has been removed. It only warned
-  on EL7 releases older than 7.4; remove any Hiera setting for it.
-* The remaining EL7-only support has been removed, along with the
-  `nfs::apply_selinux_hotfix`, `nfs::manage_sysconfig_nfs` and
-  `nfs::custom_daemon_args` parameters, the `nfs::selinux_hotfix` class and
-  the `Nfs::LegacyDaemonArgs` type. Remove any Hiera settings for these
-  parameters, and set daemon options in `/etc/nfs.conf` with
-  `nfs::custom_nfs_conf_opts` instead.
 
 ## Reference
 

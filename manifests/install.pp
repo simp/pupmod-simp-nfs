@@ -7,9 +7,7 @@
 #    The ensure status of the nfs4-acl-tools package
 #
 # @param quota_rpc_ensure
-#    The ensure status of the quota-rpc package.  Only applies to the NFS server
-#    on EL >7. Prior to EL8, rpc.rquotad files were included in the quota
-#    package.
+#    The ensure status of the quota-rpc package.  Only applies to the NFS server.
 #
 # @api private
 # @author https://github.com/simp/pupmod-simp-nfs/graphs/contributors
